@@ -9,7 +9,69 @@ const configured=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('YO
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const S={session:null,profile:null,view:'feed',friends:[],requests:[],convos:[],chat:null,channel:null,game:'',ttt:Array(9).fill(''),turn:'X',quiz:0,score:0,connect:Array.from({length:6},()=>Array(7).fill(0)),cturn:1,guess:0,tries:0,word:'',wordtries:5};
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function initials(s='S'){return esc(s.trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'S')}function toast(s){$('#toast').textContent=s;$('#toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('#toast').classList.remove('show'),2800)}function ago(d){let n=Math.max(0,(Date.now()-new Date(d))/1000|0);return n<60?'just now':n<3600?(n/60|0)+'m ago':n<86400?(n/3600|0)+'h ago':(n/86400|0)+'d ago'}function modal(t,h){$('#modaltitle').textContent=t;$('#modalcontent').innerHTML=h;$('#modalbg').classList.add('open')}function closeModal(){$('#modalbg').classList.remove('open')}$('#closemodal').onclick=closeModal;$('#modalbg').onclick=e=>{if(e.target===$('#modalbg'))closeModal()};
 function authHTML(tab='signup',message=''){return `<div class="auth"><section class="hero"><div class="brand"><span class="brandicon">🎮</span>StudentLink</div><h1>School friends.<br><span style="color:#9bbaff">New challenges.</span><br>Your community.</h1><p>Meet students, make friends, chat privately, share opinions and play games together.</p><p>✓ Public nickname · ✓ School communities · ✓ Games and conversations</p></section><section class="authbox"><div class="authcard"><h2>Welcome to StudentLink</h2><p class="muted">A student community built around connection and play.</p>${message?`<div class="note">${esc(message)}</div>`:''}<div class="tabs"><button data-tab="login" class="${tab==='login'?'active':''}">Log in</button><button data-tab="signup" class="${tab==='signup'?'active':''}">Create account</button></div><form id="authform"><div id="signupfields" class="${tab==='login'?'hidden':''}"><div class="field"><label>Public nickname</label><input id="nick" minlength="3" maxlength="24" required placeholder="CampusStar"></div><div class="field"><label>School (optional)</label><input id="school" maxlength="90" placeholder="School name"></div></div><div class="field"><label>Email</label><input id="email" type="email" required autocomplete="email"></div><div class="field"><label>Password (8+ characters)</label><input id="password" type="password" minlength="8" required autocomplete="${tab==='login'?'current-password':'new-password'}"></div><button class="btn primary full" id="authsubmit">${tab==='login'?'Log in':'Create my account'} →</button></form><div class="note">Use a nickname publicly. Never share your home address, phone number, password, timetable, or student ID. A nickname is not complete anonymity.</div><p class="tiny">This early build needs moderation and child-safety review before a broad public launch.</p></div></section></div>`}
-function renderAuth(tab='signup',msg=''){ $('#app').innerHTML=authHTML(tab,msg);$$('[data-tab]').forEach(b=>b.onclick=()=>renderAuth(b.dataset.tab));$('#authform').onsubmit=async e=>{e.preventDefault();if(!db)return toast('Configure Supabase using README.md first.');let email=$('#email').value.trim(),password=$('#password').value,nick=$('#nick')?.value.trim(),school=$('#school')?.value.trim();$('#authsubmit').disabled=true;try{if(tab==='signup'){if(nick.length<3)throw Error('Nickname needs at least 3 characters.');let {data,error}=await db.auth.signUp({email,password,options:{data:{nickname:nick,school:school||''}}});if(error)throw error;if(data.session)await boot();else renderAuth('login','Check your email for a confirmation link, then log in.')}else{let {error}=await db.auth.signInWithPassword({email,password});if(error)throw error;await boot()}}catch(err){renderAuth(tab,err.message||'Could not complete that action.')}finally{if($('#authsubmit'))$('#authsubmit').disabled=false}}}
+function renderAuth(tab='signup', msg='') {
+  $('#app').innerHTML = authHTML(tab, msg);
+  $$('[data-tab]').forEach(b => b.onclick = () => renderAuth(b.dataset.tab));
+
+  const authForm = document.getElementById('authform');
+  if (authForm) authForm.noValidate = true;
+
+  if (authForm) {
+    authForm.onsubmit = async e => {
+      e.preventDefault();
+
+      const email = document.getElementById('email')?.value.trim() || '';
+      const password = document.getElementById('password')?.value || '';
+      const nickname = document.getElementById('nick')?.value.trim() || '';
+
+      if (tab === 'signup') {
+        if (!nickname || nickname.length < 3) {
+          toast('Nickname needs at least 3 characters.');
+          return;
+        }
+        if (!email) {
+          toast('Please enter an email address.');
+          return;
+        }
+      }
+
+      if (tab === 'login') {
+        if (!email) {
+          toast('Please enter your email.');
+          return;
+        }
+      }
+
+      try {
+        if (tab === 'signup') {
+          const { data, error } = await db.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                nickname,
+                school: document.getElementById('school')?.value.trim() || ''
+              }
+            }
+          });
+          if (error) throw error;
+          renderAuth('login', 'Check your email for a confirmation link.');
+          return;
+        }
+
+        if (tab === 'login') {
+          const { data, error } = await db.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          await boot();
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+        renderAuth(tab, err.message || 'Could not complete that action.');
+      }
+    };
+  }
+}  
 function nav(v,ico,label){return `<button class="navitem ${S.view===v?'active':''}" data-view="${v}"><span>${ico}</span><span>${label}</span></button>`}function shell(){return `<header class="header"><a class="brand" data-view="feed"><span class="brandicon">🎮</span>StudentLink</a><div class="search"><input id="search" placeholder="Find students by nickname…"></div><div class="actions"><button class="btn secondary" data-view="games">🎮 Games</button><button class="btn secondary" data-view="profile">👤</button><button class="btn secondary" id="logout">Log out</button></div></header><div class="layout"><aside class="side leftside"><div class="row"><span class="avatar">${initials(S.profile.nickname)}</span><div><b>${esc(S.profile.nickname)}</b><div class="tiny">${esc(S.profile.school||'Student')}</div></div></div><div class="label">Your space</div>${nav('feed','🏠','News feed')}${nav('friends','👥','Friends')}${nav('messages','💬','Private messages')}${nav('schools','🏫','Schools')}${nav('polls','📊','Polls & opinions')}${nav('games','🎮','Games')}${nav('profile','⚙️','My profile')}<div class="note">Be kind. Protect your privacy. Report abusive behaviour.</div></aside><main class="main" id="main"><div class="card">Loading…</div></main><aside class="side rightside"><h3 class="righttitle">Friend requests</h3><div id="requests">Loading…</div><hr style="border:0;border-top:1px solid #25416b;margin:14px 0"><h3 class="righttitle">Your friends</h3><div id="friendshort">Loading…</div><div class="note">Only accept requests from people you recognise. Never send money to people you meet online.</div></aside></div><nav class="mobile">${nav('feed','🏠','Home')}${nav('friends','👥','Friends')}${nav('messages','💬','Chat')}${nav('games','🎮','Games')}${nav('profile','👤','Profile')}</nav>`}
 async function boot(){if(!db){renderAuth('signup','Setup needed: create a Supabase project, run supabase_schema.sql, and replace the two configuration placeholders in index.html.');return}let {data:{session}}=await db.auth.getSession();S.session=session;if(!session){renderAuth();return}await loadProfile();$('#app').innerHTML=shell();$('#logout').onclick=async()=>{if(S.channel)await db.removeChannel(S.channel);await db.auth.signOut();S.session=null;renderAuth('login','You have logged out.')};$('#search').onkeydown=e=>{if(e.key==='Enter')searchPeople(e.target.value)};await Promise.all([loadFriends(),loadRequests()]);await renderView();setupRealtime();db.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT')renderAuth('login')})}
 async function loadProfile(){let {data,error}=await db.from('profiles').select('*').eq('id',S.session.user.id).maybeSingle();if(error)console.warn(error);S.profile=data||{id:S.session.user.id,nickname:S.session.user.user_metadata?.nickname||'Student',school:S.session.user.user_metadata?.school||''};if(!data){let {error:e}=await db.from('profiles').upsert({id:S.profile.id,nickname:S.profile.nickname,school:S.profile.school});if(e)console.warn(e.message)}}async function loadFriends(){let {data,error}=await db.from('friendships').select('id,user_id,friend_id,status').or(`user_id.eq.${S.session.user.id},friend_id.eq.${S.session.user.id}`).eq('status','accepted');if(error){S.friends=[];return}let ids=(data||[]).map(x=>x.user_id===S.session.user.id?x.friend_id:x.user_id);let {data:p}=ids.length?await db.from('profiles').select('id,nickname,school').in('id',ids):{data:[]};S.friends=p||[]}async function loadRequests(){let {data}=await db.from('friendships').select('id,user_id,friend_id').eq('friend_id',S.session.user.id).eq('status','pending');let ids=(data||[]).map(x=>x.user_id);let {data:p}=ids.length?await db.from('profiles').select('id,nickname,school').in('id',ids):{data:[]};S.requests=(data||[]).map(x=>({...x,profile:(p||[]).find(y=>y.id===x.user_id)}));sidebars()}function sidebars(){let r=$('#requests'),f=$('#friendshort');if(!r||!f)return;r.innerHTML=S.requests.length?S.requests.map(x=>`<div class="friendline"><span class="avatar">${initials(x.profile?.nickname)}</span><div class="details"><strong>${esc(x.profile?.nickname||'Student')}</strong></div><button class="btn mint" data-accept="${x.id}">✓</button></div>`).join(''):'<p class="tiny">No pending requests.</p>';f.innerHTML=S.friends.slice(0,6).map(x=>`<div class="friendline"><span class="avatar">${initials(x.nickname)}</span><div class="details"><strong>${esc(x.nickname)}</strong><small>${esc(x.school||'Student')}</small></div></div>`).join('')||'<p class="tiny">Friends appear here.</p>'}
