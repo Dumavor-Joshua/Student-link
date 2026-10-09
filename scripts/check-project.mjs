@@ -26,4 +26,12 @@ assert.ok(js.includes('const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(
 assert.ok(js.includes('Trending schools are temporarily unavailable.'), 'Trending-schools errors must not replace the current page');
 assert.ok(js.includes('My school isn’t listed'), 'School selector must allow a clearly marked manual fallback');
 
+
+assert.ok(js.includes("from('student_feedback').select"), 'Feedback history must load from Supabase');
+assert.ok(js.includes("from('student_feedback').insert"), 'Feedback submissions must be stored in Supabase');
+assert.ok(js.includes("table:'friendships'"), 'Friendship changes must refresh through Realtime');
+assert.ok(js.includes("table:'post_likes'"), 'Like changes must refresh through Realtime');
+assert.ok(js.includes(".ilike('school',chosen)"), 'School pages must filter profiles in the database');
+assert.ok(!js.includes("studentlink-suggestion-reports"), 'Feedback must not rely on browser-only storage');
+
 console.log('StudentLink static checks passed.');
