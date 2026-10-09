@@ -71,4 +71,11 @@ assert.match(profileMarkup, /profile-danger-zone[\s\S]*id="delete-profile"/, 'Pr
 assert.ok(css.includes('@media(max-width:760px){') && css.includes('.leftside{order:3'), 'Mobile layout must use a touch-friendly bottom navigation');
 assert.ok(css.includes('@media(max-width:420px){') && css.includes('overflow-x:hidden'), 'Very narrow phone layouts must guard against horizontal overflow');
 
+
+assert.ok(js.includes("const buttons=$$('[data-view]')"), 'Navigation must bind every section button');
+assert.ok(js.includes('function wireNavigation(){'), 'Primary navigation must bind click handlers directly to navigation buttons');
+assert.ok(js.includes('wireNavigation();syncNavigationState();renderView();wireActions();'), 'Navigation handlers must be wired after the signed-in app shell is rendered');
+assert.ok(!js.includes("let v=e.target.closest('[data-view]')"), 'Primary navigation must not depend solely on document-level event delegation');
+assert.ok(css.includes('.leftside .navitem{position:relative;z-index:6;pointer-events:auto;touch-action:manipulation'), 'Navigation buttons must remain tappable above mobile layout layers');
+
 console.log('StudentLink static checks passed.');
