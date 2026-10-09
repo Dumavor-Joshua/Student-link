@@ -95,3 +95,7 @@ assert.ok(js.includes("redirectTo: window.location.origin + window.location.path
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
 assert.ok(!js.includes('Google sign-in is not connected yet') && !js.includes('Not connected</span>'), 'Google sign-in must not be shown as disconnected');
+
+assert.ok(js.includes("authForm.addEventListener('submit'"), 'Login and signup must use an explicitly registered form submit handler');
+assert.ok(js.includes("db.auth.signInWithPassword({ email, password })"), 'Login submission must call Supabase password sign-in');
+assert.ok(js.includes("authForm.dataset.submitting = 'true'") && js.includes("delete authForm.dataset.submitting"), 'Auth submission must prevent duplicate requests and always clear the loading guard');
