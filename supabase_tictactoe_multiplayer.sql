@@ -86,7 +86,7 @@ begin
 end; $$;
 
 create or replace function public.ttt_leave_game(p_game_id uuid)
-returns uuid language plpgsql security definer set search_path=public as $
+returns uuid language plpgsql security definer set search_path=public as $leave$
 declare g public.ttt_games%rowtype;
 begin
   if auth.uid() is null then raise exception 'Please sign in to leave a game.'; end if;
@@ -106,7 +106,7 @@ begin
     raise exception 'This game has already finished or cannot be left.';
   end if;
   return p_game_id;
-end; $;
+end; $leave$;
 
 revoke all on function public.ttt_create_game() from public;
 revoke all on function public.ttt_join_game(uuid) from public;
