@@ -72,4 +72,19 @@ assert.ok(css.includes('@media(max-width:760px){') && css.includes('.leftside{or
 assert.ok(css.includes('@media(max-width:420px){') && css.includes('overflow-x:hidden'), 'Very narrow phone layouts must guard against horizontal overflow');
 
 
+
+const navigationStateStart = js.indexOf('function syncNavigationState()');
+const navigationStateEnd = js.indexOf('function setView(', navigationStateStart);
+const navigationStateCode = js.slice(navigationStateStart, navigationStateEnd);
+assert.ok(navigationStateStart >= 0 && navigationStateEnd > navigationStateStart, 'Navigation state synchronization must remain present');
+assert.ok(navigationStateCode.includes("$('[data-view]').forEach"), 'Navigation state must iterate over every navigation button, not a single querySelector result');
+assert.ok(!navigationStateCode.includes("$('[data-view]').forEach"), 'Navigation state must not call forEach on a single DOM element');
+assert.ok(navigationStateCode.includes("S.view==='game'&&link.dataset.view==='games'"), 'Games button must remain selected while a multiplayer game is open');
+const renderViewStart = js.indexOf('async function renderView()');
+const renderViewEnd = js.indexOf('async function viewFeed()', renderViewStart);
+const renderViewCode = js.slice(renderViewStart, renderViewEnd);
+for (const route of ['feed','friends','messages','games','profile','suggestions']) {
+  assert.ok(renderViewCode.includes("S.view==='"+route+"'"), 'Navigation destination must render: '+route);
+}
+
 console.log('StudentLink static checks passed.');
