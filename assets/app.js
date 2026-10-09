@@ -484,7 +484,6 @@ function viewProfile(){
 function localProfilePhotoKey(){return 'studentlink-profile-photo:'+String(S.session?.user?.id||'guest')}
 function readLocalProfilePhoto(){try{return localStorage.getItem(localProfilePhotoKey())||''}catch(_){return ''}}
 function profileAvatarMarkup(name,photo,className='profile-avatar'){return photo?'<span class="'+className+' has-photo"><img src="'+esc(photo)+'" alt="" /></span>':'<span class="'+className+'">'+initials(name||'Student')+'</span>'}
-function readSuggestionReports(){try{const v=JSON.parse(localStorage.getItem('studentlink-suggestion-reports')||'[]');return Array.isArray(v)?v:[]}catch(_){return []}}
 async function viewSuggestions(){
   const userId=S.session?.user?.id;
   if(!userId){$('#main').innerHTML='<div class="card">Please sign in to submit feedback.</div>';return}
