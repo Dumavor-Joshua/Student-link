@@ -34,4 +34,15 @@ assert.ok(js.includes("table:'post_likes'"), 'Like changes must refresh through 
 assert.ok(js.includes(".ilike('school',chosen)"), 'School pages must filter profiles in the database');
 assert.ok(!js.includes("studentlink-suggestion-reports"), 'Feedback must not rely on browser-only storage');
 
+
+assert.ok(js.includes("get_studentlink_feed"), 'Feed must use the server-side randomized, school-aware query');
+assert.ok(js.includes("id=\"feed-filter\""), 'Feed must offer all-schools and own-school filters');
+assert.ok(js.includes("data-delete-post"), 'Posts must expose creator-only delete controls');
+assert.ok(js.includes(".eq('user_id',S.session.user.id).select('id')"), 'Post deletion must be constrained to the signed-in creator');
+assert.ok(js.includes("from('profile-photos').upload"), 'Profile photos must upload to Supabase Storage');
+assert.ok(js.includes("deleted_at:null"), 'Deleted profiles must have a restore path');
+assert.ok(css.includes('.profile-danger-zone'), 'Profile deletion controls must be styled');
+assert.ok(migration.includes("CREATE POLICY \"posts read while author active\""), 'Database must hide posts from deactivated profiles');
+assert.ok(migration.includes("CREATE POLICY \"Students upload their own profile photos\""), 'Storage uploads must be restricted to each user folder');
+
 console.log('StudentLink static checks passed.');
