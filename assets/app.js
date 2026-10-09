@@ -100,8 +100,10 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
   if (authForm) authForm.noValidate = true;
 
   if (authForm) {
-    authForm.onsubmit = async e => {
+    authForm.addEventListener('submit', async e => {
       e.preventDefault();
+
+      if (authForm.dataset.submitting === 'true') return;
 
       const email = document.getElementById('email')?.value.trim() || '';
       const password = document.getElementById('password')?.value || '';
@@ -144,6 +146,7 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
         return;
       }
 
+      authForm.dataset.submitting = 'true';
       const submitButton = authForm.querySelector('button[type="submit"]');
       if (submitButton) { submitButton.disabled = true; submitButton.textContent = tab === 'signup' ? 'Creating account…' : 'Logging in…'; }
       try {
@@ -191,8 +194,9 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
           submitButton.disabled = false;
           submitButton.textContent = tab === 'signup' ? 'Create account' : 'Log in';
         }
+        delete authForm.dataset.submitting;
       }
-    };
+    });
   }
 }
 function nav(v,ico,label){const selected=S.view===v||(S.view==='game'&&v==='games');return `<button type="button" class="navitem ${selected?'active':''}" data-view="${v}" aria-current="${selected?'page':'false'}" aria-pressed="${selected}"><span aria-hidden="true">${ico}</span><span>${label}</span></button>`}function shell(){return `<header class="header"><div style="display:flex;gap:16px;flex:1;align-items:center"><span style="font-weight:600;font-size:16px">StudentLink</span><div class="search-wrap"><input type="text" class="search" id="search" placeholder="Search students or schools…"><div id="search-results" class="search-results" hidden></div></div></div><button class="btn btn-secondary" id="logout">Log out</button></header><section class="trending-mobile-wrap"><h3>Trending schools</h3><div id="trending-mobile" class="trending-mobile"></div></section><div class="layout"><div class="leftside">${nav('feed','📰','Feed')}${nav('friends','👥','Friends')}${nav('messages','💬','Messages')}${nav('games','🎮','Games')}${nav('profile','👤','Profile')}${nav('suggestions','💡','Feedback')}</div><div class="main" id="main"></div><aside class="rightside"><h3 style="margin:0 0 16px 0">Trending schools</h3><div id="trending"></div></aside></div>`}
