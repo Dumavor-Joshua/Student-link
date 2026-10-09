@@ -26,8 +26,7 @@ function canonicalVerifiedSchoolName(name=''){return verifiedSchoolMatch(name)||
 function schoolPickerHTML(id,value=''){
   const initial=String(value||'').trim();
   return '<input id="'+esc(id)+'" name="'+esc(id)+'" list="verified-gh-school-options" autocomplete="organization" placeholder="Start typing your school name…" maxlength="120" value="'+esc(initial)+'" required>'+
-    '<datalist id="verified-gh-school-options">'+VERIFIED_GHANA_SHS_TVET.map(name=>'<option value="'+esc(name)+'"></option>').join('')+'</datalist>'+
-    '';
+    '<datalist id="verified-gh-school-options">'+VERIFIED_GHANA_SHS_TVET.map(name=>'<option value="'+esc(name)+'"></option>').join('')+'</datalist>';
 }
 function wireSchoolPicker(id){
   const input=document.getElementById(id);
