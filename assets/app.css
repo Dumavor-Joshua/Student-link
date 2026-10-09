@@ -114,3 +114,21 @@ textarea{min-height:96px;resize:vertical}
   .modal{max-height:calc(100dvh - 20px)}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+
+/* Authentication form refinement — UI only for unconfigured providers */
+.auth .hero{width:min(100%,460px)}
+.auth .field label{display:block;margin-bottom:7px;font-size:13px;font-weight:650;color:var(--txt)}
+.auth .field input,.auth .field select{width:100%;max-width:100%}
+.auth .password-control{display:flex;align-items:stretch;gap:8px}
+.auth .password-control input{flex:1;width:0}
+.auth .password-toggle{flex:0 0 auto;min-width:64px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--p2);color:var(--txt);font-weight:650}
+.auth-submit,.auth-google{width:100%;margin-top:14px;min-height:44px}
+.auth-text-link{display:block;margin:9px 0 0 auto;padding:4px 0;border:0;background:transparent;color:var(--mint);text-decoration:underline;text-underline-offset:3px;font-size:13px}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:17px 0 2px;color:var(--muted);font-size:11px}
+.auth-divider::before,.auth-divider::after{content:"";height:1px;flex:1;background:var(--line)}
+.auth-google{display:flex;align-items:center;justify-content:center;gap:8px}
+.coming-soon{font-size:10px;color:var(--muted);font-weight:500}
+.auth-help{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.auth-note{text-align:center}
+.auth-message{margin-top:14px;padding:10px 12px;border:1px solid rgba(60,224,177,.25);border-radius:9px;background:rgba(60,224,177,.06);color:var(--mint);font-size:13px;line-height:1.5;overflow-wrap:anywhere}
