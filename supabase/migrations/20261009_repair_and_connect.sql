@@ -350,3 +350,43 @@ exception when duplicate_object then null; when undefined_object then null; end 
 -- Prevent direct table reads from exposing the opponent's unrevealed RPS move.
 REVOKE SELECT ON public.rps_games FROM anon, authenticated;
 GRANT SELECT (id, player_one, player_two, score_one, score_two, round_no, last_result, status, winner_id, created_at, updated_at) ON public.rps_games TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.rps_get_game(p_game_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = pg_catalog, public, pg_temp
+AS $
+DECLARE g public.rps_games%rowtype;
+BEGIN
+  IF (SELECT auth.uid()) IS NULL THEN
+    RAISE EXCEPTION 'Please sign in to view this game.';
+  END IF;
+  SELECT * INTO g FROM public.rps_games
+  WHERE id=p_game_id AND (
+    player_one=(SELECT auth.uid()) OR player_two=(SELECT auth.uid())
+    OR (status='waiting' AND player_two IS NULL)
+  );
+  IF NOT FOUND THEN RAISE EXCEPTION 'Game not found or you are not a player in this game.'; END IF;
+  RETURN (to_jsonb(g)-'move_one'-'move_two') ||
+    jsonb_build_object(
+      'move_one',CASE WHEN g.player_one=(SELECT auth.uid()) THEN g.move_one ELSE NULL END,
+      'move_two',CASE WHEN g.player_two=(SELECT auth.uid()) THEN g.move_two ELSE NULL END
+    );
+END;
+$;
+REVOKE ALL ON FUNCTION public.rps_get_game(uuid) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.rps_get_game(uuid) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.bump_conversation_activity()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, public, pg_temp
+AS $
+BEGIN
+  UPDATE public.conversations SET updated_at=now() WHERE id=NEW.conversation_id;
+  RETURN NEW;
+END;
+$;
+REVOKE ALL ON FUNCTION public.bump_conversation_activity() FROM PUBLIC,anon,authenticated;
+DROP TRIGGER IF EXISTS bump_conversation_activity ON public.messages;
+CREATE TRIGGER bump_conversation_activity AFTER INSERT ON public.messages
+FOR EACH ROW EXECUTE FUNCTION public.bump_conversation_activity();
