@@ -45,3 +45,17 @@
 
 @media (min-width:681px) and (max-width:980px){.layout{height:calc(100vh - 175px)}}
 @media(max-width:680px){.layout{height:calc(100dvh - 148px)}}
+
+
+/* Online Tic-Tac-Toe multiplayer */
+.ttt-lobby-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ttt-playerline{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:center;margin-bottom:12px}
+.ttt-playerline>div{flex:1;min-width:0;overflow-wrap:anywhere}
+.ttt-playerline .title{font-size:22px;margin:4px 0}
+.ttt-vs{flex:0 0 auto!important;color:var(--muted);font-weight:700;font-size:12px}
+.ttt-board{display:grid;grid-template-columns:repeat(3,minmax(0,92px));gap:8px;justify-content:center;margin:16px auto;max-width:292px}
+.ttt-cell{height:clamp(64px,18vw,88px);font-size:clamp(26px,7vw,36px);font-weight:700;touch-action:manipulation}
+.ttt-cell:disabled{opacity:1;cursor:default}
+.ttt-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:16px}
+.ttt-actions .btn{max-width:100%}
+@media(max-width:520px){.ttt-lobby-row{align-items:flex-start;flex-direction:column}.ttt-lobby-row .btn{width:100%}.ttt-actions{flex-direction:column}.ttt-actions .btn{width:100%}.ttt-playerline .title{font-size:19px}}
