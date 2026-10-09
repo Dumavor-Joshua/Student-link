@@ -5,7 +5,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];con
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function initials(s='S'){return esc(s.trim().split(/\s+/).slice(0,2).map(x=>x[0].toUpperCase()).join(''))}
 function schoolKey(s=''){return String(s).normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase()}
 function canonicalSchoolName(s=''){const key=schoolKey(s);return S.schools.find(x=>schoolKey(x)===key)||String(s).trim().replace(/\s+/g,' ')}
-function authHTML(tab='signup',message=''){return `<div class="auth"><div class="auth-layout"><section class="auth-intro"><div class="brand"><span class="brandicon" aria-hidden="true">🔗</span><span>StudentLink</span></div><h1>Connect with classmates and your school community.</h1><p>One place to share updates, meet classmates, find school communities, and learn together.</p><div class="auth-intro-note"><span aria-hidden="true">✓</span> Made for students. Built for connection.</div></section><section class="auth-panel"><div class="hero"><div class="auth-card-heading"><h2>${tab==='signup'?'Create an account':'Welcome back'}</h2><p>${tab==='signup'?'It’s quick and easy.':'Log in to continue to StudentLink.'}</p></div><div class="tab-buttons" role="group" aria-label="Account access"><button type="button" data-tab="signup" class="${tab==='signup'?'active':''}" aria-pressed="${tab==='signup'}">Sign up</button><button type="button" data-tab="login" class="${tab==='login'?'active':''}" aria-pressed="${tab==='login'}">Log in</button></div><form id="authform" novalidate>${tab==='signup'? `<div class="field"><label for="nick">Nickname</label><input id="nick" name="nickname" autocomplete="nickname" placeholder="What should classmates call you?" minlength="3" required></div><div class="field"><label for="school">School</label><input id="school" name="school" autocomplete="organization" placeholder="Enter your school's official name" maxlength="120" required><p class="auth-help">Enter the school name as it is officially written. <a href="https://ges.gov.gh/schools.php" target="_blank" rel="noopener noreferrer">Check the GES directory</a>.</p></div>`:''}<div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div><div class="field"><label for="password">Password</label><div class="password-control"><input id="password" name="password" type="password" autocomplete="${tab==='signup'?'new-password':'current-password'}" minlength="6" required><button type="button" class="password-toggle" id="password-toggle" aria-controls="password" aria-pressed="false">Show</button></div>${tab==='signup'?'<p class="auth-help">Use at least 6 characters.</p>':''}</div>${tab==='login'?'<button type="button" class="auth-text-link" id="forgot-password">Forgot password?</button>':''}<button type="submit" class="btn auth-submit">${tab==='signup'?'Create account':'Log in'}</button><div class="auth-divider" aria-hidden="true"><span>or</span></div><button type="button" class="btn btn-secondary auth-google" id="google-signin">Continue with Google <span class="coming-soon">Not connected</span></button><p class="auth-help auth-note">Google sign-in and password recovery are not connected yet.</p></form>${message?`<p class="auth-message" role="status" aria-live="polite">${esc(message)}</p>`:''}</div><p class="auth-footer">StudentLink helps students connect with their school community.</p></section></div></div>`}function renderAuth(tab='signup', msg='') {
+function authHTML(tab='signup',message=''){return `<div class="auth"><div class="auth-layout"><section class="auth-intro"><div class="brand"><span class="brandicon" aria-hidden="true">🔗</span><span>StudentLink</span></div><h1>Connect with classmates and your school community.</h1><p>One place to share updates, meet classmates, find school communities, and learn together.</p><div class="auth-intro-note"><span aria-hidden="true">✓</span> Made for students. Built for connection.</div></section><section class="auth-panel"><div class="hero"><div class="auth-card-heading"><h2>${tab==='signup'?'Create an account':'Welcome back'}</h2><p>${tab==='signup'?'It’s quick and easy.':'Log in to continue to StudentLink.'}</p></div><div class="tab-buttons" role="group" aria-label="Account access"><button type="button" data-tab="signup" class="${tab==='signup'?'active':''}" aria-pressed="${tab==='signup'}">Sign up</button><button type="button" data-tab="login" class="${tab==='login'?'active':''}" aria-pressed="${tab==='login'}">Log in</button></div><form id="authform" novalidate>${tab==='signup'? `<div class="field"><label for="nick">Nickname</label><input id="nick" name="nickname" autocomplete="nickname" placeholder="What should classmates call you?" minlength="3" required></div><div class="field"><label for="school">School</label><input id="school" name="school" autocomplete="organization" placeholder="Enter your school's official name" maxlength="120" required><p class="auth-help">School names are not verified automatically. Check the <a href="https://ges.gov.gh/schools.php" target="_blank" rel="noopener noreferrer">GES directory</a> and enter the official name.</p></div>`:''}<div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div><div class="field"><label for="password">Password</label><div class="password-control"><input id="password" name="password" type="password" autocomplete="${tab==='signup'?'new-password':'current-password'}" minlength="6" required><button type="button" class="password-toggle" id="password-toggle" aria-controls="password" aria-pressed="false">Show</button></div>${tab==='signup'?'<p class="auth-help">Use at least 6 characters.</p>':''}</div>${tab==='login'?'<button type="button" class="auth-text-link" id="forgot-password">Forgot password?</button>':''}<button type="submit" class="btn auth-submit">${tab==='signup'?'Create account':'Log in'}</button><div class="auth-divider" aria-hidden="true"><span>or</span></div><button type="button" class="btn btn-secondary auth-google" id="google-signin">Continue with Google <span class="coming-soon">Not connected</span></button><p class="auth-help auth-note">Google sign-in and password recovery are not connected yet.</p></form><p id="auth-message" class="auth-message" role="status" aria-live="polite" ${message?'':'hidden'}>${esc(message)}</p></div><p class="auth-footer">StudentLink helps students connect with their school community.</p></section></div></div>`}function renderAuth(tab='signup', msg='') {
   $('#app').innerHTML = authHTML(tab, msg);
   $$('[data-tab]').forEach(b => b.addEventListener('click', () => renderAuth(b.dataset.tab)));
   const passwordInput = document.getElementById('password');
@@ -33,25 +33,44 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
       const nickname = document.getElementById('nick')?.value.trim() || '';
       const school = document.getElementById('school')?.value.trim() || '';
 
-      if (tab === 'signup') {
-        if (!nickname || nickname.length < 3) {
-          toast('Nickname needs at least 3 characters.');
-          return;
-        }
-        if (!school) { toast('Please enter your school name.'); return; }
-        if (!email) {
-          toast('Please enter an email address.');
-          return;
-        }
+      const showAuthError = (message, fieldId) => {
+        const status = document.getElementById('auth-message');
+        if (status) { status.textContent = message; status.hidden = false; }
+        const field = fieldId ? document.getElementById(fieldId) : null;
+        if (field) field.focus();
+      };
+      const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+      if (tab === 'signup' && (!nickname || nickname.length < 3)) {
+        showAuthError('Nickname needs at least 3 characters.', 'nick');
+        return;
+      }
+      if (tab === 'signup' && !school) {
+        showAuthError('Please enter your school name.', 'school');
+        return;
+      }
+      if (!email) {
+        showAuthError('Please enter your email address.', 'email');
+        return;
+      }
+      if (!validEmail) {
+        showAuthError('Enter a valid email address, such as you@example.com.', 'email');
+        return;
+      }
+      if (!password) {
+        showAuthError('Please enter your password.', 'password');
+        return;
+      }
+      if (tab === 'signup' && password.length < 6) {
+        showAuthError('Your password must be at least 6 characters.', 'password');
+        return;
+      }
+      if (!db) {
+        showAuthError('Sign-in is not configured right now. Please try again later.');
+        return;
       }
 
-      if (tab === 'login') {
-        if (!email) {
-          toast('Please enter your email.');
-          return;
-        }
-      }
-
+      const submitButton = authForm.querySelector('button[type="submit"]');
+      if (submitButton) { submitButton.disabled = true; submitButton.textContent = tab === 'signup' ? 'Creating account…' : 'Logging in…'; }
       try {
         if (tab === 'signup') {
           const { data, error } = await db.auth.signUp({
@@ -90,7 +109,13 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
         } else if (combined.includes('user_already_exists')) {
           friendlyMessage = 'An account may already exist for this email. Try logging in instead.';
         }
-        renderAuth(tab, friendlyMessage);
+        const status = document.getElementById('auth-message');
+        if (status) { status.textContent = friendlyMessage; status.hidden = false; }
+      } finally {
+        if (submitButton && submitButton.isConnected) {
+          submitButton.disabled = false;
+          submitButton.textContent = tab === 'signup' ? 'Create account' : 'Log in';
+        }
       }
     };
   }
@@ -205,7 +230,7 @@ function viewProfile(){
  <form id="pf">
  <div class="field"><label for="profile-photo">Profile photo</label><div class="photo-picker-row"><div id="profile-photo-current">${profileAvatarMarkup(nickname,profilePhoto,'avatar photo-avatar')}</div><div class="photo-picker-actions"><input id="profile-photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-describedby="profile-photo-help"><p id="profile-photo-help" class="tiny">Choose a clear photo (JPG, PNG, WebP or GIF). Maximum file size: 5 MB.</p><button type="button" id="remove-profile-photo" class="btn btn-secondary" ${profilePhoto?'':'hidden'}>Remove photo</button></div></div><p class="profile-note">Photo is saved in this browser only for now. Other students will not see it until shared profile-photo storage is connected.</p></div>
  <div class="field"><label for="pn">Nickname *</label><input id="pn" maxlength="40" value="${esc(nickname)}" placeholder="What should classmates call you?" required></div>
- <div class="field"><label for="ps">School *</label><input id="ps" maxlength="120" value="${esc(school)}" placeholder="Enter your school’s official name" required><p class="auth-help">Use the official school name where possible. <a href="https://ges.gov.gh/schools.php" target="_blank" rel="noopener noreferrer">Check the GES directory</a>.</p></div>
+ <div class="field"><label for="ps">School *</label><input id="ps" maxlength="120" value="${esc(school)}" placeholder="Enter your school’s official name" required><p class="auth-help">School names are not verified automatically. Check the <a href="https://ges.gov.gh/schools.php" target="_blank" rel="noopener noreferrer">GES directory</a> and enter the official name.</p></div>
  <div class="field"><label for="pyear">Class / year</label><select id="pyear"><option value="">Choose your level</option>${['SHS 1','SHS 2','SHS 3','University — Year 1','University — Year 2','University — Year 3','University — Year 4','Other'].map(v=>'<option value="'+v+'" '+(year===v?'selected':'')+'>'+v+'</option>').join('')}</select></div>
  <div class="field"><label for="pbio">About me</label><textarea id="pbio" rows="4" maxlength="240" placeholder="A little about what you study, enjoy, or hope to learn…">${esc(bio)}</textarea><div class="tiny">Up to 240 characters.</div></div>
  <div class="field"><label for="pinterests">Interests</label><input id="pinterests" maxlength="160" value="${esc(interests)}" placeholder="e.g. coding, science, football, design"></div>
