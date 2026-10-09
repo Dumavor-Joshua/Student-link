@@ -72,6 +72,7 @@ assert.ok(css.includes('@media(max-width:760px){') && css.includes('.leftside{or
 assert.ok(css.includes('@media(max-width:420px){') && css.includes('overflow-x:hidden'), 'Very narrow phone layouts must guard against horizontal overflow');
 
 
+assert.ok(js.includes("const buttons=$('[data-view]')"), 'Navigation must bind every section button');
 assert.ok(js.includes('function wireNavigation(){'), 'Primary navigation must bind click handlers directly to navigation buttons');
 assert.ok(js.includes('wireNavigation();syncNavigationState();renderView();wireActions();'), 'Navigation handlers must be wired after the signed-in app shell is rendered');
 assert.ok(!js.includes("let v=e.target.closest('[data-view]')"), 'Primary navigation must not depend solely on document-level event delegation');
