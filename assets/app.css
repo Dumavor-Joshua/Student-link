@@ -366,13 +366,3 @@ body:not(:has(.auth)) .leftside .navitem{background:transparent!important;color:
   .navitem{min-height:44px}
 }
 
-
-/* Ensure the primary navigation remains tappable on touch screens. */
-.leftside{position:relative;z-index:5;pointer-events:auto}
-.leftside .navitem{position:relative;z-index:6;pointer-events:auto;touch-action:manipulation;cursor:pointer}
-@media(max-width:760px){
-  .layout{position:relative}
-  .leftside{order:3;isolation:isolate;flex-shrink:0;min-height:58px}
-  .leftside .navitem{min-height:52px;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:rgba(49,95,206,.18)}
-  .main{position:relative;z-index:1}
-}
