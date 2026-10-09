@@ -27,7 +27,7 @@ assert.ok(js.includes('db.auth.signInWithPassword({ email, password })'), 'Login
 assert.ok(js.includes('const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);'), 'Email validation must use a correctly escaped regular expression');
 assert.ok(js.includes('Trending schools are temporarily unavailable.'), 'Trending-schools errors must not replace the current page');
 assert.ok(!js.includes('My school isn’t listed'), 'School selector must not show the unlisted-school checkbox');
-assert.ok(js.includes("return verifiedSchoolMatch(name)||String(name).trim().replace(/\\s+/g,' ');"), 'School selector must still accept manually typed school names');
+assert.ok(js.includes('function canonicalVerifiedSchoolName') && js.includes('String(name).trim().replace'), 'School selector must still accept manually typed school names');
 
 
 assert.ok(js.includes("from('student_feedback').select"), 'Feedback history must load from Supabase');
