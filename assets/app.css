@@ -2,3 +2,6 @@
 
 /* Small-screen layout refinements */
 @media(max-width:680px){.layout{height:calc(100dvh - 58px);min-height:0}.main{flex:1;min-height:0;overflow-y:auto}.leftside{flex-shrink:0}.header .title{font-size:18px}}
+
+/* Search dropdown */
+.search-wrap{position:relative;flex:1;max-width:420px}.search-wrap .search{width:100%;box-sizing:border-box}.search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:1000;background:var(--p2);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(0,0,0,.28);max-height:320px;overflow:auto}.search-result{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}.search-result:last-child{border-bottom:0}.search-result .tiny{margin-top:3px}@media(max-width:520px){.search-wrap{max-width:none}}
