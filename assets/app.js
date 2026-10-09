@@ -506,7 +506,7 @@ function toast(msg){
   el.textContent=String(msg);el.style.display='block';clearTimeout(el._hideTimer);el._hideTimer=setTimeout(()=>{el.style.display='none'},3500);
 }
 function wireNavigation(){
-  const buttons=$('[data-view]');
+  const buttons=$$('[data-view]');
   buttons.forEach(button=>{
     button.type='button';
     button.style.touchAction='manipulation';
