@@ -78,7 +78,7 @@ const navigationStateEnd = js.indexOf('function setView(', navigationStateStart)
 const navigationStateCode = js.slice(navigationStateStart, navigationStateEnd);
 assert.ok(navigationStateStart >= 0 && navigationStateEnd > navigationStateStart, 'Navigation state synchronization must remain present');
 assert.ok(navigationStateCode.includes("$('[data-view]').forEach"), 'Navigation state must iterate over every navigation button, not a single querySelector result');
-assert.ok(!/\$\('\[data-view\]'\)\.forEach/.test(navigationStateCode), 'Navigation state must not call forEach on a single DOM element');
+assert.ok(!/(?<!\$)\$\('\[data-view\]'\)\.forEach/.test(navigationStateCode), 'Navigation state must not call forEach on a single DOM element');
 assert.ok(navigationStateCode.includes("S.view==='game'&&link.dataset.view==='games'"), 'Games button must remain selected while a multiplayer game is open');
 const renderViewStart = js.indexOf('async function renderView()');
 const renderViewEnd = js.indexOf('async function viewFeed()', renderViewStart);
