@@ -307,7 +307,7 @@ body:not(:has(.auth)) .leftside .navitem{background:transparent!important;color:
   .header>div{min-width:0;gap:8px!important}
   .header>div>span:first-child{flex:0 0 auto;font-size:14px!important;white-space:nowrap}
   .header .search-wrap{flex:1 1 auto;width:0;min-width:0;max-width:none}
-  .header .search{width:100%;min-width:0;padding:8px;font-size:12px}
+  .header .search{display:block;width:100%;min-width:0;padding:8px;font-size:12px}
   .header #logout{flex:0 0 auto;min-height:40px;padding:8px 10px;font-size:12px;white-space:nowrap}
   .trending-mobile-wrap{max-width:100%;overflow:hidden}
   .layout{display:flex;flex-direction:column;height:calc(100dvh - 148px);min-height:0;overflow:hidden}
