@@ -198,7 +198,7 @@ async function openComments(postId){
 }
 async function toggleLike(id,liked){try{const q=liked?db.from('post_likes').delete().eq('post_id',id).eq('user_id',S.session.user.id):db.from('post_likes').insert({post_id:id,user_id:S.session.user.id});const {error}=await q;if(error){toast(error.message||'Could not update your like. Please try again.');return}await renderView()}catch(error){console.error(error);toast('Could not update your like. Check your connection and try again.')}}
 async function viewFriends(){
-  const {data:people,error:peopleError}=await db.from('profiles').select('id,nickname,school').neq('id',S.session.user.id).order('nickname').limit(100);
+  const {data:people,error:peopleError}=await db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).order('nickname').limit(100);
   if(peopleError)throw peopleError;
   const {data:rows,error}=await db.from('friendships').select('user_id,friend_id,status').or(`user_id.eq.${S.session.user.id},friend_id.eq.${S.session.user.id}`);
   if(error)throw error;
@@ -207,7 +207,7 @@ async function viewFriends(){
   const friendIds=new Set((rows||[]).filter(r=>r.status==='accepted').map(r=>r.user_id===S.session.user.id?r.friend_id:r.user_id));
   S.friends=(people||[]).filter(p=>friendIds.has(p.id));
   let html=`<div class='head'><h1 class='title'>Friends</h1><span class='tiny'>${S.friends.length} friends</span></div>`;
-  html+=(people||[]).map(p=>`<div class='card'><div style='display:flex;justify-content:space-between;align-items:center;gap:12px'><div><b>${esc(p.nickname)}</b><div class='tiny'>${esc(p.school||'No school')}</div></div><div style='display:flex;gap:8px;flex-wrap:wrap'>${friendIds.has(p.id)?`<button class='btn btn-secondary' data-messagefriend='${p.id}'>Message</button>`:received.has(p.id)?`<button class='btn' data-accept='${p.id}'>Accept</button><button class='btn btn-secondary' data-decline='${p.id}'>Decline</button>`:sent.has(p.id)?`<button class='btn btn-secondary' disabled>Requested</button>`:`<button class='btn' data-add='${p.id}'>Add friend</button>`}</div></div></div>`).join('');
+  html+=(people||[]).map(p=>`<div class='card'><div style='display:flex;justify-content:space-between;align-items:center;gap:12px'><div style='display:flex;align-items:center;gap:10px;min-width:0'>${profileAvatarMarkup(p.nickname,p.avatar_url,'avatar')}<div><b>${esc(p.nickname)}</b><div class='tiny'>${esc(p.school||'No school')}</div></div></div><div style='display:flex;gap:8px;flex-wrap:wrap'>${friendIds.has(p.id)?`<button class='btn btn-secondary' data-messagefriend='${p.id}'>Message</button>`:received.has(p.id)?`<button class='btn' data-accept='${p.id}'>Accept</button><button class='btn btn-secondary' data-decline='${p.id}'>Decline</button>`:sent.has(p.id)?`<button class='btn btn-secondary' disabled>Requested</button>`:`<button class='btn' data-add='${p.id}'>Add friend</button>`}</div></div></div>`).join('');
   $('#main').innerHTML=html;wireActions();
 }
 async function startConversation(friendId){if(!S.friends.some(f=>f.id===friendId))return toast('Add this student as a friend first.');const me=S.session.user.id;const [user_a,user_b]=[me,friendId].sort();let {data,error}=await db.from('conversations').select('id').eq('user_a',user_a).eq('user_b',user_b).maybeSingle();if(error)throw error;if(!data){let {data:newConvo,error:createErr}=await db.from('conversations').insert({user_a,user_b}).select();if(createErr)throw createErr;data=newConvo[0]}S.chat=data.id;await viewMessages()}
