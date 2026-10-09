@@ -369,7 +369,7 @@ async function viewOnlineGame(game){
     $$('[data-rps-online]').forEach(b=>b.onclick=()=>playOnlineMove('rps',b.dataset.rpsOnline));
   }
   $('#online-back').onclick=async()=>{if(isConnect)S.cfGameId=null;else S.rpsGameId=null;await stopOnlineGameChannel();setView('games')};
-  const computerMode=$('#rps-computer-mode');if(computerMode)computerMode.onclick=async()=>{S.rpsMode='computer';S.rpsGameId=null;await stopOnlineGameChannel();renderLocalGame()};
+  const computerMode=$('#rps-computer-mode');if(computerMode)computerMode.onclick=async()=>{S.rpsMode='computer';await leaveOnlineGame('rps');renderLocalGame()};
   const joinCurrent=$('#online-join-current');if(joinCurrent)joinCurrent.onclick=()=>joinOnlineGame(game,id);
   $('#online-lobby').onclick=async()=>{if(isConnect)S.cfGameId=null;else S.rpsGameId=null;await stopOnlineGameChannel();await viewOnlineGame(game)};
   $('#online-copy').onclick=()=>{const token=isConnect?'cf':'rps';const link=location.href.split('#')[0]+'#'+token+'='+id;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(()=>toast('Game invite link copied. Share it with a StudentLink user.')).catch(()=>toast('Copy failed. Game ID: '+id));else toast('Share this game ID with your opponent: '+id)};
