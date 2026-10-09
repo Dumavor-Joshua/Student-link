@@ -159,10 +159,11 @@ async function boot(){if(!db){renderAuth('signup','Setup needed: create a Supaba
   if(!db||!S.session)return;
   if(S.channel){await db.removeChannel(S.channel);S.channel=null}
   const refreshFeed=()=>{if(S.view==='feed')renderView()};
+  const refreshPosts=()=>{S.feedOrderIds=[];S.feedOrderMode='';if(S.view==='feed')renderView()};
   const refreshFriends=()=>{if(S.view==='friends')renderView()};
   const refreshMessages=()=>{if(S.view==='messages'){if(S.chat)openConversation(S.chat).catch(e=>console.warn('Could not refresh conversation:',e));else renderView()}};
   S.channel=db.channel('studentlink-live-updates')
-    .on('postgres_changes',{event:'*',schema:'public',table:'posts'},refreshFeed)
+    .on('postgres_changes',{event:'*',schema:'public',table:'posts'},refreshPosts)
     .on('postgres_changes',{event:'*',schema:'public',table:'post_likes'},refreshFeed)
     .on('postgres_changes',{event:'*',schema:'public',table:'friendships'},refreshFriends)
     .on('postgres_changes',{event:'*',schema:'public',table:'messages'},refreshMessages)
