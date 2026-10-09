@@ -14,6 +14,8 @@ create table if not exists public.ttt_games (
   constraint ttt_board_values_valid check (board <@ array['','X','O']::text[]),
   constraint ttt_players_differ check (player_o is null or player_o <> player_x)
 );
+alter table public.ttt_games drop constraint if exists ttt_games_status_check;
+alter table public.ttt_games add constraint ttt_games_status_check check (status in ('waiting','playing','won','draw','cancelled'));
 create index if not exists ttt_games_waiting_idx on public.ttt_games(status,created_at) where status='waiting';
 create index if not exists ttt_games_player_x_idx on public.ttt_games(player_x);
 create index if not exists ttt_games_player_o_idx on public.ttt_games(player_o);
@@ -83,12 +85,37 @@ begin
   return p_game_id;
 end; $$;
 
+create or replace function public.ttt_leave_game(p_game_id uuid)
+returns uuid language plpgsql security definer set search_path=public as $
+declare g public.ttt_games%rowtype;
+begin
+  if auth.uid() is null then raise exception 'Please sign in to leave a game.'; end if;
+  select * into g from public.ttt_games where id=p_game_id for update;
+  if not found then raise exception 'Game not found.'; end if;
+  if auth.uid() not in (g.player_x,g.player_o) then raise exception 'You are not a player in this game.'; end if;
+  if g.status='waiting' and auth.uid()=g.player_x then
+    update public.ttt_games set status='cancelled',updated_at=now() where id=p_game_id;
+  elsif g.status='playing' then
+    update public.ttt_games
+       set status='won',
+           winner_id=case when auth.uid()=g.player_x then g.player_o else g.player_x end,
+           current_turn=null,
+           updated_at=now()
+     where id=p_game_id;
+  else
+    raise exception 'This game has already finished or cannot be left.';
+  end if;
+  return p_game_id;
+end; $;
+
 revoke all on function public.ttt_create_game() from public;
 revoke all on function public.ttt_join_game(uuid) from public;
 revoke all on function public.ttt_make_move(uuid,integer) from public;
+revoke all on function public.ttt_leave_game(uuid) from public;
 grant execute on function public.ttt_create_game() to authenticated;
 grant execute on function public.ttt_join_game(uuid) to authenticated;
 grant execute on function public.ttt_make_move(uuid,integer) to authenticated;
+grant execute on function public.ttt_leave_game(uuid) to authenticated;
 
 do $$ begin alter publication supabase_realtime add table public.ttt_games;
 exception when duplicate_object then null; when undefined_object then null; end $$;
