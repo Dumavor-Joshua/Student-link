@@ -72,7 +72,20 @@ function renderAuth(tab='signup', msg='') {
         }
       } catch (err) {
         console.error(err);
-        renderAuth(tab, err.message || 'Could not complete that action.');
+        const rawMessage = String(err?.message || '');
+        const code = String(err?.code || '');
+        const combined = (rawMessage + ' ' + code).toLowerCase();
+        let friendlyMessage = rawMessage || 'Could not complete that action. Please try again.';
+        if (combined.includes('email rate limit') || combined.includes('over_email_send_rate_limit') || combined.includes('email rate limit exceeded')) {
+          friendlyMessage = 'StudentLink has temporarily reached its email sending limit. Please wait before trying again and avoid repeatedly submitting the form. If this keeps happening, the project owner needs to configure a custom SMTP email provider in Supabase Auth settings.';
+        } else if (combined.includes('over_request_rate_limit') || combined.includes('too many requests')) {
+          friendlyMessage = 'Too many attempts were made in a short time. Please wait a few minutes before trying again.';
+        } else if (combined.includes('email_address_not_authorized')) {
+          friendlyMessage = 'This Supabase project is still using its restricted test email service. The project owner must configure custom SMTP before public users can receive confirmation emails.';
+        } else if (combined.includes('user_already_exists')) {
+          friendlyMessage = 'An account may already exist for this email. Try logging in instead.';
+        }
+        renderAuth(tab, friendlyMessage);
       }
     };
   }
