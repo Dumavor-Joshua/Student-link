@@ -13,3 +13,31 @@
 #modalclose{position:absolute;top:10px;right:10px;z-index:5;min-width:44px;min-height:44px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--p2);color:var(--txt);font-size:22px;line-height:1;cursor:pointer;touch-action:manipulation}
 #modaltitle{padding-right:48px}
 @media(max-width:680px){.modalbg{padding:12px;box-sizing:border-box;align-items:center}.modal{width:100%;max-width:500px;max-height:calc(100dvh - 24px);padding:54px 16px 16px}.modal #modaltitle{margin-bottom:12px!important}}
+
+
+/* Responsive trending schools and school-filter results */
+.trending-mobile-wrap{display:none}
+.trending-school{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;width:100%;text-align:left;cursor:pointer;font:inherit}
+.trending-school:hover{border-color:var(--mint)}
+.trending-school .tiny{display:block}
+.search-section-label{padding:8px 12px 4px;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.search-school-option{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;text-align:left;background:transparent;color:var(--txt);border:0;border-bottom:1px solid var(--line);cursor:pointer;font:inherit}
+.search-school-option:hover{background:var(--p)}
+.school-student{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.school-student-info{display:flex;align-items:center;gap:12px;min-width:0;overflow-wrap:anywhere}
+@media(max-width:980px){
+  .trending-mobile-wrap{display:block;padding:12px 16px;background:var(--p);border-bottom:1px solid var(--line)}
+  .trending-mobile-wrap h3{margin:0 0 8px;font-size:14px}
+  .trending-mobile{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .trending-mobile .trending-school{flex:0 0 220px;min-height:66px;margin:0;padding:10px 12px;scroll-snap-align:start}
+  .rightside{display:none}
+  .layout{grid-template-columns:180px minmax(0,1fr)}
+}
+@media(max-width:680px){
+  .trending-mobile-wrap{padding:8px 10px}
+  .trending-mobile-wrap h3{font-size:13px;margin-bottom:6px}
+  .trending-mobile .trending-school{flex-basis:190px;min-height:58px;padding:8px 10px}
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .school-student{align-items:flex-start;flex-wrap:wrap}
+  .school-student .btn{margin-left:52px}
+}
