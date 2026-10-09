@@ -141,4 +141,4 @@ function toast(msg){
 }
 function wireActions(){$$('[data-messagefriend]').forEach(b=>b.onclick=()=>startConversation(b.dataset.messagefriend));$$('[data-add]').forEach(b=>b.onclick=()=>addFriend(b.dataset.add));$$('[data-accept]').forEach(b=>b.onclick=()=>acceptFriend(b.dataset.accept));$$('[data-decline]').forEach(b=>b.onclick=()=>declineFriend(b.dataset.decline))}
 document.addEventListener('click',e=>{let v=e.target.closest('[data-view]');if(v){e.preventDefault();setView(v.dataset.view)}});
-(async()=>{if(!configured){renderAuth('signup','Setup needed: create Supabase project, run supabase_schema.sql, and replace the two placeholders in index.html.');return}await boot()})();
+(async()=>{if(!configured){renderAuth('signup','Setup needed: create Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.');return}await boot()})();
