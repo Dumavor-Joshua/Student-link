@@ -221,8 +221,39 @@ function viewProfile(){
  <aside class="profile-side"><section class="card"><div class="section-heading"><div><h2>Profile preview</h2><p class="tiny">How your details come together.</p></div></div><div class="preview-person"><span id="preview-avatar-wrap">${profileAvatarMarkup(nickname,profilePhoto,'avatar')}</span><div><b id="preview-name">${esc(nickname||'Your nickname')}</b><div class="tiny" id="preview-school">${esc(school||'Your school')}</div></div></div><p id="preview-bio" class="preview-bio">${esc(bio||'Your bio will appear here.')}</p><div class="interest-list" id="preview-interests">${interests?interests.split(',').map(x=>x.trim()).filter(Boolean).map(x=>'<span class="interest-chip">'+esc(x)+'</span>').join(''):'<span class="tiny">Add interests to show them here.</span>'}</div></section>
  <section class="card profile-tip"><div class="tip-icon">✦</div><h3>A helpful profile</h3><p class="tiny">Use a nickname you’re comfortable sharing, add your school, and list a few interests. Avoid posting private contact details.</p></section></aside></div>`;
  loadSchools().then(()=>setupSchoolSelect('ps','ps-other',school)).catch(err=>{console.error(err);const select=$('#ps');if(select){select.innerHTML='<option value="__other__">School list unavailable — enter your school manually</option>';select.value='__other__';select.disabled=true;const other=$('#ps-other');other.style.display='block';other.required=true;other.value=school}});
- const live=()=>{const n=$('#pn').value.trim()||'Your nickname';const schoolSelect=$('#ps');const schoolOther=$('#ps-other');const schoolPreview=schoolSelect?.value==='__other__'?(schoolOther?.value.trim()||'Your school'):(schoolSelect?.selectedOptions[0]?.textContent||school||'Your school');$('#preview-name').textContent=n;$('#preview-avatar').textContent=initials(n==='Your nickname'?'Student':n);$('#preview-school').textContent=schoolPreview;$('#preview-bio').textContent=$('#pbio').value.trim()||'Your bio will appear here.';const vals=$('#pinterests').value.split(',').map(x=>x.trim()).filter(Boolean);$('#preview-interests').innerHTML=vals.map(x=>'<span class="interest-chip">'+esc(x)+'</span>').join('')||'<span class="tiny">Add interests to show them here.</span>';const count=[$('#pn').value.trim(),schoolPreview==='Your school'?'':schoolPreview,$('#pbio').value.trim(),$('#pyear').value,$('#pinterests').value.trim()].filter(Boolean).length;const percent=Math.round(count/5*100);$('#profile-completion-value').textContent=percent+'%';$('#profile-completion-track').setAttribute('aria-valuenow',String(percent));$('#profile-completion-track span').style.width=percent+'%'};
+ const live=()=>{const n=$('#pn').value.trim()||'Your nickname';const schoolSelect=$('#ps');const schoolOther=$('#ps-other');const schoolPreview=schoolSelect?.value==='__other__'?(schoolOther?.value.trim()||'Your school'):(schoolSelect?.selectedOptions[0]?.textContent||school||'Your school');$('#preview-name').textContent=n;const photoNow=readLocalProfilePhoto();const avatarName=n==='Your nickname'?'Student':n;if(!photoNow){const markup=profileAvatarMarkup(avatarName,'','avatar');$('#preview-avatar-wrap').innerHTML=markup;$('#profile-hero-avatar').innerHTML=profileAvatarMarkup(avatarName,'');$('#profile-photo-current').innerHTML=profileAvatarMarkup(avatarName,'','avatar photo-avatar')}$('#preview-avatar').textContent=initials(n==='Your nickname'?'Student':n);$('#preview-school').textContent=schoolPreview;$('#preview-bio').textContent=$('#pbio').value.trim()||'Your bio will appear here.';const vals=$('#pinterests').value.split(',').map(x=>x.trim()).filter(Boolean);$('#preview-interests').innerHTML=vals.map(x=>'<span class="interest-chip">'+esc(x)+'</span>').join('')||'<span class="tiny">Add interests to show them here.</span>';const count=[$('#pn').value.trim(),schoolPreview==='Your school'?'':schoolPreview,$('#pbio').value.trim(),$('#pyear').value,$('#pinterests').value.trim()].filter(Boolean).length;const percent=Math.round(count/5*100);$('#profile-completion-value').textContent=percent+'%';$('#profile-completion-track').setAttribute('aria-valuenow',String(percent));$('#profile-completion-track span').style.width=percent+'%'};
  ['pn','ps','ps-other','pyear','pbio','pinterests'].forEach(id=>{const el=$('#'+id);if(el)el.addEventListener('input',live);if(el)el.addEventListener('change',live)});
+
+ const photoInput=$('#profile-photo');
+ const setPhoto=photo=>{
+  try{
+   if(photo)localStorage.setItem(localProfilePhotoKey(),photo);else localStorage.removeItem(localProfilePhotoKey());
+   const name=$('#pn').value.trim()||nickname;
+   const hero=$('#profile-hero-avatar'),current=$('#profile-photo-current'),preview=$('#preview-avatar-wrap');
+   if(hero)hero.innerHTML=profileAvatarMarkup(name,photo);
+   if(current)current.innerHTML=profileAvatarMarkup(name,photo,'avatar photo-avatar');
+   if(preview)preview.innerHTML=profileAvatarMarkup(name,photo,'avatar');
+   const remove=$('#remove-profile-photo');if(remove)remove.hidden=!photo;
+  }catch(err){console.error(err);toast('Could not save this photo. Try a smaller image.')}
+ };
+ photoInput?.addEventListener('change',()=>{
+  const file=photoInput.files?.[0];if(!file)return;
+  if(!file.type.startsWith('image/')){toast('Choose an image file.');photoInput.value='';return}
+  if(file.size>5*1024*1024){toast('That image is over 5 MB. Choose a smaller file.');photoInput.value='';return}
+  const reader=new FileReader();
+  reader.onload=()=>{
+   const image=new Image();
+   image.onload=()=>{
+    const maxSide=320,scale=Math.min(1,maxSide/Math.max(image.naturalWidth,image.naturalHeight));
+    const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+    const context=canvas.getContext('2d');if(!context){toast('Image editing is unavailable in this browser.');return}
+    context.drawImage(image,0,0,canvas.width,canvas.height);setPhoto(canvas.toDataURL('image/jpeg',0.76));photoInput.value='';
+   };
+   image.onerror=()=>toast('Could not read that image. Try another one.');image.src=String(reader.result);
+  };
+  reader.onerror=()=>toast('Could not open that image. Try again.');reader.readAsDataURL(file);
+ });
+ $('#remove-profile-photo')?.addEventListener('click',()=>setPhoto(''));
  $('#pf').onsubmit=async e=>{e.preventDefault();const selected=$('#ps').value;const schoolName=selected==='__other__'?$('#ps-other').value.trim():canonicalSchoolName(selected);if(!schoolName){toast('Please choose your school.');return}const extra={bio:$('#pbio').value.trim(),year:$('#pyear').value,interests:$('#pinterests').value.trim()};const {error}=await db.from('profiles').update({nickname:$('#pn').value.trim(),school:schoolName}).eq('id',S.session.user.id);if(error){console.error(error);toast('Could not update account profile. Please try again.');return}try{localStorage.setItem(profileDraftKey(),JSON.stringify(extra))}catch(_){toast('Account details saved, but browser storage is unavailable for extra fields.');await loadProfile();renderView();return}await loadProfile();renderView();toast('Profile saved. Extra fields are stored on this browser for now.')};
 }
 function localProfilePhotoKey(){return 'studentlink-profile-photo:'+String(S.session?.user?.id||'guest')}
