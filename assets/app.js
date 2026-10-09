@@ -53,7 +53,6 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
 
   const authForm = document.getElementById('authform');
   if (authForm) authForm.noValidate = true;
-  // School names are entered directly until a reliable official directory can be connected.
 
   if (authForm) {
     authForm.onsubmit = async e => {
@@ -70,7 +69,7 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
         const field = fieldId ? document.getElementById(fieldId) : null;
         if (field) field.focus();
       };
-      const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       if (tab === 'signup' && (!nickname || nickname.length < 3)) {
         showAuthError('Nickname needs at least 3 characters.', 'nick');
         return;
