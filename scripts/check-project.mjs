@@ -48,4 +48,13 @@ assert.ok(profileMigration.includes("CREATE POLICY \"posts read while author act
 assert.ok(profileMigration.includes("CREATE POLICY \"Students upload their own profile photos\""), 'Storage uploads must be restricted to each user folder');
 assert.ok(profileGuardMigration.includes('comments readable on active posts'), 'Related activity on deactivated posts must be hidden');
 
+
+assert.ok(js.includes("uniqueSchoolNames"), 'School suggestions must be deduplicated and alphabetically sorted');
+assert.ok(js.includes("aria-current"), 'Sidebar active state must be synchronized with the current route');
+assert.ok(js.includes("S.view==='game'&&v==='games'"), 'Games navigation must remain active inside a game');
+assert.ok(!js.includes("My school isn’t listed"), 'The unlisted-school checkbox must be removed');
+assert.ok(js.includes("Start typing your school name"), 'School field must remain searchable and allow manual school names');
+assert.ok(css.includes('.leftside .navitem[aria-current="page"]'), 'Selected sidebar route must have a definitive active style');
+assert.ok(css.includes('.auth-panel .hero'), 'Authentication forms must use the refined card layout');
+
 console.log('StudentLink static checks passed.');
