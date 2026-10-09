@@ -58,4 +58,17 @@ assert.ok(js.includes("Start typing your school name"), 'School field must remai
 assert.ok(css.includes('.leftside .navitem[aria-current="page"]'), 'Selected sidebar route must have a definitive active style');
 assert.ok(css.includes('.auth-panel .hero'), 'Authentication forms must use the refined card layout');
 
+
+const shellStart = js.indexOf('function shell(){');
+const shellEnd = js.indexOf('async function boot()', shellStart);
+const shellMarkup = js.slice(shellStart, shellEnd);
+const profileStart = js.indexOf('function viewProfile()');
+const profileEnd = js.indexOf('function profileAvatarMarkup', profileStart);
+const profileMarkup = js.slice(profileStart, profileEnd);
+assert.ok(shellStart >= 0 && shellEnd > shellStart, 'App shell must remain present');
+assert.doesNotMatch(shellMarkup, /profile-danger-zone|id="delete-profile"/, 'Profile deactivation controls must not appear under the main menu');
+assert.match(profileMarkup, /profile-danger-zone[\s\S]*id="delete-profile"/, 'Profile deactivation controls must exist on the Profile page');
+assert.ok(css.includes('@media(max-width:760px){') && css.includes('.leftside{order:3'), 'Mobile layout must use a touch-friendly bottom navigation');
+assert.ok(css.includes('@media(max-width:420px){') && css.includes('overflow-x:hidden'), 'Very narrow phone layouts must guard against horizontal overflow');
+
 console.log('StudentLink static checks passed.');
