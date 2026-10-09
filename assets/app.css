@@ -262,3 +262,28 @@ input:focus,textarea:focus,select:focus{outline:3px solid rgba(49,95,206,.13);bo
 .auth-footer{margin:18px 0 0;color:#8a8d91;font-size:12px;text-align:center}
 @media(max-width:760px){.auth{padding:22px 12px;align-items:flex-start}.auth-layout{grid-template-columns:minmax(0,1fr);gap:12px;max-width:440px}.auth-intro{text-align:center;padding:8px 10px 0}.auth-intro .brand{justify-content:center;margin-bottom:10px;font-size:34px}.auth-intro .brandicon{width:38px;height:38px;font-size:21px}.auth-intro h1{max-width:none;font-size:23px}.auth-intro>p{font-size:14px}.auth-intro-note{justify-content:center;margin-top:12px}.auth .hero{padding:16px 10px}.auth-card-heading{text-align:center}.auth-footer{margin-top:8px}}
 @media(max-width:420px){.auth{padding:12px 8px}.auth-intro h1{font-size:21px}.auth .hero{padding:12px 6px}.auth .field input{min-height:46px}}
+
+
+/* StudentLink dark-navy surface refinement */
+/* Keep the requested navy page background while tinting formerly white surfaces. */
+:root{--bg:#101b35;--p:#172746;--p2:#eaf0f8;--line:#cbd6e6;--txt:#202938;--muted:#5b687c;--blue:#315fce;--mint:#16866c}
+body:not(:has(.auth)){background:var(--bg);color:#f5f7ff}
+body:not(:has(.auth)) .header{background:#172746;border-bottom-color:#354a6d}
+body:not(:has(.auth)) .header>div>span:first-child{color:#f5f7ff}
+body:not(:has(.auth)) .header .search{background:#eaf0f8;color:#202938}
+body:not(:has(.auth)) .layout,body:not(:has(.auth)) .main{background:var(--bg)}
+body:not(:has(.auth)) .leftside,body:not(:has(.auth)) .rightside,body:not(:has(.auth)) .trending-mobile-wrap{background:#172746;border-color:#354a6d}
+body:not(:has(.auth)) .card{background:#eaf0f8;color:#202938;border-color:#cbd6e6}
+body:not(:has(.auth)) .head .title{color:#f5f7ff}
+body:not(:has(.auth)) .head .tiny{color:#b7c5df}
+body:not(:has(.auth)) .leftside .navitem{color:#dce6f7}
+body:not(:has(.auth)) .leftside .navitem.active{background:#315fce;color:#fff}
+body:not(:has(.auth)) .trending-mobile-wrap h3,body:not(:has(.auth)) .rightside h3{color:#f5f7ff}
+body:not(:has(.auth)) .trending-school{background:#eaf0f8;color:#202938;border:1px solid #cbd6e6}
+body:not(:has(.auth)) .trending-school b{color:#202938;display:block;overflow-wrap:anywhere;white-space:normal}
+body:not(:has(.auth)) .trending-school .tiny{color:#5b687c}
+body:not(:has(.auth)) input,body:not(:has(.auth)) textarea,body:not(:has(.auth)) select{background:#f7f9fc;color:#202938;border-color:#cbd6e6}
+body:not(:has(.auth)) .btn-secondary{background:#f7f9fc;color:#27364d;border-color:#cbd6e6}
+body:not(:has(.auth)) .state-message{background:#eaf0f8;color:#202938}
+body:not(:has(.auth)) .state-message .tiny{color:#5b687c}
+@media(max-width:760px){body:not(:has(.auth)) .leftside{background:#172746}}
