@@ -11,6 +11,7 @@ assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracte
 assert.ok(html.includes('src="assets/app.js?v='), 'HTML must load the extracted application script, including its cache version');
 assert.ok(js.includes('body:body||q'), 'Poll posts must provide a non-empty posts.body field');
 assert.ok(js.includes('data-vote'), 'Poll options must expose voting controls');
+assert.ok(js.includes("if(data?.length)"), 'An empty feed must not issue queries using an empty post-ID list');
 assert.ok(js.includes('option_index:optionIndex'), 'Poll voting must store the selected option index');
 assert.ok(js.includes("from('friendships')"), 'Friend requests must use the schema friendships table');
 assert.doesNotMatch(js, /friend_requests|convo_id/, 'Legacy table/column names must not remain');
