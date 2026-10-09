@@ -35,4 +35,4 @@ StudentLink is a student-focused social space for school friends, posts, polls, 
 
 ## Development workflow
 
-Changes are staged on `studentlink/phase-1-stabilization` for review before merging into `main`. Test authentication, feed posts, friend requests, messaging, profile updates, and mobile layouts with a separate test account before deploying.
+Changes are committed to `main` and deployed through GitHub Pages. The validation workflow runs on pushes to `main` and pull requests. Before sharing a release, test authentication, feed posts, friend requests, messaging, profile updates, and mobile layouts with separate test accounts.
