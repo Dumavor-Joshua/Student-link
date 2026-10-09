@@ -99,7 +99,7 @@ assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profi
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
 assert.ok(!js.includes('Google sign-in is not connected yet') && !js.includes('Not connected</span>'), 'Google sign-in must not be shown as disconnected');
 
-assert.ok(js.includes("$('[data-tab]').forEach"), 'Auth tab binding must iterate over all tab buttons using querySelectorAll');
+assert.ok(js.includes("$$('[data-tab]').forEach"), 'Auth tab binding must iterate over all tab buttons using querySelectorAll');
 assert.ok(!js.includes("  $('[data-tab]').forEach"), 'Auth rendering must not call forEach on a single querySelector result');
 assert.ok(js.includes("authForm.addEventListener('submit'"), 'Login and signup must use an explicitly registered form submit handler');
 assert.ok(js.includes("db.auth.signInWithPassword({ email, password })"), 'Login submission must call Supabase password sign-in');
