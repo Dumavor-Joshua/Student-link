@@ -41,3 +41,7 @@
   .school-student{align-items:flex-start;flex-wrap:wrap}
   .school-student .btn{margin-left:52px}
 }
+
+
+@media (min-width:681px) and (max-width:980px){.layout{height:calc(100vh - 175px)}}
+@media(max-width:680px){.layout{height:calc(100dvh - 148px)}}
