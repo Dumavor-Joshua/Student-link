@@ -361,7 +361,7 @@ async function viewOnlineGame(game){
     if(!S.onlineGameChannel)await watchOnlineGameChannel(game,null);return;
   }
   if(!S.onlineGameChannel)await watchOnlineGameChannel(game,id);
-  const {data:g,error}=await db.from(table).select('*').eq('id',id).maybeSingle();
+  const gameResult=isConnect?await db.from(table).select('*').eq('id',id).maybeSingle():await db.rpc('rps_get_game',{p_game_id:id});const g=gameResult.data,error=gameResult.error;
   if(error||!g){$('#main').innerHTML='<div class="card">Could not load this online game. Return to the game lobby and try again.</div><button type="button" class="btn btn-secondary" id="online-back">Back to lobby</button>';$('#online-back').onclick=async()=>{if(isConnect)S.cfGameId=null;else S.rpsGameId=null;await stopOnlineGameChannel();viewOnlineGame(game)};return}
   const playerIds=[g.player_one,g.player_two].filter(Boolean);let profiles=[];
   if(playerIds.length){const p=await db.from('profiles').select('id,nickname').in('id',playerIds);profiles=p.data||[]}
