@@ -217,7 +217,42 @@ async function loadConvos(){
   const names=Object.fromEntries((profiles||[]).map(p=>[p.id,p.nickname]));
   S.convos=await Promise.all(rows.map(async c=>{const {data:lastMessages,error:messageError}=await db.from('messages').select('body,created_at').eq('conversation_id',c.id).order('created_at',{ascending:false}).limit(1);if(messageError)throw messageError;const otherId=c.user_a===S.session.user.id?c.user_b:c.user_a;return{id:c.id,otherNickname:names[otherId]||'Student',lastMessage:lastMessages?.[0]?.body||''}}));
 }
-function viewGames(){let gs=[['⭕❌','Tic-Tac-Toe','Online multiplayer — play from anywhere','ttt'],['🧠','Student Quiz','General knowledge','quiz'],['🔵🟡','Connect Four','Connect four in a row','connect']];$('#main').innerHTML=`<div class="head"><h1 class="title">Games</h1></div>${gs.map(g=>`<div class="card" data-game="${g[3]}" style="cursor:pointer"><span style="font-size:24px">${g[0]}</span> <b>${g[1]}</b><div class="tiny">${g[2]}</div></div>`).join('')}`;$$('[data-game]').forEach(el=>{el.onclick=()=>{S.game=el.dataset.game;S.view='game';renderView()}})}
+function viewGames(){let gs=[['⭕❌','Tic-Tac-Toe','Online multiplayer — play from anywhere','ttt'],['🧠','Student Quiz','General knowledge','quiz'],['🔵🟡','Connect Four','Connect four in a row','connect'],['✊✋✌️','Rock Paper Scissors','Play a quick round against the computer','rps'],['🔢','Number Guess','Find the secret number from 1 to 100','guess'],['🔤','Word Scramble','Unscramble words and build your score','scramble']];$('#main').innerHTML='<div class="head"><h1 class="title">Games</h1><p class="tiny">Choose a game to play.</p></div>'+gs.map(g=>'<div class="card" data-game="'+g[3]+'" style="cursor:pointer"><span style="font-size:24px">'+g[0]+'</span> <b>'+g[1]+'</b><div class="tiny">'+g[2]+'</div></div>').join('');$('[data-game]').forEach(el=>{el.onclick=()=>{S.game=el.dataset.game;S.view='game';renderView()}})}
+
+
+function scrambleWord(word){let chars=word.split(''),mixed=word;for(let i=0;i<12&&mixed===word;i++){for(let j=chars.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[chars[j],chars[k]]=[chars[k],chars[j]]}mixed=chars.join('')}return mixed===word?word.split('').reverse().join(''):mixed}
+function renderLocalGame(){
+  const game=S.game;
+  const titles={rps:'Rock Paper Scissors',guess:'Number Guess',scramble:'Word Scramble'};
+  let html='<div class="head"><button type="button" class="btn btn-secondary" id="games-back">← Games</button><h1 class="title">'+titles[game]+'</h1></div>';
+  if(game==='rps'){
+    if(!S.rpsState)S.rpsState={wins:0,losses:0,draws:0,last:'Choose rock, paper, or scissors to start.'};
+    const st=S.rpsState;
+    html+='<div class="card"><p>'+st.last+'</p><p class="tiny">Your score — Wins: '+st.wins+' · Losses: '+st.losses+' · Draws: '+st.draws+'</p><div style="display:flex;flex-wrap:wrap;gap:8px">'+[['rock','✊ Rock'],['paper','✋ Paper'],['scissors','✌️ Scissors']].map(x=>'<button type="button" class="btn" data-rps="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><p class="tiny">You play against the computer. Scores last while this page remains open.</p><button type="button" class="btn btn-secondary" id="rps-reset">Reset score</button></div>';
+    $('#main').innerHTML=html;$('#games-back').onclick=()=>setView('games');
+    $('[data-rps]').forEach(b=>b.onclick=()=>{const you=b.dataset.rps,choices=['rock','paper','scissors'],cpu=choices[Math.floor(Math.random()*3)];if(you===cpu){st.draws++;st.last='You chose '+you+'; computer chose '+cpu+'. It is a draw.'}else if((you==='rock'&&cpu==='scissors')||(you==='paper'&&cpu==='rock')||(you==='scissors'&&cpu==='paper')){st.wins++;st.last='You chose '+you+'; computer chose '+cpu+'. You win this round!'}else{st.losses++;st.last='You chose '+you+'; computer chose '+cpu+'. Computer wins this round.'}renderLocalGame()});
+    $('#rps-reset').onclick=()=>{S.rpsState={wins:0,losses:0,draws:0,last:'Score reset. Choose your move.'};renderLocalGame()};return;
+  }
+  if(game==='guess'){
+    if(!S.guessState)S.guessState={target:Math.floor(Math.random()*100)+1,attempts:0,message:'Guess a whole number from 1 to 100.',finished:false};
+    const st=S.guessState;
+    html+='<div class="card"><p>'+st.message+'</p><p class="tiny">Attempts: '+st.attempts+'</p><form id="guess-form"><div class="field"><label for="guess-input">Your guess</label><input id="guess-input" type="number" min="1" max="100" step="1" required '+(st.finished?'disabled':'')+' placeholder="Enter 1–100"></div><button type="submit" class="btn" '+(st.finished?'disabled':'')+'>Check guess</button></form><button type="button" class="btn btn-secondary" id="guess-reset">New number</button></div>';
+    $('#main').innerHTML=html;$('#games-back').onclick=()=>setView('games');
+    $('#guess-form').onsubmit=e=>{e.preventDefault();if(st.finished)return;const input=$('#guess-input'),n=Number(input.value);if(!Number.isInteger(n)||n<1||n>100){st.message='Enter a whole number between 1 and 100.';renderLocalGame();return}st.attempts++;if(n===st.target){st.message='Correct! You found the number in '+st.attempts+' attempt'+(st.attempts===1?'':'s')+'.';st.finished=true}else st.message=n<st.target?'Too low. Try a higher number.':'Too high. Try a lower number.';renderLocalGame()};
+    $('#guess-reset').onclick=()=>{S.guessState={target:Math.floor(Math.random()*100)+1,attempts:0,message:'New number ready. Guess from 1 to 100.',finished:false};renderLocalGame()};return;
+  }
+  if(game==='scramble'){
+    const words=['planet','school','friend','science','puzzle','laptop','garden','energy','bridge','rocket'];
+    if(!S.scrambleState){const word=words[Math.floor(Math.random()*words.length)];S.scrambleState={word:word,scrambled:scrambleWord(word),solved:0,attempts:0,message:'Unscramble the letters to find the word.',solvedCurrent:false}}
+    const st=S.scrambleState;
+    html+='<div class="card"><p>Scrambled word</p><h2 style="font-size:30px;letter-spacing:.18em">'+st.scrambled.toUpperCase()+'</h2><p>'+st.message+'</p><p class="tiny">Solved: '+st.solved+' · Attempts: '+st.attempts+'</p><form id="scramble-form"><div class="field"><label for="scramble-input">Your answer</label><input id="scramble-input" maxlength="20" autocomplete="off" required '+(st.solvedCurrent?'disabled':'')+' placeholder="Type the word"></div><button type="submit" class="btn" '+(st.solvedCurrent?'disabled':'')+'>Check word</button></form><button type="button" class="btn btn-secondary" id="scramble-next">Next word</button><button type="button" class="btn btn-secondary" id="scramble-reset">Reset score</button></div>';
+    $('#main').innerHTML=html;$('#games-back').onclick=()=>setView('games');
+    $('#scramble-form').onsubmit=e=>{e.preventDefault();if(st.solvedCurrent)return;st.attempts++;if($('#scramble-input').value.trim().toLowerCase()===st.word){st.solved++;st.solvedCurrent=true;st.message='Correct! The word was '+st.word+'. Choose Next word to continue.'}else st.message='Not quite. Try again!';renderLocalGame()};
+    $('#scramble-next').onclick=()=>{let word=st.word;while(words.length>1&&word===st.word)word=words[Math.floor(Math.random()*words.length)];S.scrambleState={word:word,scrambled:scrambleWord(word),solved:st.solved,attempts:st.attempts,message:'New word. You can do it!',solvedCurrent:false};renderLocalGame()};
+    $('#scramble-reset').onclick=()=>{S.scrambleState=null;renderLocalGame()};return;
+  }
+}
+
 
 async function stopTttChannel(){if(S.tttChannel){const oldChannel=S.tttChannel;S.tttChannel=null;await db.removeChannel(oldChannel)}}
 async function watchTttChannel(gameId=null){await stopTttChannel();if(!db||!S.session||S.view!=='game')return;const filter={event:'*',schema:'public',table:'ttt_games'};if(gameId)filter.filter='id=eq.'+gameId;const channel=db.channel(gameId?'ttt-game-'+gameId:'ttt-lobby');channel.on('postgres_changes',filter,()=>{if(S.view==='game'&&S.tttGameId===gameId)viewGame()}).subscribe();S.tttChannel=channel}
@@ -226,6 +261,7 @@ async function joinTttGame(id){const {error}=await db.rpc('ttt_join_game',{p_gam
 async function makeTttMove(cell){if(!S.tttGameId)return;const {error}=await db.rpc('ttt_make_move',{p_game_id:S.tttGameId,p_cell:cell});if(error){toast(error.message||'Move could not be made.');return}await viewGame()}
 async function viewGame(){
   const game=S.game;
+  if(game==='rps'||game==='guess'||game==='scramble'){renderLocalGame();return}
   if(game!=='ttt'){$('#main').innerHTML='<div class="head"><button class="btn btn-secondary" id="games-back">← Games</button><h1 class="title">'+(game==='quiz'?'Student Quiz':'Connect Four')+'</h1></div><div class="card">This game is not implemented yet. You can return to the games list.</div>';$('#games-back').onclick=()=>setView('games');return}
   if(!S.tttGameId){
     const {data:games,error}=await db.from('ttt_games').select('id,player_x,created_at').eq('status','waiting').is('player_o',null).order('created_at',{ascending:true}).limit(30);
