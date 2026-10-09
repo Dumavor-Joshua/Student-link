@@ -31,7 +31,7 @@ StudentLink is a student-focused social space for school friends, posts, polls, 
 
 - Feed, profile editing, friend requests, private conversations, and a local two-player Tic-Tac-Toe game are implemented in the client.
 - Student Quiz and Connect Four are placeholders and are not playable yet.
-- Poll creation is present; interactive poll voting still needs a complete UI and end-to-end tests.
+- Poll creation, single-vote submission, and basic poll results are implemented in the client; end-to-end tests against a configured Supabase project are still needed.
 
 ## Development workflow
 
