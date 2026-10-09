@@ -346,3 +346,7 @@ exception when duplicate_object then null; when undefined_object then null; end 
 do $$ begin alter publication supabase_realtime add table public.friendships;
 exception when duplicate_object then null; when undefined_object then null; end $$;
 
+
+-- Prevent direct table reads from exposing the opponent's unrevealed RPS move.
+REVOKE SELECT ON public.rps_games FROM anon, authenticated;
+GRANT SELECT (id, player_one, player_two, score_one, score_two, round_no, last_result, status, winner_id, created_at, updated_at) ON public.rps_games TO authenticated;
