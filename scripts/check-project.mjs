@@ -42,7 +42,8 @@ assert.ok(js.includes(".eq('user_id',S.session.user.id).select('id')"), 'Post de
 assert.ok(js.includes("from('profile-photos').upload"), 'Profile photos must upload to Supabase Storage');
 assert.ok(js.includes("deleted_at:null"), 'Deleted profiles must have a restore path');
 assert.ok(css.includes('.profile-danger-zone'), 'Profile deletion controls must be styled');
-assert.ok(migration.includes("CREATE POLICY \"posts read while author active\""), 'Database must hide posts from deactivated profiles');
-assert.ok(migration.includes("CREATE POLICY \"Students upload their own profile photos\""), 'Storage uploads must be restricted to each user folder');
+assert.ok(profileMigration.includes("CREATE POLICY \"posts read while author active\""), 'Database must hide posts from deactivated profiles');
+assert.ok(profileMigration.includes("CREATE POLICY \"Students upload their own profile photos\""), 'Storage uploads must be restricted to each user folder');
+assert.ok(profileGuardMigration.includes('comments readable on active posts'), 'Related activity on deactivated posts must be hidden');
 
 console.log('StudentLink static checks passed.');
