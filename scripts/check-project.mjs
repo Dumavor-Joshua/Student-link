@@ -88,3 +88,10 @@ for (const route of ['feed','friends','messages','games','profile','suggestions'
 }
 
 console.log('StudentLink static checks passed.');
+
+assert.ok(index.includes('rel="icon" type="image/svg+xml" href="assets/favicon.svg?v='), 'Website must declare a versioned SVG favicon');
+assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), 'Continue with Google must use Supabase Google OAuth');
+assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
+assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
+assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
+assert.ok(!js.includes('Google sign-in is not connected yet') && !js.includes('Not connected</span>'), 'Google sign-in must not be shown as disconnected');
