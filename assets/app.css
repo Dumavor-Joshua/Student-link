@@ -5,3 +5,5 @@
 
 /* Search dropdown */
 .search-wrap{position:relative;flex:1;max-width:420px}.search-wrap .search{width:100%;box-sizing:border-box}.search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:1000;background:var(--p2);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(0,0,0,.28);max-height:320px;overflow:auto}.search-result{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}.search-result:last-child{border-bottom:0}.search-result .tiny{margin-top:3px}@media(max-width:520px){.search-wrap{max-width:none}}
+
+@media(max-width:680px){.header>div{min-width:0;gap:8px!important}.search-wrap{min-width:0;max-width:none}.header .search{display:block;min-width:0;padding:7px 8px;font-size:12px}.header .btn{padding:8px 10px}.search-results{max-width:calc(100vw - 20px)}}
