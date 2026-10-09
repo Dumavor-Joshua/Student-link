@@ -6,6 +6,8 @@ const html = read('index.html');
 const js = read('assets/app.js');
 const css = read('assets/app.css');
 const migration = read('supabase/migrations/20261009_harden_poll_vote_policy.sql');
+const profileMigration = read('supabase/migrations/20261009_profile_photos_deactivation_and_feed.sql');
+const profileGuardMigration = read('supabase/migrations/20261009_active_profile_write_guards.sql');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(html.includes('src="assets/app.js?v='), 'HTML must load the extracted application script, including its cache version');
