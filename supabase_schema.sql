@@ -8,7 +8,12 @@ create table if not exists public.post_likes(post_id uuid not null references pu
 create table if not exists public.comments(id uuid primary key default gen_random_uuid(),post_id uuid not null references public.posts(id) on delete cascade,user_id uuid not null references public.profiles(id) on delete cascade,body text not null check(char_length(body) between 1 and 600),created_at timestamptz not null default now());
 create table if not exists public.friendships(id uuid primary key default gen_random_uuid(),user_id uuid not null references public.profiles(id) on delete cascade,friend_id uuid not null references public.profiles(id) on delete cascade,status text not null default 'pending' check(status in ('pending','accepted')),created_at timestamptz not null default now(),check(user_id<>friend_id),unique(user_id,friend_id));
 create table if not exists public.conversations(id uuid primary key default gen_random_uuid(),user_a uuid not null references public.profiles(id) on delete cascade,user_b uuid not null references public.profiles(id) on delete cascade,created_at timestamptz not null default now(),updated_at timestamptz not null default now(),check(user_a<>user_b),check(user_a<user_b),unique(user_a,user_b));
-create table if not exists public.messages(id uuid primary key default gen_random_uuid(),conversation_id uuid not null references public.conversations(id) on delete cascade,sender_id uuid not null references public.profiles(id) on delete cascade,body text not null check(char_length(body) between 1 and 1500),created_at timestamptz not null default now());
+create table if not exists public.messages(id uuid primary key default gen_random_uuid(),conversation_id uuid not null references public.conversations(id) on delete cascade,sender_id uuid not null references public.profiles(id) on delete cascade,body text not null check(char_length(body) between 1 and 1500),attachment_path text,attachment_name text,attachment_mime_type text,attachment_size bigint check(attachment_size is null or (attachment_size>0 and attachment_size<5242880)),created_at timestamptz not null default now());
+ALTER TABLE public.messages ADD COLUMN IF NOT EXISTS attachment_path text;
+ALTER TABLE public.messages ADD COLUMN IF NOT EXISTS attachment_name text;
+ALTER TABLE public.messages ADD COLUMN IF NOT EXISTS attachment_mime_type text;
+ALTER TABLE public.messages ADD COLUMN IF NOT EXISTS attachment_size bigint;
+DO $ BEGIN ALTER TABLE public.messages ADD CONSTRAINT messages_attachment_size_check CHECK(attachment_size IS NULL OR (attachment_size>0 AND attachment_size<5242880)); EXCEPTION WHEN duplicate_object THEN NULL; END $;
 create index if not exists messages_conversation_created_idx on public.messages(conversation_id,created_at);
 create table if not exists public.poll_votes(post_id uuid not null references public.posts(id) on delete cascade,user_id uuid not null references public.profiles(id) on delete cascade,option_index integer not null check(option_index between 0 and 3),created_at timestamptz not null default now(),primary key(post_id,user_id));
 create table if not exists public.reports(id uuid primary key default gen_random_uuid(),reporter_id uuid not null references public.profiles(id) on delete cascade,content_type text not null check(content_type in ('post','comment','profile','message')),content_id uuid not null,reason text not null check(char_length(reason) between 1 and 100),details text not null default '' check(char_length(details)<=500),status text not null default 'open' check(status in ('open','reviewing','resolved','dismissed')),created_at timestamptz not null default now());
@@ -128,3 +133,21 @@ WITH CHECK(bucket_id='post-images' AND (storage.foldername(name))[1]=(SELECT aut
 DROP POLICY IF EXISTS "Students delete their own post images" ON storage.objects;
 CREATE POLICY "Students delete their own post images" ON storage.objects FOR DELETE TO authenticated
 USING(bucket_id='post-images' AND (storage.foldername(name))[1]=(SELECT auth.uid())::text);
+
+
+-- Private message attachments (maximum file size is strictly below 5 MiB).
+INSERT INTO storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
+VALUES('message-files','message-files',false,5242880,NULL)
+ON CONFLICT(id) DO UPDATE SET public=false,file_size_limit=5242880,allowed_mime_types=NULL;
+
+DROP POLICY IF EXISTS "Conversation participants read message files" ON storage.objects;
+CREATE POLICY "Conversation participants read message files" ON storage.objects FOR SELECT TO authenticated
+USING(bucket_id='message-files' AND EXISTS(SELECT 1 FROM public.conversations c WHERE c.id::text=(storage.foldername(name))[1] AND (c.user_a=(SELECT auth.uid()) OR c.user_b=(SELECT auth.uid()))));
+
+DROP POLICY IF EXISTS "Conversation participants upload message files" ON storage.objects;
+CREATE POLICY "Conversation participants upload message files" ON storage.objects FOR INSERT TO authenticated
+WITH CHECK(bucket_id='message-files' AND (storage.foldername(name))[2]=(SELECT auth.uid())::text AND EXISTS(SELECT 1 FROM public.conversations c WHERE c.id::text=(storage.foldername(name))[1] AND (c.user_a=(SELECT auth.uid()) OR c.user_b=(SELECT auth.uid()))));
+
+DROP POLICY IF EXISTS "Senders delete their own message files" ON storage.objects;
+CREATE POLICY "Senders delete their own message files" ON storage.objects FOR DELETE TO authenticated
+USING(bucket_id='message-files' AND (storage.foldername(name))[2]=(SELECT auth.uid())::text AND EXISTS(SELECT 1 FROM public.conversations c WHERE c.id::text=(storage.foldername(name))[1] AND (c.user_a=(SELECT auth.uid()) OR c.user_b=(SELECT auth.uid()))));
