@@ -475,7 +475,7 @@ async function viewFriends(){
 async function startConversation(friendId){
  if(friendId===S.session?.user?.id)return toast('You cannot message yourself.');
  if(!S.friends.some(f=>f.id===friendId)){
-  const {data:relationship,error:relationshipError}=await db.from('friendships').select('user_id,friend_id,status').or(\`and(user_id.eq.\${S.session.user.id},friend_id.eq.\${friendId}),and(user_id.eq.\${friendId},friend_id.eq.\${S.session.user.id})\`).eq('status','accepted').limit(1).maybeSingle();
+  const {data:relationship,error:relationshipError}=await db.from('friendships').select('user_id,friend_id,status').or(`and(user_id.eq.${S.session.user.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${S.session.user.id})`).eq('status','accepted').limit(1).maybeSingle();
   if(relationshipError)throw relationshipError;
   if(!relationship)return toast('Add this student as a friend first.');
   const {data:friendProfile,error:profileError}=await db.from('profiles').select('id,nickname,school,avatar_url').eq('id',friendId).maybeSingle();
@@ -575,7 +575,7 @@ function renderUnreadIndicators(){
  });
 }
 async function loadConvos(){
-  const {data,error}=await db.from('conversations').select('id,user_a,user_b,updated_at').or(\`user_a.eq.\${S.session.user.id},user_b.eq.\${S.session.user.id}\`).order('updated_at',{ascending:false});
+  const {data,error}=await db.from('conversations').select('id,user_a,user_b,updated_at').or(`user_a.eq.${S.session.user.id},user_b.eq.${S.session.user.id}`).order('updated_at',{ascending:false});
   if(error)throw error;
   const rows=data||[],ids=rows.map(c=>c.id);
   const otherIds=rows.map(c=>c.user_a===S.session.user.id?c.user_b:c.user_a);
