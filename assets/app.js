@@ -1,7 +1,7 @@
 // Configure these two values from your own Supabase project. Never use a service-role key here.
 const SUPABASE_URL='https://fpdcetkvxdryogtvldax.supabase.co';const SUPABASE_ANON_KEY='sb_publishable_HMzJqdTbufV4vvJ6QyWl5A_-0PPa0Rs';
 const configured=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('YOUR_')&&!SUPABASE_ANON_KEY.includes('YOUR_');const db=configured&&window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const S={session:null,profile:null,schools:[],view:'feed',schoolFilter:'',feedMode:'all',feedOrderIds:[],feedOrderMode:'',friends:[],requests:[],convos:[],chat:null,channel:null,tttChannel:null,tttGameId:null,onlineGameChannel:null,cfGameId:null,rpsGameId:null,rpsMode:'computer',game:'',ttt:Array(9).fill(0),notifiedMessageIds:new Set(),notifiedFriendshipIds:new Set(),};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const S={session:null,profile:null,schools:[],view:'feed',publicProfileId:null,schoolFilter:'',feedMode:'all',feedOrderIds:[],feedOrderMode:'',friends:[],requests:[],convos:[],chat:null,channel:null,tttChannel:null,tttGameId:null,onlineGameChannel:null,cfGameId:null,rpsGameId:null,rpsMode:'computer',game:'',ttt:Array(9).fill(0),notifiedMessageIds:new Set(),notifiedFriendshipIds:new Set(),};
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function initials(s='S'){return esc(s.trim().split(/\s+/).slice(0,2).map(x=>x[0].toUpperCase()).join(''))}
 function schoolKey(s=''){return String(s).normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase()}
 const VERIFIED_GHANA_SHS_TVET = [
@@ -367,6 +367,7 @@ async function renderView(){
     games:()=>viewGames(),
     game:()=>viewGame(),
     profile:()=>viewProfile(),
+    'public-profile':()=>viewPublicProfile(S.publicProfileId),
     suggestions:()=>viewSuggestions(),
     school:()=>viewSchoolStudents(S.schoolFilter)
   };
@@ -687,8 +688,16 @@ async function viewGame(){
 }
 function profileDraftKey(){return 'studentlink-profile-draft-'+(S.session?.user?.id||'guest')}
 function readProfileDraft(){try{return JSON.parse(localStorage.getItem(profileDraftKey())||'{}')}catch(_){return {}}}
+function openPublicProfile(userId){
+ if(!userId)return;
+ if(userId===S.session?.user?.id){setView('profile');return}
+ S.publicProfileId=userId;
+ S.view='public-profile';
+ syncNavigationState();
+ renderView();
+}
 async function viewPublicProfile(userId){
- if(!userId||userId===S.session.user.id){setView('profile');return}
+ if(!userId)throw new Error('No student profile was selected.');
  const {data:p,error}=await db.from('profiles').select('id,nickname,school,avatar_url').eq('id',userId).maybeSingle();
  if(error)throw error;
  if(!p){$('#main').innerHTML='<section class="card"><h2>Profile unavailable</h2><p class="tiny">This profile may be hidden or no longer available.</p><button class="btn btn-secondary" type="button" data-public-back>Back</button></section>';return}
@@ -756,7 +765,7 @@ async function viewSuggestions(){
 async function acceptFriend(id){const {error}=await db.from('friendships').update({status:'accepted'}).eq('user_id',id).eq('friend_id',S.session.user.id).eq('status','pending');if(error){toast(error.message);return}toast('Friend request accepted.');renderView()}
 async function declineFriend(id){const {error}=await db.from('friendships').delete().eq('user_id',id).eq('friend_id',S.session.user.id).eq('status','pending');if(error){toast(error.message);return}renderView()}
 function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));}); }
-function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();S.tttGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';syncNavigationState();renderView()}
+function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();S.tttGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
 function modal(title,content){$('#modaltitle').textContent=title;$('#modalcontent').innerHTML=content;$('#modalbg').classList.add('show')}
 function closeModal(){$('#modalbg').classList.remove('show')}
 document.addEventListener('click',e=>{if(e.target.closest('#modalclose')){e.preventDefault();closeModal()}});
@@ -766,7 +775,7 @@ function toast(msg){
   el.textContent=String(msg);el.style.display='block';clearTimeout(el._hideTimer);el._hideTimer=setTimeout(()=>{el.style.display='none'},3500);
 }
 function wireActions(){$$('[data-messagefriend]').forEach(b=>b.onclick=()=>startConversation(b.dataset.messagefriend).catch(error=>{console.error(error);toast('Could not open this conversation. Please try again.')}));$$('[data-add]').forEach(b=>b.onclick=()=>addFriend(b.dataset.add).catch(error=>{console.error(error);toast('Could not send the friend request. Please try again.')}));$$('[data-accept]').forEach(b=>b.onclick=()=>acceptFriend(b.dataset.accept).catch(error=>{console.error(error);toast('Could not accept the friend request. Please try again.')}));$$('[data-decline]').forEach(b=>b.onclick=()=>declineFriend(b.dataset.decline).catch(error=>{console.error(error);toast('Could not decline the friend request. Please try again.')}))}
-document.addEventListener('click',e=>{if(e.target.closest('#theme-toggle')){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');return}const publicProfile=e.target.closest('[data-public-profile]');if(publicProfile){e.preventDefault();viewPublicProfile(publicProfile.dataset.publicProfile).catch(error=>{console.error(error);toast('Could not load this profile. Please try again.')});return}if(e.target.closest('[data-public-back]')){setView('friends');return}const sr=$('#search-results');if(sr&&!e.target.closest('.search-wrap'))sr.hidden=true;const school=e.target.closest('[data-school]');if(school){e.preventDefault();S.schoolFilter=school.dataset.school;S.view='school';syncNavigationState();if(sr)sr.hidden=true;renderView();return}let v=e.target.closest('[data-view]');if(v){e.preventDefault();setView(v.dataset.view);return}let add=e.target.closest('[data-search-add]');if(add){addFriend(add.dataset.searchAdd).catch(error=>{console.error(error);toast('Could not send the friend request. Please try again.')});if(sr)sr.hidden=true}});
+document.addEventListener('click',e=>{if(e.target.closest('#theme-toggle')){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');return}const publicProfile=e.target.closest('[data-public-profile]');if(publicProfile){e.preventDefault();openPublicProfile(publicProfile.dataset.publicProfile);return}if(e.target.closest('[data-public-back]')){setView('friends');return}const sr=$('#search-results');if(sr&&!e.target.closest('.search-wrap'))sr.hidden=true;const school=e.target.closest('[data-school]');if(school){e.preventDefault();S.schoolFilter=school.dataset.school;S.view='school';syncNavigationState();if(sr)sr.hidden=true;renderView();return}let v=e.target.closest('[data-view]');if(v){e.preventDefault();setView(v.dataset.view);return}let add=e.target.closest('[data-search-add]');if(add){addFriend(add.dataset.searchAdd).catch(error=>{console.error(error);toast('Could not send the friend request. Please try again.')});if(sr)sr.hidden=true}});
 async function startStudentLink(){
   const app=document.getElementById('app');
   try{
