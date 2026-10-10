@@ -1,4 +1,4 @@
-const CACHE_NAME='studentlink-shell-v19';
+const CACHE_NAME='studentlink-shell-v20';
 const BASE=new URL('./',self.location.href);
 const APP_SHELL=[new URL('./',BASE).href,new URL('./manifest.json',BASE).href,new URL('./assets/app.css?v=studentlink-messages-fullscreen-16',BASE).href,new URL('./assets/app.js?v=studentlink-messages-fullscreen-16',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.svg',BASE).href,new URL('./assets/icon-512.svg',BASE).href];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});
@@ -39,26 +39,46 @@ self.addEventListener('push',event=>{
   event.waitUntil(Promise.allSettled(tasks));
 });
 async function openStudentLinkDestination(destination){
-  const clientsList=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  const scopeURL=new URL(self.registration.scope);
+  let target;
+  try{
+    target=new URL(destination||'?openMessages=1',scopeURL);
+  }catch(_){
+    target=new URL('?openMessages=1',scopeURL);
+  }
+  // Never let notification payloads send a click outside the StudentLink app scope.
+  if(target.origin!==scopeURL.origin||!target.pathname.startsWith(scopeURL.pathname)){
+    target=new URL('?openMessages=1',scopeURL);
+  }
+  const targetURL=target.href;
+  let clientsList=[];
+  try{clientsList=await self.clients.matchAll({type:'window',includeUncontrolled:true});}catch(error){console.warn('StudentLink could not inspect open windows:',error);}
   for(const client of clientsList){
-    if('focus' in client){
-      await client.navigate(destination);
-      return client.focus();
+    if(!('focus' in client))continue;
+    try{
+      await client.focus();
+      if(typeof client.navigate==='function')await client.navigate(targetURL);
+      return;
+    }catch(error){
+      console.warn('StudentLink could not reuse an open window; opening the app instead:',error);
     }
   }
-  if(self.clients.openWindow)return self.clients.openWindow(destination);
+  if(self.clients.openWindow){
+    try{return await self.clients.openWindow(targetURL);}
+    catch(error){console.error('StudentLink could not open from a notification:',error);}
+  }
 }
 self.addEventListener('notificationclick',event=>{
   event.notification.close();
   const data=event.notification.data||{};
-  const destination=new URL(data.url||'?openMessages=1',self.registration.scope).href;
+  let destination=data.url||'?openMessages=1';
   if(event.action==='reply'){
-    // Web Push notification actions are buttons, not native text-input reply fields.
-    // Route Reply directly into the matching chat and focus its composer in the app.
-    const replyDestination=new URL(destination);
+    // The action opens StudentLink's chat composer; web push actions cannot
+    // reliably provide a native text field across supported browsers.
+    const replyDestination=new URL(destination,self.registration.scope);
+    replyDestination.searchParams.set('openMessages','1');
     replyDestination.searchParams.set('reply','1');
-    event.waitUntil(openStudentLinkDestination(replyDestination.href));
-    return;
+    destination=replyDestination.href;
   }
   event.waitUntil(openStudentLinkDestination(destination));
 });
