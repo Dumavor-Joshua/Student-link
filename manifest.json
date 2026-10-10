@@ -1,0 +1,19 @@
+{
+  "name": "StudentLink",
+  "short_name": "StudentLink",
+  "description": "Connect with classmates, share posts, chat and play learning games.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101b35",
+  "theme_color": "#101b35",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
