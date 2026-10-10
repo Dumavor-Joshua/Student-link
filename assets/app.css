@@ -965,3 +965,5 @@ input,textarea,select{font-size:16px}
  .navitem .unread-badge{position:absolute;top:3px;right:4px;min-width:17px;height:17px;padding:0 4px;font-size:10px}
  .navitem{position:relative}
 }
+
+@media(max-width:680px){.navitem span.unread-badge{display:inline-flex}}
