@@ -395,3 +395,20 @@ body:not(:has(.auth)) .header #notifications-toggle{flex:0 0 auto;display:inline
 .profile-name-link:hover,.profile-name-link:focus-visible{text-decoration:underline;color:var(--blue)}
 .profile-open:focus-visible,.profile-name-link:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}
 .profile-public-avatar{width:84px;height:84px}
+
+
+/* StudentLink theme tokens: the default remains the existing dark navy theme. */
+:root[data-theme="light"]{--bg:#f3f6fc;--p:#ffffff;--p2:#e8eef8;--line:#cbd6e7;--txt:#17243b;--muted:#52627a;--blue:#245edb;--mint:#087f67;color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
+.post-image-wrap{margin:12px 0;overflow:hidden;border-radius:10px;background:var(--p2);text-align:center}
+.post-image{display:block;width:auto;max-width:100%;max-height:560px;margin:0 auto;object-fit:contain}
+#post-image-preview{margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--p2)}
+#postform input[type="file"]{width:100%;max-width:100%;padding:8px;background:var(--p2);color:var(--txt);border:1px solid var(--line);border-radius:8px}
+:root[data-theme="light"] body{background:var(--bg);color:var(--txt)}
+:root[data-theme="light"] .card,:root[data-theme="light"] .modal,:root[data-theme="light"] .modal-content{background:var(--p);color:var(--txt);border-color:var(--line)}
+:root[data-theme="light"] .header,:root[data-theme="light"] .leftside,:root[data-theme="light"] .rightside{background:var(--p);color:var(--txt);border-color:var(--line)}
+:root[data-theme="light"] .main{background:var(--bg);color:var(--txt)}
+:root[data-theme="light"] input,:root[data-theme="light"] textarea,:root[data-theme="light"] select{background:#fff;color:#17243b;border-color:var(--line)}
+:root[data-theme="light"] .btn-secondary{background:#edf2fa;color:#17243b;border-color:var(--line)}
+:root[data-theme="light"] .navitem{color:#263751}
+:root[data-theme="light"] .navitem.active{color:#fff}
