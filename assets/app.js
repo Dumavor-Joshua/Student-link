@@ -731,7 +731,18 @@ async function loadConvos(){
   S.convos.sort((a,b)=>new Date(b.lastMessageAt||0)-new Date(a.lastMessageAt||0));
   updateMessageBadges();
 }
-function viewGames(){let gs=[['⭕❌','Tic-Tac-Toe','Online multiplayer — play from anywhere','ttt'],['🧠','Student Quiz','General knowledge','quiz'],['🔵🟡','Connect Four','Connect four in a row','connect'],['✊✋✌️','Rock Paper Scissors','Play a quick round against the computer','rps'],['🔢','Number Guess','Find the secret number from 1 to 100','guess'],['🔤','Word Scramble','Unscramble words and build your score','scramble']];$('#main').innerHTML='<div class="head"><h1 class="title">Games</h1><p class="tiny">Choose a game to play.</p></div>'+gs.map(g=>'<div class="card" data-game="'+g[3]+'" style="cursor:pointer"><span style="font-size:24px">'+g[0]+'</span> <b>'+g[1]+'</b><div class="tiny">'+g[2]+'</div></div>').join('');$$('[data-game]').forEach(el=>{el.onclick=()=>{S.game=el.dataset.game;S.view='game';renderView()}})}
+function viewGames(){
+  const games=[
+    {icon:'⭕❌',name:'Tic-Tac-Toe',mode:'MULTIPLAYER',description:'Challenge another student in a live match.',id:'ttt',tone:'blue'},
+    {icon:'🔵🟡',name:'Connect Four',mode:'MULTIPLAYER',description:'Connect four discs before your opponent does.',id:'connect',tone:'purple'},
+    {icon:'✊✋✌️',name:'Rock Paper Scissors',mode:'MULTIPLAYER',description:'Play live rounds with another StudentLink player.',id:'rps',tone:'coral'},
+    {icon:'🧠',name:'Student Quiz',mode:'SOLO',description:'Test your general knowledge and learn as you go.',id:'quiz',tone:'green'},
+    {icon:'🔢',name:'Number Guess',mode:'SOLO',description:'Use hints to find the hidden number from 1 to 100.',id:'guess',tone:'amber'},
+    {icon:'🔤',name:'Word Scramble',mode:'SOLO',description:'Unscramble words and build your score.',id:'scramble',tone:'sky'}
+  ];
+  $('#main').innerHTML='<section class="games-page"><div class="games-intro"><div><p class="eyebrow">PLAY • LEARN • CONNECT</p><h1 class="title">StudentLink Games</h1><p class="games-subtitle">Quick challenges for your break. Play solo or compete with classmates.</p></div><div class="games-count"><strong>06</strong><span>games to play</span></div></div><div class="games-section-heading"><h2>Game library</h2><span class="tiny">Pick a game to get started</span></div><div class="games-grid">'+games.map(g=>'<button type="button" class="game-tile tone-'+g.tone+'" data-game="'+g.id+'"><span class="game-tile-icon" aria-hidden="true">'+g.icon+'</span><span class="game-tile-copy"><span class="game-tile-heading">'+esc(g.name)+'</span><span class="game-tile-description">'+esc(g.description)+'</span><span class="game-tile-mode '+(g.mode==='MULTIPLAYER'?'mode-online':'mode-solo')+'">'+(g.mode==='MULTIPLAYER'?'● '+g.mode:'○ '+g.mode)+'</span></span><span class="game-tile-arrow" aria-hidden="true">↗</span></button>').join('')+'</div><p class="games-footnote">Online games need a signed-in account and an active connection. Solo games work without an opponent.</p></section>';
+  $$('[data-game]').forEach(el=>el.onclick=()=>{S.game=el.dataset.game;S.view='game';renderView()});
+}
 
 
 function scrambleWord(word){let chars=word.split(''),mixed=word;for(let i=0;i<12&&mixed===word;i++){for(let j=chars.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[chars[j],chars[k]]=[chars[k],chars[j]]}mixed=chars.join('')}return mixed===word?word.split('').reverse().join(''):mixed}
