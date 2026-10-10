@@ -793,31 +793,66 @@ function renderDeletedProfile(){const root=$('#app');if(!root)return;root.innerH
 async function viewSuggestions(){
   const userId=S.session?.user?.id;
   if(!userId){$('#main').innerHTML='<div class="card">Please sign in to submit feedback.</div>';return}
-  const {data:reports,error}=await db.from('student_feedback').select('id,type,title,area,details,priority,status,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(100);
-  if(error)throw error;
-  const list=reports||[];
+  let list=[],historyError=false;
+  try{
+    const {data,error}=await db.from('student_feedback').select('id,type,title,area,details,priority,status,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(100);
+    if(error)throw error;
+    list=data||[];
+  }catch(error){
+    console.error('Feedback history could not load:',error);
+    historyError=true;
+  }
   const counts={all:list.length,bug:list.filter(r=>r.type==='bug').length,feature:list.filter(r=>r.type==='feature').length,feedback:list.filter(r=>r.type==='feedback').length};
-  $('#main').innerHTML=`<div class="head"><div class="tiny">HELP US BUILD STUDENTLINK</div><h1 class="title">Suggestions & bug reports</h1><span class="tiny">Found something broken or have an idea? Tell us what happened and help shape the next version.</span></div>
-  <div class="feedback-banner"><div class="feedback-banner-icon">✦</div><div><strong>Early tester feedback matters.</strong><p class="tiny">Be specific and kind. Please don’t include passwords, private messages, or sensitive personal information.</p></div></div>
-  <div class="feedback-layout"><section class="card feedback-form-card"><div class="section-heading"><div><h2>Send feedback</h2><p class="tiny">Your report will be sent to the StudentLink database.</p></div><span class="profile-step">01</span></div>
+  const typeLabel=type=>type==='bug'?'Bug report':type==='feature'?'Feature idea':'General feedback';
+  const statusLabel=status=>({'open':'Open','in_review':'In review','reviewing':'In review','planned':'Planned','resolved':'Resolved','closed':'Closed','rejected':'Closed'}[String(status||'open').toLowerCase()]||'Open');
+  const dateLabel=value=>{const date=value?new Date(value):null;return date&&!Number.isNaN(date.getTime())?date.toLocaleDateString():'Date unavailable'};
+  $('#main').innerHTML=\`<div class="head"><div class="tiny">HELP US BUILD STUDENTLINK</div><h1 class="title">Suggestions & bug reports</h1><span class="tiny">Found something broken or have an idea? Tell us what happened and help shape the next version.</span></div>
+  <div class="feedback-banner"><div class="feedback-banner-icon" aria-hidden="true">✦</div><div><strong>Early tester feedback matters.</strong><p class="tiny">Be specific and kind. Please don’t include passwords, private messages, or sensitive personal information.</p></div></div>
+  <div class="feedback-layout"><section class="card feedback-form-card"><div class="section-heading"><div><h2>Send feedback</h2><p class="tiny">Submissions are saved to StudentLink when the feedback service is available. You’ll see a clear message if saving fails.</p></div><span class="profile-step" aria-hidden="true">01</span></div>
+  <div id="feedback-submit-status" class="feedback-inline-status" role="status" aria-live="polite" hidden></div>
   <form id="suggestion-form">
   <div class="field"><label for="feedback-type">What would you like to report? *</label><select id="feedback-type" required><option value="bug">🐛 Report a bug</option><option value="feature">💡 Suggest a feature</option><option value="feedback">💬 General feedback</option></select></div>
-  <div class="field"><label for="feedback-title">Short title *</label><input id="feedback-title" maxlength="100" required placeholder="e.g. Profile save button does nothing"></div>
+  <div class="field"><label for="feedback-title">Short title *</label><input id="feedback-title" maxlength="100" required placeholder="e.g. Profile save button does nothing" autocomplete="off"><div class="tiny feedback-counter" id="feedback-title-count">0 / 100</div></div>
   <div class="field"><label for="feedback-area">Where did it happen?</label><select id="feedback-area"><option>Not sure</option><option>Sign in / sign up</option><option>Feed and posts</option><option>Profile</option><option>Friends</option><option>Messages</option><option>Schools and search</option><option>Games</option><option>Mobile layout</option><option>Other</option></select></div>
-  <div class="field"><label for="feedback-details">Describe it *</label><textarea id="feedback-details" rows="5" maxlength="2000" required placeholder="What happened? What did you expect to happen?"></textarea><div class="tiny">For bugs, include the steps to reproduce the problem if you can.</div></div>
+  <div class="field"><label for="feedback-details">Describe it *</label><textarea id="feedback-details" rows="5" maxlength="2000" required placeholder="What happened? What did you expect to happen?"></textarea><div class="feedback-counter-row"><span class="tiny">For bugs, include the steps to reproduce the problem if you can.</span><span class="tiny feedback-counter" id="feedback-details-count">0 / 2000</span></div></div>
   <div class="field"><label for="feedback-priority">How serious is it?</label><select id="feedback-priority"><option value="normal">Normal — feature idea or minor issue</option><option value="low">Low — small inconvenience</option><option value="high">High — blocks an important task</option></select></div>
-  <button type="submit" class="btn">Submit feedback</button></form></section>
-  <aside class="feedback-side"><section class="card"><div class="section-heading"><div><h2>Your feedback</h2><p class="tiny">Saved reports follow their review status.</p></div></div><div class="feedback-stats"><div><strong>${counts.all}</strong><span class="tiny">All</span></div><div><strong>${counts.bug}</strong><span class="tiny">Bugs</span></div><div><strong>${counts.feature}</strong><span class="tiny">Ideas</span></div></div><div class="feedback-list" id="feedback-list">${list.length?list.map(r=>'<article class="feedback-item"><div class="feedback-item-top"><span class="feedback-type-pill '+esc(r.type)+'">'+(r.type==='bug'?'Bug report':r.type==='feature'?'Feature idea':'General feedback')+'</span><span class="tiny">'+esc(new Date(r.created_at).toLocaleDateString())+'</span></div><strong>'+esc(r.title)+'</strong><p class="tiny">'+esc(r.area||'Not specified')+' · '+esc(r.priority||'normal')+'</p><p>'+esc(r.details)+'</p><span class="feedback-status">'+esc(r.status||'open')+'</span></article>').join(''):'<div class="feedback-empty"><span>📝</span><b>No feedback submitted yet</b><p class="tiny">Your reports will appear here after you submit them.</p></div>'}</div></section>
-  <section class="card feedback-tip"><h3>What makes a useful bug report?</h3><ul><li>What you clicked or tried</li><li>What you expected to happen</li><li>What actually happened</li><li>Your device or browser, if relevant</li></ul></section></aside></div>`;
-  $('#suggestion-form').onsubmit=async e=>{
+  <button type="submit" class="btn">Submit feedback</button>
+  <p class="tiny feedback-storage-note">Only your own submitted reports are shown in the history panel.</p></form></section>
+  <aside class="feedback-side"><section class="card"><div class="section-heading"><div><h2>Your feedback</h2><p class="tiny">Track the reports associated with your account.</p></div></div>
+  \${historyError?'<div class="feedback-inline-status is-warning" id="feedback-history-notice" role="status">Your report history could not load. You can still try submitting, but saving depends on the feedback service being available.</div>':''}
+  <div class="feedback-stats"><div><strong>\${counts.all}</strong><span class="tiny">All loaded</span></div><div><strong>\${counts.bug}</strong><span class="tiny">Bugs</span></div><div><strong>\${counts.feature}</strong><span class="tiny">Ideas</span></div></div><div class="feedback-list" id="feedback-list">\${list.length?list.map(r=>'<article class="feedback-item"><div class="feedback-item-top"><span class="feedback-type-pill '+esc(r.type)+'">'+esc(typeLabel(r.type))+'</span><span class="tiny">'+esc(dateLabel(r.created_at))+'</span></div><strong>'+esc(r.title)+'</strong><p class="tiny">'+esc(r.area||'Not specified')+' · '+esc(r.priority||'normal')+'</p><p class="feedback-item-details">'+esc(r.details)+'</p><span class="feedback-status status-'+esc(String(r.status||'open').toLowerCase().replace(/[^a-z0-9_-]/g,''))+'">'+esc(statusLabel(r.status))+'</span></article>').join(''):'<div class="feedback-empty"><span aria-hidden="true">📝</span><b>No feedback submitted yet</b><p class="tiny">Once a report is saved, it will appear here.</p></div>'}</div></section>
+  <section class="card feedback-tip"><h3>What makes a useful bug report?</h3><ul><li>What you clicked or tried</li><li>What you expected to happen</li><li>What actually happened</li><li>Your device or browser, if relevant</li></ul></section></aside></div>\`;
+  const form=$('#suggestion-form'),titleInput=$('#feedback-title'),detailsInput=$('#feedback-details');
+  const titleCount=$('#feedback-title-count'),detailsCount=$('#feedback-details-count'),submitStatus=$('#feedback-submit-status');
+  const updateCount=(input,output,max)=>{if(input&&output)output.textContent=input.value.length+' / '+max};
+  titleInput?.addEventListener('input',()=>updateCount(titleInput,titleCount,100));
+  detailsInput?.addEventListener('input',()=>updateCount(detailsInput,detailsCount,2000));
+  updateCount(titleInput,titleCount,100);updateCount(detailsInput,detailsCount,2000);
+  const showFeedbackStatus=(message,kind='success')=>{if(!submitStatus)return;submitStatus.textContent=message;submitStatus.className='feedback-inline-status'+(kind==='warning'?' is-warning':'');submitStatus.hidden=false};
+  form.onsubmit=async e=>{
     e.preventDefault();
-    const type=$('#feedback-type').value,title=$('#feedback-title').value.trim(),details=$('#feedback-details').value.trim();
-    if(!title||!details){toast('Please add a title and description.');return}
-    const submit=$('#suggestion-form button[type="submit"]');if(submit){submit.disabled=true;submit.textContent='Submitting…'}
-    const {error:saveError}=await db.from('student_feedback').insert({user_id:userId,type,title,area:$('#feedback-area').value,details,priority:$('#feedback-priority').value});
-    if(saveError){console.error(saveError);toast('Feedback could not be submitted. Please try again.');if(submit){submit.disabled=false;submit.textContent='Submit feedback'}return}
-    toast('Feedback sent to StudentLink. Thank you.');
-    await viewSuggestions();
+    const type=$('#feedback-type').value,title=titleInput.value.trim(),details=detailsInput.value.trim();
+    if(!title||!details){showFeedbackStatus('Add a short title and a description before submitting.','warning');return}
+    const submit=form.querySelector('button[type="submit"]');
+    if(submit){submit.disabled=true;submit.textContent='Submitting…'}
+    if(submitStatus)submitStatus.hidden=true;
+    try{
+      const {error:saveError}=await db.from('student_feedback').insert({user_id:userId,type,title,area:$('#feedback-area').value,details,priority:$('#feedback-priority').value});
+      if(saveError)throw saveError;
+      form.reset();
+      updateCount(titleInput,titleCount,100);updateCount(detailsInput,detailsCount,2000);
+      showFeedbackStatus('Your feedback was saved successfully. Thank you for helping improve StudentLink.');
+      toast('Feedback saved successfully.');
+      await viewSuggestions();
+      const refreshedStatus=$('#feedback-submit-status');
+      if(refreshedStatus){refreshedStatus.textContent='Your feedback was saved successfully. Thank you for helping improve StudentLink.';refreshedStatus.hidden=false}
+    }catch(error){
+      console.error('Feedback submission failed:',error);
+      showFeedbackStatus('Your feedback could not be saved. Nothing was confirmed as submitted. Please check your connection and try again later.','warning');
+    }finally{
+      const currentSubmit=form.querySelector('button[type="submit"]');
+      if(currentSubmit){currentSubmit.disabled=false;currentSubmit.textContent='Submit feedback'}
+    }
   };
 }async function viewSchools(){let {data,error}=await db.from('profiles').select('school').not('school','is',null).neq('school','').order('school').limit(1000);if(error)throw error;let c={};(data||[]).forEach(p=>{const name=canonicalSchoolName((p.school||'').trim());const key=schoolKey(name);if(key){if(!c[key])c[key]={name,count:0};c[key].count++}});let top=Object.values(c).sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)).slice(0,5);const cards=top.map(({name,count})=>'<button type="button" class="card trending-school" data-school="'+esc(name)+'"><b>'+esc(name)+'</b><span class="tiny">'+count+' students</span></button>').join('')||'<p class="tiny">Schools will appear as students join.</p>';const desktop=$('#trending'),mobile=$('#trending-mobile');if(desktop)desktop.innerHTML=cards;if(mobile)mobile.innerHTML=cards;}async function viewSchoolStudents(school){const chosen=canonicalSchoolName(school||'');if(!chosen){S.view='feed';await renderView();return}$('#main').innerHTML='<div class="card">Loading students from '+esc(chosen)+'…</div>';const {data,error}=await db.from('profiles').select('id,nickname,school').ilike('school',chosen).order('nickname').limit(1000);if(error)throw error;const people=(data||[]).filter(p=>schoolKey(canonicalSchoolName(p.school||''))===schoolKey(chosen));let html='<div class="head"><button type="button" class="btn btn-secondary" id="back-to-feed">← Back</button><h1 class="title" style="margin-top:12px">'+esc(chosen)+'</h1><span class="tiny">'+people.length+' student'+(people.length===1?'':'s')+'</span></div>';if(!people.length)html+='<div class="card">No other students from this school have joined yet.</div>';else html+=people.map(p=>'<div class="card school-student"><div class="school-student-info"><span class="avatar">'+initials(p.nickname)+'</span><div><b>'+esc(p.nickname)+(p.id===S.session.user.id?' (You)':'')+'</b><div class="tiny">'+esc(p.school||chosen)+'</div></div></div>'+(p.id===S.session.user.id?'<span class="tiny">Your profile</span>':'<button type="button" class="btn" data-add="'+p.id+'">Add friend</button>')+'</div>').join('');$('#main').innerHTML=html;$('#back-to-feed').onclick=()=>setView('feed');wireActions();}async function addFriend(id){if(id===S.session.user.id)return;const {error}=await db.from('friendships').insert({user_id:S.session.user.id,friend_id:id,status:'pending'});if(error){toast(error.code==='23505'?'A request already exists.':error.message);return}toast('Friend request sent.');renderView()}
 async function acceptFriend(id){const {error}=await db.from('friendships').update({status:'accepted'}).eq('user_id',id).eq('friend_id',S.session.user.id).eq('status','pending');if(error){toast(error.message);return}toast('Friend request accepted.');renderView()}
