@@ -135,3 +135,13 @@ assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("cla
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
 assert.ok(html.includes('studentlink-messages-layout-1') && sw.includes('studentlink-messages-layout-1'), 'Messages layout assets must use a fresh cache version');
+
+
+assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
+assert.ok(js.includes('id="attach-file"') && js.includes("message-files').upload"), 'Message composer must upload attachments to private Supabase Storage');
+assert.ok(js.includes('file.size>=5*1024*1024'), 'Message attachments must be strictly smaller than 5 MB');
+assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,attachment_size'), 'Messages must load attachment metadata');
+assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
+assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
+assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
+assert.ok(html.includes('studentlink-message-attachments-1') && sw.includes('studentlink-message-attachments-1'), 'Updated messaging assets must bypass stale caches');
