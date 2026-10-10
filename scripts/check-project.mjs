@@ -5,6 +5,8 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf
 const html = read('index.html');
 const js = read('assets/app.js');
 const css = read('assets/app.css');
+const sw = read('sw.js');
+const schema = read('supabase_schema.sql');
 const migration = read('supabase/migrations/20261009_harden_poll_vote_policy.sql');
 const profileMigration = read('supabase/migrations/20261009_profile_photos_deactivation_and_feed.sql');
 const profileGuardMigration = read('supabase/migrations/20261009_active_profile_write_guards.sql');
