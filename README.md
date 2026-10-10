@@ -36,3 +36,11 @@ StudentLink is a student-focused social space for school friends, posts, polls, 
 ## Development workflow
 
 Changes are committed to `main` and deployed through GitHub Pages. The validation workflow runs on pushes to `main` and pull requests. Before sharing a release, test authentication, feed posts, friend requests, messaging, profile updates, and mobile layouts with separate test accounts.
+
+
+## Frontend audit additions (October 2026)
+
+- Installable PWA shell with a manifest, service worker, and offline app-shell fallback. First-time installation and browser support vary by device; a first visit still requires an internet connection.
+- Public profiles now display shared bio, class/year, interests, and recent posts.
+- Profile bio, class/year, and interests are stored in Supabase. Existing databases must run `supabase/migrations/20261010_add_public_profile_details.sql`.
+- Messaging uses the existing conversations/messages tables with a responsive two-pane desktop layout and one-pane mobile chat view.
