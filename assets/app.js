@@ -701,8 +701,12 @@ async function viewPublicProfile(userId){
  const {data:p,error}=await db.from('profiles').select('id,nickname,school,avatar_url').eq('id',userId).maybeSingle();
  if(error)throw error;
  if(!p){$('#main').innerHTML='<section class="card"><h2>Profile unavailable</h2><p class="tiny">This profile may be hidden or no longer available.</p><button class="btn btn-secondary" type="button" data-public-back>Back</button></section>';return}
- const html='<div class="head"><div class="tiny">STUDENTLINK MEMBER</div><h1 class="title">Student profile</h1><p class="tiny">Public information shared with signed-in students.</p></div><section class="profile-hero card"><div>'+profileAvatarMarkup(p.nickname,p.avatar_url,'avatar profile-public-avatar')+'</div><div class="profile-hero-copy"><h2>'+esc(p.nickname||'Student')+'</h2><div class="profile-school-line">🎓 '+esc(p.school||'School not provided')+'</div></div></section><div class="card" style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn btn-secondary" data-public-back>Back</button>'+S.friends.some(f=>f.id===p.id)?'<button type="button" class="btn" data-messagefriend="'+esc(p.id)+'">Message</button>':'<button type="button" class="btn" data-add="'+esc(p.id)+'">Add friend</button>'+'</div>';
+ const profileAction=S.friends.some(f=>f.id===p.id)
+  ? '<button type="button" class="btn" data-messagefriend="'+esc(p.id)+'">Message</button>'
+  : '<button type="button" class="btn" data-add="'+esc(p.id)+'">Add friend</button>';
+ const html='<div class="head"><div class="tiny">STUDENTLINK MEMBER</div><h1 class="title">Student profile</h1><p class="tiny">Public information shared with signed-in students.</p></div><section class="profile-hero card"><div>'+profileAvatarMarkup(p.nickname,p.avatar_url,'avatar profile-public-avatar')+'</div><div class="profile-hero-copy"><h2>'+esc(p.nickname||'Student')+'</h2><div class="profile-school-line">🎓 '+esc(p.school||'School not provided')+'</div></div></section><div class="card" style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn btn-secondary" data-public-back>Back</button>'+profileAction+'</div>';
  $('#main').innerHTML=html;
+ wireActions();
 }
 function viewProfile(){
  const p=S.profile||{},draft=readProfileDraft(),nickname=p.nickname||'',school=p.school||'',bio=draft.bio||'',year=draft.year||'',interests=draft.interests||'',photo=p.avatar_url||'';
