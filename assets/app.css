@@ -790,3 +790,29 @@ input,textarea,select{font-size:16px}
   .auth-layout{gap:8px}
   .auth-panel .hero{padding:12px}
 }
+
+/* Frontend audit: profile, Messenger-style chat, and accessible touch targets. */
+.profile-public-details{display:grid;gap:12px;grid-template-columns:minmax(0,1fr);margin-top:14px}
+.profile-public-details .card{margin:0}.profile-public-bio{white-space:pre-wrap;overflow-wrap:anywhere}
+.profile-public-interests{display:flex;flex-wrap:wrap;gap:7px}.profile-public-post{margin-top:10px}
+.messenger-layout{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:14px;min-height:460px;height:min(68vh,720px)}
+.messenger-sidebar,.messenger-chat{border:1px solid var(--line);border-radius:12px;background:var(--p);min-width:0;min-height:0;overflow:hidden}
+.messenger-sidebar{display:flex;flex-direction:column}.messenger-sidebar-head{padding:14px;border-bottom:1px solid var(--line)}
+.messenger-conversation-list{overflow-y:auto;min-height:0}
+.messenger-conversation{display:flex;gap:10px;align-items:center;width:100%;padding:12px;text-align:left;background:transparent;color:var(--txt);border:0;border-bottom:1px solid var(--line);cursor:pointer;min-width:0}
+.messenger-conversation:hover,.messenger-conversation.active{background:var(--p2)}
+.messenger-conversation-copy{min-width:0;flex:1}.messenger-conversation-copy strong,.messenger-preview{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.messenger-chat{display:flex;flex-direction:column}.messenger-chat-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.messenger-chat-head .messenger-chat-person{flex:1;min-width:0}.messenger-chat-head h2{font-size:16px;margin:0}
+.messenger-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:16px;min-height:0;overscroll-behavior:contain}
+.messenger-empty{margin:auto;text-align:center;color:var(--muted);padding:24px}
+.message-row{display:flex;flex-direction:column;max-width:min(78%,520px);align-self:flex-start;gap:3px}.message-row.mine{align-self:flex-end;align-items:flex-end}
+.message-bubble{background:var(--p2);padding:9px 13px;border-radius:18px 18px 18px 5px;overflow-wrap:anywhere;white-space:pre-wrap}
+.message-row.mine .message-bubble{background:var(--blue);color:white;border-radius:18px 18px 5px 18px}
+.message-time{font-size:10px;color:var(--muted);padding:0 5px}
+.messenger-composer{display:flex;gap:8px;align-items:flex-end;padding:12px;border-top:1px solid var(--line);padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.messenger-composer textarea{flex:1;min-width:0;min-height:42px;max-height:120px;resize:vertical;border-radius:20px;padding:10px 14px;font-size:16px}
+.messenger-composer .btn{min-height:42px}.messenger-back{display:none}.messenger-search{margin-top:10px;font-size:16px}
+@media(max-width:760px){.messenger-layout{display:block;height:auto;min-height:0}.messenger-sidebar{min-height:55vh}.messenger-chat{display:none;min-height:62vh;height:calc(100dvh - 190px);max-height:760px}.messenger-layout.chat-open .messenger-sidebar{display:none}.messenger-layout.chat-open .messenger-chat{display:flex}.messenger-back{display:inline-flex}.message-row{max-width:88%}}
+@media(max-width:520px){.messenger-sidebar,.messenger-chat{border-radius:8px}.messenger-chat{height:calc(100dvh - 160px)}.messenger-scroll{padding:10px}.messenger-composer{gap:6px;padding:8px}.messenger-composer .btn{padding:10px 12px}button,.btn,.navitem{touch-action:manipulation}input,textarea,select{font-size:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
