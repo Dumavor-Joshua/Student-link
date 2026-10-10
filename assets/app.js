@@ -311,6 +311,13 @@ async function subscribeToPushNotifications(){
   if(error)throw error;
   return true;
 }
+async function syncStudentLinkDeviceBadge(count){
+  try{
+    if(!('setAppBadge' in navigator)&&!('clearAppBadge' in navigator))return;
+    if(Number(count)>0&&typeof navigator.setAppBadge==='function')await navigator.setAppBadge(Math.min(999,Number(count)));
+    else if(typeof navigator.clearAppBadge==='function')await navigator.clearAppBadge();
+  }catch(error){console.debug('StudentLink device app badge is unavailable on this platform:',error);}
+}
 async function refreshNotificationHistoryBadge(){
   if(!db||!S.session?.user?.id)return;
   const {count,error}=await db.from('notifications').select('id',{count:'exact',head:true}).is('read_at',null);
@@ -319,6 +326,7 @@ async function refreshNotificationHistoryBadge(){
   if(!badge)return;
   badge.textContent=Number(count||0)>99?'99+':String(count||0);
   badge.hidden=!(count>0);
+  await syncStudentLinkDeviceBadge(count||0);
   badge.style.cssText='display:'+(count>0?'inline-flex':'none')+';align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;margin-left:4px';
 }
 async function openNotificationHistory(){
