@@ -717,3 +717,10 @@ body:not(:has(.auth)) .header #notifications-toggle{flex:0 0 auto;display:inline
 :root[data-theme="dark"] .post-composer-prompt{background:#203454;border-color:#354a6d;color:#f5f7ff}
 :root[data-theme="dark"] .post-composer-actions{border-color:#354a6d}
 :root[data-theme="dark"] .post-composer-avatar{background:#2b4166;color:#cbdcff}
+
+
+/* Replace the browser's default file-picker text with a clear Add button. */
+.post-image-input{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.field:has(.post-image-input:focus-visible) .post-image-add,
+.post-image-add:focus-visible{outline:3px solid #8aa7ed;outline-offset:3px}
+.post-image-add{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:9px 18px;border-radius:10px;cursor:pointer;font-weight:600}
