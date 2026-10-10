@@ -149,7 +149,7 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-message-unread-mobile-7') && sw.includes('studentlink-message-unread-mobile-7'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-unread-read-receipts-8') && sw.includes('studentlink-unread-read-receipts-8'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('data-message-nav-badge') && js.includes('messenger-unread-badge'), 'Messages navigation and chat rows must render unread badges');
 assert.ok(js.includes("count:'exact',head:true") && js.includes('updateMessageReadCursor'), 'Unread message counts must be computed and cleared when a visible chat is opened');
 assert.ok(js.includes("S.publicProfileId=null;S.view='messages';syncNavigationState();await renderView()}"), 'Profile and friends Message actions must use the shared view renderer');
