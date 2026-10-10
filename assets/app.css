@@ -555,3 +555,93 @@ body:not(:has(.auth)) .header #notifications-toggle{flex:0 0 auto;display:inline
 :root[data-theme="dark"] .comment-item span{color:#fff}
 :root[data-theme="dark"] .comment,
 :root[data-theme="dark"] .comment-item{background:#222f45}
+
+
+/* Light mode polish: enforce dark headings and add subtle, minimal visual structure. */
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3,
+:root[data-theme="light"] h4,
+:root[data-theme="light"] h5,
+:root[data-theme="light"] h6,
+:root[data-theme="light"] .title,
+:root[data-theme="light"] .section-title,
+:root[data-theme="light"] .card-title,
+:root[data-theme="light"] .panel-title,
+:root[data-theme="light"] .auth-card-heading,
+:root[data-theme="light"] .auth-card-heading h2,
+:root[data-theme="light"] .auth-intro h1,
+:root[data-theme="light"] .profile-name,
+:root[data-theme="light"] .profile-name-link,
+:root[data-theme="light"] .trending-school b,
+:root[data-theme="light"] .leftside h3,
+:root[data-theme="light"] .rightside h3,
+:root[data-theme="light"] .main h2,
+:root[data-theme="light"] .main h3{color:#17243b!important}
+:root[data-theme="light"] body{
+  background-color:#eaf0fb;
+  background-image:
+    radial-gradient(ellipse at 8% 3%,rgba(119,157,235,.20) 0,rgba(119,157,235,0) 34%),
+    radial-gradient(ellipse at 92% 22%,rgba(187,160,235,.18) 0,rgba(187,160,235,0) 30%),
+    linear-gradient(145deg,#eaf0fb 0%,#f4f0fc 52%,#e8f4f3 100%);
+  background-attachment:fixed;
+}
+:root[data-theme="light"] .header{
+  box-shadow:0 4px 18px rgba(49,73,120,.07);
+  border-bottom:1px solid rgba(166,185,221,.65);
+}
+:root[data-theme="light"] .leftside,
+:root[data-theme="light"] .rightside,
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .modal,
+:root[data-theme="light"] .modal-content{
+  box-shadow:0 7px 22px rgba(49,73,120,.065);
+}
+:root[data-theme="light"] .card{
+  border-radius:15px;
+  transition:box-shadow .18s ease,transform .18s ease;
+}
+:root[data-theme="light"] .card:hover{
+  box-shadow:0 10px 26px rgba(49,73,120,.10);
+}
+:root[data-theme="light"] .leftside h3,
+:root[data-theme="light"] .rightside h3,
+:root[data-theme="light"] .main h2,
+:root[data-theme="light"] .main h3,
+:root[data-theme="light"] .section-title{
+  position:relative;
+}
+:root[data-theme="light"] .leftside h3::after,
+:root[data-theme="light"] .rightside h3::after,
+:root[data-theme="light"] .section-title::after{
+  content:"";
+  display:block;
+  width:32px;
+  height:3px;
+  margin-top:7px;
+  border-radius:3px;
+  background:linear-gradient(90deg,#477df0,#9b8be8);
+}
+:root[data-theme="light"] .trending-mobile-wrap,
+:root[data-theme="light"] .trending-school{
+  border-radius:12px;
+}
+:root[data-theme="light"] .trending-school{
+  box-shadow:inset 3px 0 0 #8ba8e8;
+}
+:root[data-theme="light"] .btn,
+:root[data-theme="light"] button{
+  transition:filter .15s ease,box-shadow .15s ease;
+}
+:root[data-theme="light"] .btn-primary,
+:root[data-theme="light"] .auth-submit{
+  box-shadow:0 4px 10px rgba(36,94,219,.18);
+}
+:root[data-theme="light"] .btn-secondary{
+  background:linear-gradient(135deg,#eef3ff,#e7eafb);
+}
+@media(prefers-reduced-motion:reduce){
+  :root[data-theme="light"] .card,
+  :root[data-theme="light"] .btn,
+  :root[data-theme="light"] button{transition:none}
+}
