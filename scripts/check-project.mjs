@@ -128,3 +128,10 @@ assert.ok(!js.includes("  $('[data-tab]').forEach"), 'Auth rendering must not ca
 assert.ok(js.includes("authForm.addEventListener('submit'"), 'Login and signup must use an explicitly registered form submit handler');
 assert.ok(js.includes("db.auth.signInWithPassword({ email, password })"), 'Login submission must call Supabase password sign-in');
 assert.ok(js.includes("authForm.dataset.submitting = 'true'") && js.includes("delete authForm.dataset.submitting"), 'Auth submission must prevent duplicate requests and always clear the loading guard');
+
+
+assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='messages')"), 'Messages view must use the wider focused app layout');
+assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
+assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
+assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
+assert.ok(html.includes('studentlink-messages-layout-1') && sw.includes('studentlink-messages-layout-1'), 'Messages layout assets must use a fresh cache version');
