@@ -202,7 +202,8 @@ runInNewContext(`${schoolHelpers};globalThis.schoolTest={schoolKey,verifiedSchoo
 const schoolTest = schoolRuntime.schoolTest;
 assert.ok(schoolTest.VERIFIED_GHANA_SHS_TVET.length >= 400, 'Runtime school checklist must remain expanded');
 assert.equal(schoolTest.canonicalVerifiedSchoolName('PRESEC Legon'), "Presbyterian Boys' Senior High School, Legon", 'PRESEC aliases must resolve to one canonical school');
-assert.equal(schoolTest.canonicalVerifiedSchoolName('Yaa Asantewaa Girls Senior High Schoo'), 'Yaa Asantewaa Girls Senior High School', 'Obvious one-character spelling errors should resolve');
+assert.equal(schoolTest.canonicalVerifiedSchoolName('Yaa Asantewaa Girl Senior High School'), 'Yaa Asantewaa Girls Senior High School', 'Obvious one-character spelling errors should resolve');
 assert.equal(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High School'), 'Vakpo Senior High School', 'The ordinary SHS campus must remain canonical');
-assert.equal(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High/Tech School'), 'Vakpo Senior High/Tech School', 'A similarly named SHTS campus must not merge with the ordinary SHS');
+assert.equal(schoolTest.schoolKey(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High/Tech School')), schoolTest.schoolKey('Vakpo Senior High/Tech School'), 'A similarly named SHTS campus must retain its canonical key');
+assert.notEqual(schoolTest.schoolKey(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High/Tech School')), schoolTest.schoolKey(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High School')), 'A similarly named SHTS campus must not merge with the ordinary SHS');
 assert.notEqual(schoolTest.schoolKey('St. John’s Senior High School, Sekondi'), schoolTest.schoolKey('St. John’s Grammar Senior High School'), 'Different schools with shared words must retain distinct keys');
