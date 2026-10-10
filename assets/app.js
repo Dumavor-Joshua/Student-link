@@ -10,7 +10,8 @@ function schoolKey(s=''){
     .replace(/&/g,' and ')
     .replace(/\b(senior\s+high\s*\/\s*technical|senior\s+high\s*\/\s*tech|senior\s+high\s+technical|shts|shst|shst\.?|senior high tech)\b/g,' shts ')
     .replace(/\b(technical\s+institute|tech\.?\s+inst\.?|tech\.?\s+institute)\b/g,' techinst ')
-    .replace(/\b(snr\.?\s*high|senior\s+high(?:\s+school)?|s\.?h\.?s\.?)\b/g,' shs ')\n    .replace(/\b(shs|shts)\s+school\b/g,' $1 ')
+    .replace(/\b(snr\.?\s*high|senior\s+high(?:\s+school)?|s\.?h\.?s\.?)\b/g,' shs ')
+    .replace(/\b(shs|shts)\s+school\b/g,' $1 ')
     .replace(/\b(comm\.?|community)\b/g,' community ')
     .replace(/\b(presby)\b/g,' presbyterian ')
     .replace(/\b(cath\.?|catholic)\b/g,' catholic ')
@@ -58,7 +59,7 @@ const VERIFIED_GHANA_SHS_TVET = [
   "Sankor Community Day Senior High School",
   "Bonzo-Kaku Senior High School",
   "Uthman Bin Afam Senior High School",
-  "Nkruful Agricultural Senior High School",
+  "Nkroful Agricultural Senior High School",
   "Esiama Senior High/Tech School",
   "Half Assini Senior High School",
   "Annor Adjaye Senior High School",
@@ -75,7 +76,7 @@ const VERIFIED_GHANA_SHS_TVET = [
   "Adiembra Senior High School",
   "Methodist Senior High School, Sekondi",
   "Bompeh Senior High/Tech School",
-  "Fiase-man Senior High School",
+  "Fiaseman Senior High School",
   "Benso Senior High/Tech School",
   "Nana Brentu Senior High/Tech School",
   "Bia Senior High/Tech School",
