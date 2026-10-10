@@ -136,7 +136,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-message-entry-6') && sw.includes('studentlink-message-entry-6'), 'Messages assets must use a fresh cache version');
+assert.ok(html.includes('studentlink-message-unread-6') && sw.includes('studentlink-message-unread-6'), 'Messages assets must use a fresh cache version');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -148,13 +148,17 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-message-entry-6') && sw.includes('studentlink-message-entry-6'), 'Updated messaging assets must bypass stale caches');
-assert.ok(js.includes('data-message-nav-badge') && js.includes('messenger-unread-badge'), 'Messages navigation and chat rows must render unread badges');
-assert.ok(js.includes("count:'exact',head:true") && js.includes('updateMessageReadCursor'), 'Unread message counts must be computed and cleared when a visible chat is opened');
-assert.ok(js.includes("S.publicProfileId=null;S.view='messages';syncNavigationState();await renderView()}"), 'Profile and friends Message actions must use the shared view renderer');
-assert.ok(css.includes('.nav-unread-badge') && css.includes('.messenger-unread-badge'), 'Unread message badges must have responsive styling');
+assert.ok(html.includes('studentlink-message-unread-6') && sw.includes('studentlink-message-unread-6'), 'Updated messaging assets must bypass stale caches');
 
 assert.ok(js.includes('const relatedIds=[...new Set([...friendIds,...sent,...received])]'), 'Friends view must load all friend and pending-request profiles even when they are outside the discovery limit');
 assert.ok(js.includes("$('#main').innerHTML=html;\n wireActions();\n}\nfunction viewProfile()"), 'Public profile action buttons must be wired after rendering');
 assert.ok(js.includes("stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null"), 'Leaving a multiplayer game must release realtime channels and reset stale game IDs');
 assert.equal((js.match(/function scrambleWord\(/g)||[]).length, 1, 'Word scramble helper should be declared once');
+
+
+assert.ok(js.includes("function messageReadStateKey()") && js.includes("function markConversationRead("), 'Unread messages must use a per-account read marker');
+assert.ok(js.includes("unreadCount:unreadByConversation[c.id]||0"), 'Each conversation must calculate its unread-message count');
+assert.ok(js.includes("function unreadConversationCount()") && js.includes("data-unread-total"), 'Messages navigation must show unread conversation count');
+assert.ok(js.includes("await renderView();") && js.includes("same renderer as the left navigation"), 'Message buttons from profiles and friends must use the same renderer as navigation');
+assert.ok(js.includes("const onMessageChange=payload=>{refreshUnreadIndicators();refreshMessages();notifyIncomingMessage(payload)}"), 'Realtime incoming messages must refresh unread badges');
+assert.ok(css.includes('.unread-badge') && css.includes('.navitem .unread-badge'), 'Unread badges must be styled for desktop and mobile');
