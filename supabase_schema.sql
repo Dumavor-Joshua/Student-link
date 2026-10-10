@@ -2,7 +2,7 @@
 create extension if not exists pgcrypto;
 create table if not exists public.profiles(id uuid primary key references auth.users(id) on delete cascade,nickname text not null check(char_length(nickname) between 3 and 24),school text not null default '' check(char_length(school)<=90),created_at timestamptz not null default now(),updated_at timestamptz not null default now());
 create unique index if not exists profiles_nickname_lower_unique on public.profiles(lower(nickname));
-create table if not exists public.posts(id uuid primary key default gen_random_uuid(),user_id uuid not null references public.profiles(id) on delete cascade,body text not null check(char_length(body) between 1 and 1500),post_type text not null default 'text' check(post_type in ('text','poll')),poll_question text,poll_options jsonb not null default '[]'::jsonb,created_at timestamptz not null default now(),check(post_type<>'poll' or (poll_question is not null and jsonb_typeof(poll_options)='array' and jsonb_array_length(poll_options) between 2 and 4)));
+create table if not exists public.posts(id uuid primary key default gen_random_uuid(),user_id uuid not null references public.profiles(id) on delete cascade,body text not null check(char_length(body) between 1 and 1500),image_url text,post_type text not null default 'text' check(post_type in ('text','poll')),poll_question text,poll_options jsonb not null default '[]'::jsonb,created_at timestamptz not null default now(),check(post_type<>'poll' or (poll_question is not null and jsonb_typeof(poll_options)='array' and jsonb_array_length(poll_options) between 2 and 4)));
 create index if not exists posts_created_at_idx on public.posts(created_at desc);
 create table if not exists public.post_likes(post_id uuid not null references public.posts(id) on delete cascade,user_id uuid not null references public.profiles(id) on delete cascade,created_at timestamptz not null default now(),primary key(post_id,user_id));
 create table if not exists public.comments(id uuid primary key default gen_random_uuid(),post_id uuid not null references public.posts(id) on delete cascade,user_id uuid not null references public.profiles(id) on delete cascade,body text not null check(char_length(body) between 1 and 600),created_at timestamptz not null default now());
@@ -113,3 +113,18 @@ USING(EXISTS(SELECT 1 FROM public.posts post JOIN public.profiles author ON auth
 DROP POLICY IF EXISTS "votes readable" ON public.poll_votes;
 CREATE POLICY "votes readable on active posts" ON public.poll_votes FOR SELECT TO authenticated
 USING(EXISTS(SELECT 1 FROM public.posts post JOIN public.profiles author ON author.id=post.user_id WHERE post.id=poll_votes.post_id AND author.deleted_at IS NULL));
+
+
+-- Optional images attached to text posts.
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS image_url text;
+INSERT INTO storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
+VALUES('post-images','post-images',true,5242880,ARRAY['image/jpeg','image/png','image/webp'])
+ON CONFLICT(id) DO UPDATE SET public=true,file_size_limit=5242880,allowed_mime_types=ARRAY['image/jpeg','image/png','image/webp'];
+
+DROP POLICY IF EXISTS "Students upload their own post images" ON storage.objects;
+CREATE POLICY "Students upload their own post images" ON storage.objects FOR INSERT TO authenticated
+WITH CHECK(bucket_id='post-images' AND (storage.foldername(name))[1]=(SELECT auth.uid())::text);
+
+DROP POLICY IF EXISTS "Students delete their own post images" ON storage.objects;
+CREATE POLICY "Students delete their own post images" ON storage.objects FOR DELETE TO authenticated
+USING(bucket_id='post-images' AND (storage.foldername(name))[1]=(SELECT auth.uid())::text);
