@@ -599,4 +599,36 @@ function toast(msg){
 }
 function wireActions(){$$('[data-messagefriend]').forEach(b=>b.onclick=()=>startConversation(b.dataset.messagefriend).catch(error=>{console.error(error);toast('Could not open this conversation. Please try again.')}));$$('[data-add]').forEach(b=>b.onclick=()=>addFriend(b.dataset.add).catch(error=>{console.error(error);toast('Could not send the friend request. Please try again.')}));$$('[data-accept]').forEach(b=>b.onclick=()=>acceptFriend(b.dataset.accept).catch(error=>{console.error(error);toast('Could not accept the friend request. Please try again.')}));$$('[data-decline]').forEach(b=>b.onclick=()=>declineFriend(b.dataset.decline).catch(error=>{console.error(error);toast('Could not decline the friend request. Please try again.')}))}
 document.addEventListener('click',e=>{const sr=$('#search-results');if(sr&&!e.target.closest('.search-wrap'))sr.hidden=true;const school=e.target.closest('[data-school]');if(school){e.preventDefault();S.schoolFilter=school.dataset.school;S.view='school';syncNavigationState();if(sr)sr.hidden=true;renderView();return}let v=e.target.closest('[data-view]');if(v){e.preventDefault();setView(v.dataset.view);return}let add=e.target.closest('[data-search-add]');if(add){addFriend(add.dataset.searchAdd).catch(error=>{console.error(error);toast('Could not send the friend request. Please try again.')});if(sr)sr.hidden=true}});
-(async()=>{if(!configured){renderAuth('signup','Setup needed: create Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.');return}await boot()})();
+async function startStudentLink(){
+  const app=document.getElementById('app');
+  try{
+    if(!configured){
+      renderAuth('signup','Setup needed: create Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.');
+      return;
+    }
+    await boot();
+  }catch(error){
+    console.error('StudentLink startup failed:',error);
+    if(!app)return;
+    app.innerHTML='';
+    const panel=document.createElement('section');
+    panel.className='card state-message error-state';
+    panel.style.cssText='max-width:620px;margin:24px auto;padding:24px;text-align:left';
+    const heading=document.createElement('h2');
+    heading.textContent='StudentLink could not finish loading';
+    const message=document.createElement('p');
+    message.textContent='A startup request failed. Check your connection and try again. This error handler does not change your account or saved data.';
+    const detail=document.createElement('p');
+    detail.className='tiny';
+    detail.style.cssText='overflow-wrap:anywhere';
+    detail.textContent='Error: '+String(error&&error.message||error||'Unknown startup error');
+    const retry=document.createElement('button');
+    retry.className='btn btn-primary';
+    retry.type='button';
+    retry.textContent='Try loading again';
+    retry.addEventListener('click',()=>{app.textContent='Loading StudentLink…';startStudentLink()});
+    panel.append(heading,message,detail,retry);
+    app.appendChild(panel);
+  }
+}
+startStudentLink();
