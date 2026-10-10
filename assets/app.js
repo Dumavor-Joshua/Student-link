@@ -256,35 +256,79 @@ function renderPasswordReset(message=''){
     }
   };
 }
-async function boot(){if(!db){renderAuth('signup',!configured?'Setup needed: create a Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.':!window.supabase?'StudentLink could not load its sign-in library. Check your connection and reload the page. If this continues, try another network.':'StudentLink could not initialize its sign-in service. Reload the page and try again.');return}const resetRequested=new URLSearchParams(window.location.search).get('reset-password')==='1';let {data:{session},error}=await db.auth.getSession();if(resetRequested){renderPasswordReset(error?'Could not validate the reset session. Request a new reset link.':'');return}if(error||!session){renderAuth();return}S.session=session;await loadProfile();const pendingGoogleProfileKey='studentlink-google-signup-profile';const pendingGoogleProfileRaw=safeSessionGet(pendingGoogleProfileKey);if(pendingGoogleProfileRaw){safeSessionRemove(pendingGoogleProfileKey);try{const pending=JSON.parse(pendingGoogleProfileRaw);if(Date.now()-Number(pending.createdAt)<10*60*1000&&S.profile?.school===''&&String(S.profile?.nickname||'').startsWith('Student_')&&pending.nickname&&pending.school){const {error:profileError}=await db.from('profiles').update({nickname:pending.nickname,school:pending.school}).eq('id',S.session.user.id);if(profileError)throw profileError;await loadProfile()}}catch(profileError){console.warn('Google signup profile details could not be saved:',profileError);toast('Google sign-in worked, but your profile details could not be saved. You can update them from Profile.')}}if(S.profile?.deleted_at){renderDeletedProfile();return}$('#app').innerHTML=shell();setupInstallControl();const invite=location.hash.match(/^#(ttt|cf|rps)=([0-9a-f-]{36})$/i);if(invite){S.view='game';if(invite[1].toLowerCase()==='ttt'){S.game='ttt';S.tttGameId=invite[2]}else if(invite[1].toLowerCase()==='cf'){S.game='connect';S.cfGameId=invite[2]}else{S.game='rps';S.rpsMode='online';S.rpsGameId=invite[2]}}setupNotificationControl();setUpRealtime();loadConvos().catch(error=>console.warn('Unread message counts are unavailable:',error));startUnreadBadgeSync();renderView();wireActions();$('#logout').onclick=()=>{db.auth.signOut();renderAuth()};const search=$('#search'),results=$('#search-results');let searchTimer;if(search&&results){search.oninput=()=>{clearTimeout(searchTimer);const term=search.value.trim();if(term.length<2){results.hidden=true;results.innerHTML='';return}searchTimer=setTimeout(async()=>{const safeTerm=term.replace(/[^\p{L}\p{N} '\-]/gu,'').trim();if(!safeTerm){results.hidden=true;results.innerHTML='';return}const [studentResult,schoolResult]=await Promise.all([db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).or('nickname.ilike.%'+safeTerm+'%,school.ilike.%'+safeTerm+'%').order('nickname').limit(20),db.from('profiles').select('school').not('school','is',null).ilike('school','%'+safeTerm+'%').limit(500)]);if(studentResult.error||schoolResult.error){results.innerHTML='<div class="search-result">Search unavailable</div>';results.hidden=false;return}const schoolMap=new Map();(schoolResult.data||[]).forEach(p=>{const name=(p.school||'').trim();const key=schoolKey(name);if(key&&!schoolMap.has(key))schoolMap.set(key,canonicalSchoolName(name))});const schoolButtons=Array.from(schoolMap.values()).slice(0,5).map(name=>'<button type="button" class="search-school-option" data-school="'+esc(name)+'"><span>🏫</span><span>View all students at <b>'+esc(name)+'</b></span></button>').join('');const studentRows=(studentResult.data||[]).map(p=>'<div class="search-result"><div style="display:flex;align-items:center;gap:8px"><button type="button" class="profile-open" data-public-profile="'+esc(p.id)+'" aria-label="View '+esc(p.nickname)+'\'s profile">'+profileAvatarMarkup(p.nickname,p.avatar_url,'avatar')+'</button><div><button type="button" class="profile-name-link" data-public-profile="'+esc(p.id)+'">'+esc(p.nickname)+'</button><div class="tiny">'+esc(p.school||'No school')+'</div></div></div><button class="btn btn-secondary" data-search-add="'+p.id+'">Add</button></div>').join('');results.innerHTML=(schoolButtons?'<div class="search-section-label">Schools</div>'+schoolButtons:'')+(studentRows?'<div class="search-section-label">Students</div>'+studentRows:'')||'<div class="search-result">No students or schools found</div>';results.hidden=false},250);}}}function updateNotificationButton(){
+async function boot(){if(!db){renderAuth('signup',!configured?'Setup needed: create a Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.':!window.supabase?'StudentLink could not load its sign-in library. Check your connection and reload the page. If this continues, try another network.':'StudentLink could not initialize its sign-in service. Reload the page and try again.');return}const resetRequested=new URLSearchParams(window.location.search).get('reset-password')==='1';let {data:{session},error}=await db.auth.getSession();if(resetRequested){renderPasswordReset(error?'Could not validate the reset session. Request a new reset link.':'');return}if(error||!session){renderAuth();return}S.session=session;await loadProfile();const pendingGoogleProfileKey='studentlink-google-signup-profile';const pendingGoogleProfileRaw=safeSessionGet(pendingGoogleProfileKey);if(pendingGoogleProfileRaw){safeSessionRemove(pendingGoogleProfileKey);try{const pending=JSON.parse(pendingGoogleProfileRaw);if(Date.now()-Number(pending.createdAt)<10*60*1000&&S.profile?.school===''&&String(S.profile?.nickname||'').startsWith('Student_')&&pending.nickname&&pending.school){const {error:profileError}=await db.from('profiles').update({nickname:pending.nickname,school:pending.school}).eq('id',S.session.user.id);if(profileError)throw profileError;await loadProfile()}}catch(profileError){console.warn('Google signup profile details could not be saved:',profileError);toast('Google sign-in worked, but your profile details could not be saved. You can update them from Profile.')}}if(S.profile?.deleted_at){renderDeletedProfile();return}$('#app').innerHTML=shell();setupInstallControl();const invite=location.hash.match(/^#(ttt|cf|rps)=([0-9a-f-]{36})$/i);if(invite){S.view='game';if(invite[1].toLowerCase()==='ttt'){S.game='ttt';S.tttGameId=invite[2]}else if(invite[1].toLowerCase()==='cf'){S.game='connect';S.cfGameId=invite[2]}else{S.game='rps';S.rpsMode='online';S.rpsGameId=invite[2]}}const pushParams=new URLSearchParams(location.search);if(pushParams.get('openMessages')==='1'){S.view='messages';S.chat=pushParams.get('conversation')||null;}setupNotificationControl();setUpRealtime();loadConvos().catch(error=>console.warn('Unread message counts are unavailable:',error));startUnreadBadgeSync();renderView();wireActions();$('#logout').onclick=()=>{db.auth.signOut();renderAuth()};const search=$('#search'),results=$('#search-results');let searchTimer;if(search&&results){search.oninput=()=>{clearTimeout(searchTimer);const term=search.value.trim();if(term.length<2){results.hidden=true;results.innerHTML='';return}searchTimer=setTimeout(async()=>{const safeTerm=term.replace(/[^\p{L}\p{N} '\-]/gu,'').trim();if(!safeTerm){results.hidden=true;results.innerHTML='';return}const [studentResult,schoolResult]=await Promise.all([db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).or('nickname.ilike.%'+safeTerm+'%,school.ilike.%'+safeTerm+'%').order('nickname').limit(20),db.from('profiles').select('school').not('school','is',null).ilike('school','%'+safeTerm+'%').limit(500)]);if(studentResult.error||schoolResult.error){results.innerHTML='<div class="search-result">Search unavailable</div>';results.hidden=false;return}const schoolMap=new Map();(schoolResult.data||[]).forEach(p=>{const name=(p.school||'').trim();const key=schoolKey(name);if(key&&!schoolMap.has(key))schoolMap.set(key,canonicalSchoolName(name))});const schoolButtons=Array.from(schoolMap.values()).slice(0,5).map(name=>'<button type="button" class="search-school-option" data-school="'+esc(name)+'"><span>🏫</span><span>View all students at <b>'+esc(name)+'</b></span></button>').join('');const studentRows=(studentResult.data||[]).map(p=>'<div class="search-result"><div style="display:flex;align-items:center;gap:8px"><button type="button" class="profile-open" data-public-profile="'+esc(p.id)+'" aria-label="View '+esc(p.nickname)+'\'s profile">'+profileAvatarMarkup(p.nickname,p.avatar_url,'avatar')+'</button><div><button type="button" class="profile-name-link" data-public-profile="'+esc(p.id)+'">'+esc(p.nickname)+'</button><div class="tiny">'+esc(p.school||'No school')+'</div></div></div><button class="btn btn-secondary" data-search-add="'+p.id+'">Add</button></div>').join('');results.innerHTML=(schoolButtons?'<div class="search-section-label">Schools</div>'+schoolButtons:'')+(studentRows?'<div class="search-section-label">Students</div>'+studentRows:'')||'<div class="search-result">No students or schools found</div>';results.hidden=false},250);}}}function updateNotificationButton(){
   const button=document.getElementById('notifications-toggle');
   if(!button)return;
   if(!('Notification' in window)){
     button.textContent='🔔 Unavailable';
-    button.title='This browser does not support browser notifications.';
+    button.title='This browser does not support notifications.';
     button.disabled=true;
     return;
   }
   const permission=Notification.permission;
   button.disabled=permission==='denied';
-  button.textContent=permission==='granted'?'🔔 On':permission==='denied'?'🔔 Blocked':'🔔 Enable';
-  button.title=permission==='granted'?'Browser notifications are enabled.':permission==='denied'?'Allow notifications for this site in your browser settings.':'Enable browser notifications for new messages and friend requests.';
+  button.textContent=permission==='granted'?'🔔 Push On':permission==='denied'?'🔔 Blocked':'🔔 Enable';
+  button.title=permission==='granted'?'Notifications are allowed. Background push works after this device subscribes.':permission==='denied'?'Allow notifications for this site in your browser settings.':'Enable message notifications, including when StudentLink is closed.';
   button.setAttribute('aria-label',button.title);
+}
+function base64UrlToUint8Array(value){
+  const padding='='.repeat((4-value.length%4)%4);
+  const base64=(value+padding).replaceAll('-','+').replaceAll('_','/');
+  const raw=atob(base64);
+  return Uint8Array.from(raw,c=>c.charCodeAt(0));
+}
+function arrayBufferToBase64Url(value){
+  const bytes=new Uint8Array(value);
+  let binary='';
+  for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);
+  return btoa(binary).replaceAll('+','-').replaceAll('/','_').replace(/=+$/,'');
+}
+async function subscribeToPushNotifications(){
+  if(!window.isSecureContext)throw new Error('Push notifications require a secure HTTPS connection.');
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))throw new Error('This browser does not support background push. On iPhone, add StudentLink to the Home Screen and open the installed app.');
+  if(!S.session?.user?.id||!db)throw new Error('Sign in to StudentLink before enabling notifications.');
+  const {data:applicationServerKey,error:keyError}=await db.rpc('studentlink_vapid_public_config');
+  if(keyError||typeof applicationServerKey!=='string'||!applicationServerKey)throw new Error('StudentLink push setup is unavailable. Please try again later.');
+  const registration=await navigator.serviceWorker.ready;
+  let subscription=await registration.pushManager.getSubscription();
+  if(!subscription){
+    subscription=await registration.pushManager.subscribe({
+      userVisibleOnly:true,
+      applicationServerKey:base64UrlToUint8Array(applicationServerKey)
+    });
+  }
+  const p256dh=subscription.getKey('p256dh');
+  const authKey=subscription.getKey('auth');
+  if(!p256dh||!authKey)throw new Error('The browser did not provide a valid push subscription.');
+  const {error}=await db.from('push_subscriptions').upsert({
+    endpoint:subscription.endpoint,
+    user_id:S.session.user.id,
+    p256dh:arrayBufferToBase64Url(p256dh),
+    auth:arrayBufferToBase64Url(authKey),
+    updated_at:new Date().toISOString()
+  },{onConflict:'endpoint'});
+  if(error)throw error;
+  return true;
 }
 function setupNotificationControl(){
   const button=document.getElementById('notifications-toggle');
   if(!button)return;
   updateNotificationButton();
   button.addEventListener('click',async()=>{
-    if(!('Notification' in window)){toast('This browser does not support browser notifications.');return;}
-    if(Notification.permission==='denied'){toast('Notifications are blocked by your browser. Allow them in the site settings, then reload StudentLink.');return;}
-    if(Notification.permission==='granted'){toast('Browser notifications are already enabled.');return;}
+    if(!('Notification' in window)){toast('This browser does not support notifications.');return;}
+    if(Notification.permission==='denied'){toast('Notifications are blocked. Allow them in your browser site settings, then reload StudentLink.');return;}
+    button.disabled=true;
     try{
-      const permission=await Notification.requestPermission();
+      let permission=Notification.permission;
+      if(permission!=='granted')permission=await Notification.requestPermission();
       updateNotificationButton();
-      if(permission==='granted')toast('Notifications enabled for new messages and friend requests.');
-      else toast('Notifications were not enabled. You can enable them later in your browser settings.');
-    }catch(error){console.warn('Could not request notification permission:',error);toast('Could not enable notifications in this browser.');}
+      if(permission!=='granted'){toast('Notifications were not enabled. You can enable them later in browser settings.');return;}
+      await subscribeToPushNotifications();
+      toast('Background message notifications are enabled on this device.');
+    }catch(error){
+      console.warn('Could not enable StudentLink push notifications:',error);
+      toast(error?.message||'Could not enable background notifications. Check browser permissions and try again.');
+    }finally{button.disabled=Notification.permission==='denied';updateNotificationButton();}
   });
 }
 function sendBrowserNotification(title,body,tag){
