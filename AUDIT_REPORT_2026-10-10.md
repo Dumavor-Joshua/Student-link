@@ -32,7 +32,7 @@ Applied migration `harden_notification_rpc_and_indexes` to project `fpdcetkvxdry
 - The advisor no longer reports anonymous EXECUTE access for the three notification trigger functions.
 - Remaining security warnings include the disabled leaked-password protection setting and several SECURITY DEFINER RPCs intended for signed-in features (including game RPCs and relationship checks). Those require function-by-function authorization review; indiscriminately revoking them would break working features.
 - Remaining performance warnings include RLS policies that should wrap `auth.uid()` in a scalar subquery, plus indexes reported unused so far. An index being unused in a low-traffic project is not by itself a reason to drop it.
-- Static regression checks were updated in the repository, but were not executed in a Node runtime during this session.
+- GitHub Actions ran the Node syntax check and static regression suite successfully on the final source commit (commit `6e6be284ce71caa7ab71cec70fe44fabe0e85775`); both check steps completed with `success`. This is static validation, not a full live browser test.
 - No real two-account browser test, iPhone Safari test, or live push-notification test was available in this session.
 
 ## Reward system decision
