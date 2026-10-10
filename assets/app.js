@@ -541,7 +541,7 @@ function updateMessageBadges(){
   document.querySelectorAll('[data-convo]').forEach(button=>{const convo=(S.convos||[]).find(c=>c.id===button.dataset.convo);const badge=button.querySelector('.messenger-unread-badge');if(!badge)return;const count=Number(convo?.unreadCount)||0;badge.textContent=String(count);badge.hidden=count===0;badge.setAttribute('aria-label',count+' unread messages')});
 }
 async function loadConvos(){
-  const {data,error}=await db.from('conversations').select('id,user_a,user_b,updated_at').or(\`user_a.eq.\${S.session.user.id},user_b.eq.\${S.session.user.id}\`).order('updated_at',{ascending:false});
+  const {data,error}=await db.from('conversations').select('id,user_a,user_b,updated_at').or(`user_a.eq.${S.session.user.id},user_b.eq.${S.session.user.id}`).order('updated_at',{ascending:false});
   if(error)throw error;
   const rows=data||[];const otherIds=rows.map(c=>c.user_a===S.session.user.id?c.user_b:c.user_a);
   const {data:profiles,error:profileError}=otherIds.length?await db.from('profiles').select('id,nickname,avatar_url').in('id',otherIds):{data:[],error:null};
