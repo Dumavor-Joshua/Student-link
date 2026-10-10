@@ -287,7 +287,8 @@ async function subscribeToPushNotifications(){
   if(!window.isSecureContext)throw new Error('Push notifications require a secure HTTPS connection.');
   if(!('serviceWorker' in navigator)||!('PushManager' in window))throw new Error('This browser does not support background push. On iPhone, add StudentLink to the Home Screen and open the installed app.');
   if(!S.session?.user?.id||!db)throw new Error('Sign in to StudentLink before enabling notifications.');
-  const {data:applicationServerKey,error:keyError}=await db.rpc('studentlink_vapid_public_config');
+  const {data:pushConfig,error:keyError}=await db.from('push_public_config').select('vapid_public_key').eq('id',true).maybeSingle();
+  const applicationServerKey=pushConfig?.vapid_public_key;
   if(keyError||typeof applicationServerKey!=='string'||!applicationServerKey)throw new Error('StudentLink push setup is unavailable. Please try again later.');
   const registration=await navigator.serviceWorker.ready;
   let subscription=await registration.pushManager.getSubscription();
