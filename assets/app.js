@@ -339,7 +339,48 @@ async function setUpRealtime(){
     .subscribe(status=>{if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')console.warn('StudentLink realtime status:',status)});
 }
 async function loadProfile(){let {data,error}=await db.from('profiles').select('*').eq('id',S.session.user.id).maybeSingle();if(error)console.warn(error);S.profile=data||{id:S.session.user.id,nickname:'Student',school:''}}
-async function renderView(){let m=$('#main');if(!m)return;m.setAttribute('aria-live','polite');m.setAttribute('aria-busy','true');m.innerHTML='<div class="card state-message" role="status"><span class="state-icon" aria-hidden="true">⏳</span><div><b>Loading this page…</b><p class="tiny">Please wait a moment.</p></div></div>';try{if(S.view==='feed')await viewFeed();if(S.view==='friends')await viewFriends();if(S.view==='messages')await viewMessages();if(S.view==='games')viewGames();if(S.view==='game')await viewGame();if(S.view==='profile')viewProfile();if(S.view==='suggestions')viewSuggestions();if(S.view==='school')await viewSchoolStudents(S.schoolFilter);try{await viewSchools()}catch(schoolError){console.warn('Trending schools could not be loaded:',schoolError);const fallback='<p class="tiny">Trending schools are temporarily unavailable.</p>';const desktop=$('#trending'),mobile=$('#trending-mobile');if(desktop)desktop.innerHTML=fallback;if(mobile)mobile.innerHTML=fallback}}catch(e){console.error(e);m.innerHTML=`<div class="card state-message error-state" role="alert"><span class="state-icon" aria-hidden="true">!</span><div><b>This page couldn't be loaded</b><p>${esc(e?.message||'Something went wrong. Please try again.')}</p><p class="tiny">Check your connection and try opening this page again.</p></div></div>`}finally{m.setAttribute('aria-busy','false')}}
+async function renderView(){
+  const main=$('#main');
+  if(!main)return;
+  main.setAttribute('aria-live','polite');
+  main.setAttribute('aria-busy','true');
+  main.innerHTML='<div class="card state-message" role="status"><span class="state-icon" aria-hidden="true">⏳</span><div><b>Loading this page…</b><p class="tiny">Please wait a moment.</p></div></div>';
+  const renderers={
+    feed:()=>viewFeed(),
+    friends:()=>viewFriends(),
+    messages:()=>viewMessages(),
+    games:()=>viewGames(),
+    game:()=>viewGame(),
+    profile:()=>viewProfile(),
+    suggestions:()=>viewSuggestions(),
+    school:()=>viewSchoolStudents(S.schoolFilter)
+  };
+  try{
+    const render=renderers[S.view];
+    if(!render)throw new Error('That StudentLink page is not available.');
+    await render();
+  }catch(error){
+    console.error('StudentLink page failed:',S.view,error);
+    if(main.isConnected){
+      main.innerHTML='<section class="card state-message error-state" role="alert"><span class="state-icon" aria-hidden="true">!</span><div><b>This page could not be loaded</b><p id="page-error-message"></p><p class="tiny">Other StudentLink sections remain available. Try this page again or open another section.</p><button type="button" class="btn btn-secondary" id="retry-page">Try again</button></div></section>';
+      const message=$('#page-error-message');
+      if(message)message.textContent=String(error?.message||'Something went wrong. Please try again.');
+      $('#retry-page')?.addEventListener('click',()=>{renderView().catch(e=>console.error('Page retry failed:',e));});
+    }
+  }finally{
+    if(main.isConnected)main.setAttribute('aria-busy','false');
+  }
+  // Sidebar school discovery is optional and must not prevent the selected page from working.
+  try{
+    await viewSchools();
+  }catch(error){
+    console.warn('Trending schools are temporarily unavailable:',error);
+    const fallback='<p class="tiny">Trending schools are temporarily unavailable.</p>';
+    const desktop=$('#trending'),mobile=$('#trending-mobile');
+    if(desktop)desktop.innerHTML=fallback;
+    if(mobile)mobile.innerHTML=fallback;
+  }
+}
 async function viewFeed(){
  const mode=S.feedMode==='school'?'school':'all';let data=[];
  if(S.feedOrderMode!==mode||!S.feedOrderIds.length){const result=await db.rpc('get_studentlink_feed',{p_school_only:mode==='school',p_limit:40});if(result.error)throw result.error;data=result.data||[];S.feedOrderMode=mode;S.feedOrderIds=data.map(p=>p.id)}
@@ -717,4 +758,12 @@ async function startStudentLink(){
     app.appendChild(panel);
   }
 }
+// Last-resort diagnostics for unexpected errors. Feature-level handlers should catch expected failures first.
+window.addEventListener('unhandledrejection',event=>{
+  console.error('Unhandled StudentLink async error:',event.reason);
+});
+window.addEventListener('error',event=>{
+  console.error('Unexpected StudentLink runtime error:',event.error||event.message);
+});
+
 startStudentLink();

@@ -8,6 +8,10 @@ const css = read('assets/app.css');
 const migration = read('supabase/migrations/20261009_harden_poll_vote_policy.sql');
 const profileMigration = read('supabase/migrations/20261009_profile_photos_deactivation_and_feed.sql');
 const profileGuardMigration = read('supabase/migrations/20261009_active_profile_write_guards.sql');
+const gameIndexMigration = read('supabase/migrations/20261010_add_missing_game_fk_indexes.sql');
+const gameRpcHardeningMigration = read('supabase/migrations/20261010_harden_game_rpc_search_path.sql');
+const rlsOptimizationMigration = read('supabase/migrations/20261010_optimize_rls_auth_uid_policies.sql');
+const tablePrivilegeMigration = read('supabase/migrations/20261010_revoke_unused_table_privileges.sql');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(html.includes('src="assets/app.js?v='), 'HTML must load the extracted application script, including its cache version');
@@ -83,9 +87,26 @@ assert.ok(navigationStateCode.includes("S.view==='game'&&link.dataset.view==='ga
 const renderViewStart = js.indexOf('async function renderView()');
 const renderViewEnd = js.indexOf('async function viewFeed()', renderViewStart);
 const renderViewCode = js.slice(renderViewStart, renderViewEnd);
-for (const route of ['feed','friends','messages','games','profile','suggestions']) {
-  assert.ok(renderViewCode.includes("S.view==='"+route+"'"), 'Navigation destination must render: '+route);
+for (const [route,renderer] of Object.entries({
+  feed:'viewFeed',friends:'viewFriends',messages:'viewMessages',games:'viewGames',
+  game:'viewGame',profile:'viewProfile',suggestions:'viewSuggestions',school:'viewSchoolStudents'
+})) {
+  assert.ok(renderViewCode.includes(route+':()=>'+renderer+'(') || renderViewCode.includes(route+':()=>'+renderer+'()'),
+    'Navigation destination must have an isolated renderer: '+route);
 }
+assert.ok(renderViewCode.includes('const renderers={'), 'Page renderers must be dispatched through an explicit route map');
+assert.ok(renderViewCode.includes('Other StudentLink sections remain available.'), 'A page failure must offer recovery without blocking other sections');
+assert.ok(renderViewCode.includes('await viewSchools()'), 'Trending schools must load independently of the selected page');
+assert.ok(js.includes("window.addEventListener('unhandledrejection'"), 'Unexpected async errors must be logged for diagnosis');
+assert.ok(js.includes("window.addEventListener('error'"), 'Unexpected runtime errors must be logged for diagnosis');
+assert.doesNotMatch(js, /awardWinnerPoints|loadMyGamePoints|studentlink_award_game_points|game_point_awards/,
+  'Paused game rewards must not be wired into the main app code');
+
+assert.ok(gameIndexMigration.includes('create index if not exists rps_games_winner_id_idx'), 'Game foreign-key indexes must be tracked in migrations');
+assert.ok(gameRpcHardeningMigration.includes('set search_path = pg_catalog, public, pg_temp'), 'Multiplayer SECURITY DEFINER functions must use a hardened search_path');
+assert.ok(rlsOptimizationMigration.includes('(select auth.uid())'), 'RLS auth identity checks should use scalar subqueries');
+assert.ok(tablePrivilegeMigration.includes('revoke references, trigger, truncate on all tables in schema public'), 'Browser roles must not have unnecessary table-level privileges');
+assert.doesNotMatch(tablePrivilegeMigration, /drop\s+(table|policy|function)/i, 'Privilege maintenance must not drop application objects');
 
 console.log('StudentLink static checks passed.');
 
@@ -93,7 +114,7 @@ assert.ok(html.includes('rel="icon" type="image/svg+xml" href="assets/favicon.sv
 assert.ok(js.includes("document.getElementById('google-signin')"), 'Google button must be located during auth rendering');
 assert.ok(js.includes("googleButton?.addEventListener('click'") , 'Continue with Google must have a click handler');
 assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), 'Continue with Google must use Supabase Google OAuth');
-assert.ok(html.includes('studentlink-google-oauth-fix-1'), 'App script cache version must be refreshed after Google sign-in fixes');
+assert.ok(html.includes('studentlink-fault-isolation-1'), 'App script cache version must be refreshed after fault-isolation changes');
 assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
