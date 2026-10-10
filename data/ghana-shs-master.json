@@ -27,7 +27,7 @@
       "note": "Reports a compiled register of 2,135 public and private second-cycle schools across categories A–G; the list is rendered dynamically and has not been fully imported into this file."
     }
   ],
-  "completenessNote": "Expanded working checklist from the existing StudentLink directory and additional entries cross-checked against public GES/TVET register material. This is not yet a complete import of every public and private entry in the 2026 second-cycle register. Names absent from this list remain usable as typed values and are normalized for grouping.",
+  "completenessNote": "The current offline master checklist contains 382 unique canonical names and is an expanded working directory, not a complete import of every public and private entry in the 2026 second-cycle register. Names absent from this list remain usable as typed values and are normalized for grouping.",
   "normalizationPolicy": "Exact normalized names and explicit aliases canonicalize immediately. Fuzzy matching is restricted to unique, high-confidence matches; ambiguous names and different campuses remain separate.",
   "schools": [
     {
@@ -44,10 +44,6 @@
     },
     {
       "name": "Abetifi Presby Senior High",
-      "aliases": []
-    },
-    {
-      "name": "Abetifi Presby Senior High School",
       "aliases": []
     },
     {
@@ -192,10 +188,6 @@
       "aliases": []
     },
     {
-      "name": "Akontombra Senior High",
-      "aliases": []
-    },
-    {
       "name": "Akontombra Senior High School",
       "aliases": []
     },
@@ -229,10 +221,6 @@
     },
     {
       "name": "Ameyaw Akumfi Senior High/Technical",
-      "aliases": []
-    },
-    {
-      "name": "Anfoega Senior High",
       "aliases": []
     },
     {
@@ -280,10 +268,6 @@
       "aliases": []
     },
     {
-      "name": "Asawinso Senior High",
-      "aliases": []
-    },
-    {
       "name": "Asawinso Senior High School",
       "aliases": []
     },
@@ -297,10 +281,6 @@
     },
     {
       "name": "Atebubu Senior High",
-      "aliases": []
-    },
-    {
-      "name": "Atebubu Senior High School",
       "aliases": []
     },
     {
@@ -321,10 +301,6 @@
     },
     {
       "name": "Awutu Winton Senior High",
-      "aliases": []
-    },
-    {
-      "name": "Axim Girls Senior High",
       "aliases": []
     },
     {
@@ -400,10 +376,6 @@
       "aliases": []
     },
     {
-      "name": "Bodi Senior High",
-      "aliases": []
-    },
-    {
       "name": "Bodi Senior High School",
       "aliases": []
     },
@@ -456,10 +428,6 @@
       "aliases": []
     },
     {
-      "name": "Buipe Senior High School",
-      "aliases": []
-    },
-    {
       "name": "Cambridge Senior High Technical School",
       "aliases": []
     },
@@ -508,19 +476,11 @@
       "aliases": []
     },
     {
-      "name": "Dadieso Senior High",
-      "aliases": []
-    },
-    {
       "name": "Dadieso Senior High School",
       "aliases": []
     },
     {
       "name": "Daffiamah Senior High",
-      "aliases": []
-    },
-    {
-      "name": "Dagbon State Senior High/Tech School",
       "aliases": []
     },
     {
@@ -659,10 +619,6 @@
       "aliases": []
     },
     {
-      "name": "Ghana Senior High/Tech School, Takoradi",
-      "aliases": []
-    },
-    {
       "name": "Ghana Senior High/Technical School, Takoradi",
       "aliases": []
     },
@@ -676,10 +632,6 @@
     },
     {
       "name": "Gwiraman Community Senior High School",
-      "aliases": []
-    },
-    {
-      "name": "Half Assini Senior High",
       "aliases": []
     },
     {
@@ -699,10 +651,6 @@
     },
     {
       "name": "Holy Trinity Senior High School",
-      "aliases": []
-    },
-    {
-      "name": "Huni Valley Senior High",
       "aliases": []
     },
     {
@@ -774,10 +722,6 @@
       "aliases": []
     },
     {
-      "name": "Keta Senior High/Tech School",
-      "aliases": []
-    },
-    {
       "name": "Keta Senior High/Technical",
       "aliases": []
     },
@@ -795,10 +739,6 @@
     },
     {
       "name": "Klikor Senior High/Tech School",
-      "aliases": []
-    },
-    {
-      "name": "Klikor Senior High/Technical",
       "aliases": []
     },
     {
@@ -938,19 +878,11 @@
       "aliases": []
     },
     {
-      "name": "Mepe St. Kizito Senior High/Technical",
-      "aliases": []
-    },
-    {
       "name": "Methodist Senior High School, Saltpond",
       "aliases": []
     },
     {
       "name": "Methodist Senior High School, Sekondi",
-      "aliases": []
-    },
-    {
-      "name": "Methodist Senior High, Sekondi",
       "aliases": []
     },
     {
@@ -993,10 +925,6 @@
       "aliases": []
     },
     {
-      "name": "Mpohor Senior High",
-      "aliases": []
-    },
-    {
       "name": "Mpohor Senior High School",
       "aliases": []
     },
@@ -1010,10 +938,6 @@
     },
     {
       "name": "Nana Brentu Senior High/Tech School",
-      "aliases": []
-    },
-    {
-      "name": "Nana Brentu Senior High/Technical",
       "aliases": []
     },
     {
@@ -1213,10 +1137,6 @@
       "aliases": []
     },
     {
-      "name": "Peki Senior High/Technical",
-      "aliases": []
-    },
-    {
       "name": "Peki Senior High/Technical School",
       "aliases": []
     },
@@ -1245,10 +1165,6 @@
     },
     {
       "name": "Presby Senior High School, Tamale",
-      "aliases": []
-    },
-    {
-      "name": "Presby Senior High School, Tema",
       "aliases": []
     },
     {
@@ -1285,10 +1201,6 @@
     },
     {
       "name": "Prestea Senior High/Tech School",
-      "aliases": []
-    },
-    {
-      "name": "Prestea Senior High/Technical",
       "aliases": []
     },
     {
@@ -1348,10 +1260,6 @@
       "aliases": []
     },
     {
-      "name": "Sefwi Bekwai Senior High",
-      "aliases": []
-    },
-    {
       "name": "Sefwi Bekwai Senior High School",
       "aliases": []
     },
@@ -1373,10 +1281,6 @@
     },
     {
       "name": "Serwaah Nyarko Girls Senior High",
-      "aliases": []
-    },
-    {
-      "name": "Sogakope Senior High",
       "aliases": []
     },
     {
@@ -1436,10 +1340,6 @@
       "aliases": []
     },
     {
-      "name": "St. Joseph Senior High, Sefwi Wiawso",
-      "aliases": []
-    },
-    {
       "name": "St. Louis Senior High School, Kumasi",
       "aliases": [
         "st louis kumasi",
@@ -1467,19 +1367,11 @@
       "aliases": []
     },
     {
-      "name": "St. Mary's Senior High, Konongo",
-      "aliases": []
-    },
-    {
       "name": "St. Michael's Senior High, Ahenkro",
       "aliases": []
     },
     {
       "name": "St. Monica's Senior High School, Mampong",
-      "aliases": []
-    },
-    {
-      "name": "St. Monica's Senior High, Mampong",
       "aliases": []
     },
     {
@@ -1580,7 +1472,9 @@
     },
     {
       "name": "Tema Senior High",
-      "aliases": []
+      "aliases": [
+        "tema secondary"
+      ]
     },
     {
       "name": "Terchire Senior High",
@@ -1592,10 +1486,6 @@
     },
     {
       "name": "Toase Senior High",
-      "aliases": []
-    },
-    {
-      "name": "Tongo Senior High/Tech School",
       "aliases": []
     },
     {
@@ -1612,10 +1502,6 @@
     },
     {
       "name": "Tumu Senior High/Tech School",
-      "aliases": []
-    },
-    {
-      "name": "Tuna Senior High/Tech School",
       "aliases": []
     },
     {
@@ -1636,10 +1522,6 @@
     },
     {
       "name": "Uthman Bin Affan Islamic Senior High",
-      "aliases": []
-    },
-    {
-      "name": "Vakpo Senior High",
       "aliases": []
     },
     {
@@ -1676,10 +1558,6 @@
     },
     {
       "name": "Wenchi Methodist Senior High",
-      "aliases": []
-    },
-    {
-      "name": "Wenchi Methodist Senior High School",
       "aliases": []
     },
     {
