@@ -56,8 +56,9 @@ async function openStudentLinkDestination(destination){
   for(const client of clientsList){
     if(!('focus' in client))continue;
     try{
+      if(typeof client.navigate!=='function')continue;
+      await client.navigate(targetURL);
       await client.focus();
-      if(typeof client.navigate==='function')await client.navigate(targetURL);
       return;
     }catch(error){
       console.warn('StudentLink could not reuse an open window; opening the app instead:',error);
