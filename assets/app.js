@@ -228,7 +228,7 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
 function applyTheme(theme){const chosen=theme==='light'?'light':'dark';document.documentElement.dataset.theme=chosen;try{localStorage.setItem('studentlink-theme',chosen)}catch(_){}const b=$('#theme-toggle');if(b){b.textContent=chosen==='dark'?'☀️ Light':'🌙 Dark';b.setAttribute('aria-label',chosen==='dark'?'Switch to light mode':'Switch to dark mode');b.setAttribute('aria-pressed',String(chosen==='light'))}}
 function initTheme(){let saved='dark';try{saved=localStorage.getItem('studentlink-theme')||'dark'}catch(_){}document.documentElement.dataset.theme=saved==='light'?'light':'dark'}
 initTheme();
-function nav(v,ico,label){const selected=S.view===v||(S.view==='game'&&v==='games');const badge=v==='messages'?'<span class="nav-unread-badge" data-message-nav-badge hidden>0</span>':'';return `<button type="button" class="navitem ${selected?'active':''}" data-view="${v}" aria-current="${selected?'page':'false'}" aria-pressed="${selected}"><span aria-hidden="true">${ico}</span><span>${label}</span>${badge}</button>`}function shell(){return `<header class="header"><div style="display:flex;gap:16px;flex:1;align-items:center"><span style="font-weight:600;font-size:16px">StudentLink</span><div class="search-wrap"><input type="text" class="search" id="search" placeholder="Search students or schools…"><div id="search-results" class="search-results" hidden></div></div></div><div style="display:flex;align-items:center;gap:8px"><button class="btn btn-secondary" id="install-app" type="button">Install app</button><button class="btn btn-secondary message-count-shortcut" id="messages-shortcut" type="button" aria-label="Open messages; 0 conversations with unread messages">💬 <span class="message-shortcut-label">Messages</span> <span class="header-message-badge" data-message-header-badge hidden>0</span></button><button class="btn btn-secondary" id="logout">Log out</button><button class="btn btn-secondary" id="theme-toggle" type="button" aria-label="Switch color theme">☀️ Light</button><button class="btn btn-secondary" id="notifications-toggle" type="button" aria-label="Enable browser notifications">🔔 Enable</button></div></header><section class="trending-mobile-wrap"><h3>Trending schools</h3><div id="trending-mobile" class="trending-mobile"></div></section><div class="layout"><div class="leftside">${nav('feed','📰','Feed')}${nav('friends','👥','Friends')}${nav('messages','💬','Messages')}${nav('games','🎮','Games')}${nav('profile','👤','Profile')}${nav('suggestions','💡','Feedback')}</div><div class="main" id="main"></div><aside class="rightside"><h3 style="margin:0 0 16px 0">Trending schools</h3><div id="trending"></div></aside></div>`}
+function nav(v,ico,label){const selected=S.view===v||(S.view==='game'&&v==='games');const badge=v==='messages'?'<span class="nav-unread-badge" data-message-nav-badge hidden>0</span>':v==='feed'?'<span class="nav-unread-badge" data-home-unread-badge hidden>0</span>':'';return `<button type="button" class="navitem ${selected?'active':''}" data-view="${v}" aria-current="${selected?'page':'false'}" aria-pressed="${selected}"><span aria-hidden="true">${ico}</span><span>${label}</span>${badge}</button>`}function shell(){return `<header class="header"><div style="display:flex;gap:16px;flex:1;align-items:center"><span style="font-weight:600;font-size:16px">StudentLink</span><div class="search-wrap"><input type="text" class="search" id="search" placeholder="Search students or schools…"><div id="search-results" class="search-results" hidden></div></div></div><div style="display:flex;align-items:center;gap:8px"><button class="btn btn-secondary" id="install-app" type="button">Install app</button><button class="btn btn-secondary message-count-shortcut" id="messages-shortcut" type="button" aria-label="Open messages; 0 conversations with unread messages">💬 <span class="message-shortcut-label">Messages</span> <span class="header-message-badge" data-message-header-badge hidden>0</span></button><button class="btn btn-secondary" id="logout">Log out</button><button class="btn btn-secondary" id="theme-toggle" type="button" aria-label="Switch color theme">☀️ Light</button><button class="btn btn-secondary" id="notifications-toggle" type="button" aria-label="Enable browser notifications">🔔 Enable</button></div></header><section class="trending-mobile-wrap"><h3>Trending schools</h3><div id="trending-mobile" class="trending-mobile"></div></section><div class="layout"><div class="leftside">${nav('feed','📰','Feed')}${nav('friends','👥','Friends')}${nav('messages','💬','Messages')}${nav('games','🎮','Games')}${nav('profile','👤','Profile')}${nav('suggestions','💡','Feedback')}</div><div class="main" id="main"></div><aside class="rightside"><h3 style="margin:0 0 16px 0">Trending schools</h3><div id="trending"></div></aside></div>`}
 function renderPasswordReset(message=''){
   const root=document.getElementById('app');if(!root)return;
   root.innerHTML='<div class="auth"><div class="auth-layout"><section class="auth-intro"><div class="brand"><span class="brandicon" aria-hidden="true">🔗</span><span>StudentLink</span></div><h1>Secure your account.</h1><p>Choose a new password to get back to your school community.</p></section><section class="auth-panel"><div class="hero"><div class="auth-card-heading"><h2>Set a new password</h2><p>Use at least 6 characters.</p></div><form id="reset-password-form"><div class="field"><label for="new-password">New password</label><input id="new-password" type="password" autocomplete="new-password" minlength="6" required></div><div class="field"><label for="confirm-password">Confirm new password</label><input id="confirm-password" type="password" autocomplete="new-password" minlength="6" required></div><button type="submit" class="btn auth-submit" id="save-new-password">Update password</button></form><p id="reset-password-message" class="auth-message" role="status" aria-live="polite" '+(message?'':'hidden')+'>'+esc(message)+'</p><button type="button" class="auth-text-link" id="back-to-login">Back to sign in</button></div></section></div></div>';
@@ -306,6 +306,30 @@ async function notifyFriendRequest(payload){
     sendBrowserNotification('New friend request',((person?.nickname||'A student')+' sent you a friend request.'),'friend-request-'+id);
   }catch(error){console.warn('Could not process friend-request notification:',error);}
 }
+// A short, unobtrusive incoming-message tone. Browsers require a user gesture before audio can play.
+let studentLinkAudioContext=null;
+function primeMessageSound(){
+  try{
+    const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+    if(!AudioContextClass)return;
+    if(!studentLinkAudioContext)studentLinkAudioContext=new AudioContextClass();
+    if(studentLinkAudioContext.state==='suspended')studentLinkAudioContext.resume().catch(()=>{});
+  }catch(_){}
+}
+document.addEventListener('pointerdown',primeMessageSound,{passive:true});
+document.addEventListener('keydown',primeMessageSound);
+function playMessageSound(){
+  try{
+    const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+    if(!AudioContextClass)return;
+    if(!studentLinkAudioContext)studentLinkAudioContext=new AudioContextClass();
+    const ctx=studentLinkAudioContext;
+    if(ctx.state==='suspended'){ctx.resume().then(()=>playMessageSound()).catch(()=>{});return;}
+    const now=ctx.currentTime;
+    const gain=ctx.createGain();gain.gain.setValueAtTime(0.0001,now);gain.gain.exponentialRampToValueAtTime(0.12,now+0.025);gain.gain.exponentialRampToValueAtTime(0.0001,now+0.22);gain.connect(ctx.destination);
+    const oscillator=ctx.createOscillator();oscillator.type='sine';oscillator.frequency.setValueAtTime(880,now);oscillator.frequency.setValueAtTime(1175,now+0.09);oscillator.connect(gain);oscillator.start(now);oscillator.stop(now+0.23);
+  }catch(error){console.warn('Message sound is unavailable in this browser:',error);}
+}
 async function notifyIncomingMessage(payload){
   try{
     const row=payload?.new;
@@ -316,6 +340,7 @@ async function notifyIncomingMessage(payload){
     const {data:conversation,error}=await db.from('conversations').select('user_a,user_b').eq('id',row.conversation_id).maybeSingle();
     if(error){console.warn('Could not verify message conversation for notification:',error);return;}
     if(!conversation||![conversation.user_a,conversation.user_b].includes(S.session?.user?.id))return;
+    playMessageSound();
     if(S.view==='messages'&&S.chat===row.conversation_id&&document.visibilityState==='visible')return;
     const {data:person,error:profileError}=await db.from('profiles').select('nickname').eq('id',row.sender_id).maybeSingle();
     if(profileError)console.warn('Could not load message notification sender:',profileError);
@@ -534,8 +559,10 @@ function formatAttachmentSize(bytes){const size=Number(bytes)||0;return size<102
 async function updateMessageReadCursor(conversationId,timestamp){if(!conversationId||!timestamp||!S.session?.user?.id)return;const {error}=await db.from('conversation_reads').upsert({conversation_id:conversationId,user_id:S.session.user.id,last_read_at:timestamp},{onConflict:'conversation_id,user_id'});if(error)throw error;S.messageReadAt[conversationId]=timestamp}
 function updateMessageBadges(){
   const unreadChats=(S.convos||[]).filter(c=>Number(c.unreadCount)>0).length;
-  document.querySelectorAll('[data-message-nav-badge],[data-message-header-badge]').forEach(badge=>{badge.textContent=String(unreadChats);badge.hidden=unreadChats===0;badge.setAttribute('aria-label',unreadChats+' chats with unread messages')});
+  document.querySelectorAll('[data-message-nav-badge],[data-message-header-badge],[data-home-unread-badge]').forEach(badge=>{badge.textContent=String(unreadChats);badge.hidden=unreadChats===0;badge.setAttribute('aria-label',unreadChats+' chats with unread messages')});
   const headerShortcut=document.getElementById('messages-shortcut');if(headerShortcut)headerShortcut.setAttribute('aria-label','Open messages; '+unreadChats+' conversations with unread messages');
+  // On supported installed PWAs, mirror the unread-chat count on the phone's home-screen app icon.
+  try{if('setAppBadge' in navigator){if(unreadChats>0)navigator.setAppBadge(unreadChats).catch(()=>{});else if('clearAppBadge' in navigator)navigator.clearAppBadge().catch(()=>{});}}catch(_){}
   document.querySelectorAll('[data-convo]').forEach(button=>{const convo=(S.convos||[]).find(c=>c.id===button.dataset.convo);const badge=button.querySelector('.messenger-unread-badge');if(!badge)return;const count=Number(convo?.unreadCount)||0;badge.textContent=String(count);badge.hidden=count===0;badge.setAttribute('aria-label',count+' unread messages')});
 }
 // Realtime is the fast path; periodic and foreground refreshes keep badges correct if a mobile browser drops a socket event.
