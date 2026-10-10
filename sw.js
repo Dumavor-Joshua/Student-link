@@ -23,7 +23,12 @@ self.addEventListener('push',event=>{
     renotify:true,
     data:{url:typeof payload.url==='string'?payload.url:'?openMessages=1'}
   };
-  event.waitUntil(self.registration.showNotification(title,options));
+  const tasks=[self.registration.showNotification(title,options)];
+  const badgeCount=Number(payload.badgeCount);
+  if(typeof self.navigator?.setAppBadge==='function'&&Number.isFinite(badgeCount)){
+    tasks.push(badgeCount>0?self.navigator.setAppBadge(badgeCount):self.navigator.clearAppBadge());
+  }
+  event.waitUntil(Promise.allSettled(tasks));
 });
 self.addEventListener('notificationclick',event=>{
   event.notification.close();
