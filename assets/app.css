@@ -949,3 +949,13 @@ input,textarea,select{font-size:16px}
  .feedback-item{padding:11px}
  .feedback-inline-status{font-size:12px}
 }
+
+
+/* Unread message indicators: navigation counts unread chats; chat rows count unread messages. */
+.navitem{position:relative}
+.nav-unread-badge,.messenger-unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#e5484d;color:#fff;font-size:11px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.nav-unread-badge[hidden],.messenger-unread-badge[hidden]{display:none!important}
+.nav-unread-badge{margin-left:auto}
+.messenger-conversation{position:relative}
+.messenger-conversation .messenger-unread-badge{flex:0 0 auto;margin-left:auto;align-self:center}
+@media(max-width:760px){.nav-unread-badge{min-width:18px;height:18px;padding:0 5px;font-size:10px}.messenger-conversation .messenger-unread-badge{min-width:20px;height:20px}}
