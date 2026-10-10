@@ -1,7 +1,7 @@
 // Configure these two values from your own Supabase project. Never use a service-role key here.
 const SUPABASE_URL='https://fpdcetkvxdryogtvldax.supabase.co';const SUPABASE_ANON_KEY='sb_publishable_HMzJqdTbufV4vvJ6QyWl5A_-0PPa0Rs';
 const configured=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('YOUR_')&&!SUPABASE_ANON_KEY.includes('YOUR_');const db=configured&&window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const S={session:null,profile:null,schools:[],view:'feed',schoolFilter:'',feedMode:'all',feedOrderIds:[],feedOrderMode:'',friends:[],requests:[],convos:[],chat:null,channel:null,tttChannel:null,tttGameId:null,onlineGameChannel:null,cfGameId:null,rpsGameId:null,rpsMode:'computer',game:'',ttt:Array(9).fill(0),};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const S={session:null,profile:null,schools:[],view:'feed',schoolFilter:'',feedMode:'all',feedOrderIds:[],feedOrderMode:'',friends:[],requests:[],convos:[],chat:null,channel:null,tttChannel:null,tttGameId:null,onlineGameChannel:null,cfGameId:null,rpsGameId:null,rpsMode:'computer',game:'',ttt:Array(9).fill(0),notifiedMessageIds:new Set(),notifiedFriendshipIds:new Set(),};
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function initials(s='S'){return esc(s.trim().split(/\s+/).slice(0,2).map(x=>x[0].toUpperCase()).join(''))}
 function schoolKey(s=''){return String(s).normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase()}
 const VERIFIED_GHANA_SHS_TVET = [
@@ -199,16 +199,84 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
     });
   }
 }
-function nav(v,ico,label){const selected=S.view===v||(S.view==='game'&&v==='games');return `<button type="button" class="navitem ${selected?'active':''}" data-view="${v}" aria-current="${selected?'page':'false'}" aria-pressed="${selected}"><span aria-hidden="true">${ico}</span><span>${label}</span></button>`}function shell(){return `<header class="header"><div style="display:flex;gap:16px;flex:1;align-items:center"><span style="font-weight:600;font-size:16px">StudentLink</span><div class="search-wrap"><input type="text" class="search" id="search" placeholder="Search students or schools…"><div id="search-results" class="search-results" hidden></div></div></div><div style="display:flex;align-items:center;gap:8px"><button class="btn btn-secondary" id="logout">Log out</button></div></header><section class="trending-mobile-wrap"><h3>Trending schools</h3><div id="trending-mobile" class="trending-mobile"></div></section><div class="layout"><div class="leftside">${nav('feed','📰','Feed')}${nav('friends','👥','Friends')}${nav('messages','💬','Messages')}${nav('games','🎮','Games')}${nav('profile','👤','Profile')}${nav('suggestions','💡','Feedback')}</div><div class="main" id="main"></div><aside class="rightside"><h3 style="margin:0 0 16px 0">Trending schools</h3><div id="trending"></div></aside></div>`}
-async function boot(){if(!db){renderAuth('signup','Setup needed: create a Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.');return}let {data:{session},error}=await db.auth.getSession();if(error||!session){renderAuth();return}S.session=session;await loadProfile();const pendingGoogleProfileKey='studentlink-google-signup-profile';const pendingGoogleProfileRaw=sessionStorage.getItem(pendingGoogleProfileKey);if(pendingGoogleProfileRaw){sessionStorage.removeItem(pendingGoogleProfileKey);try{const pending=JSON.parse(pendingGoogleProfileRaw);if(Date.now()-Number(pending.createdAt)<10*60*1000&&S.profile?.school===''&&String(S.profile?.nickname||'').startsWith('Student_')&&pending.nickname&&pending.school){const {error:profileError}=await db.from('profiles').update({nickname:pending.nickname,school:pending.school}).eq('id',S.session.user.id);if(profileError)throw profileError;await loadProfile()}}catch(profileError){console.warn('Google signup profile details could not be saved:',profileError);toast('Google sign-in worked, but your profile details could not be saved. You can update them from Profile.')}}if(S.profile?.deleted_at){renderDeletedProfile();return}$('#app').innerHTML=shell();const invite=location.hash.match(/^#(ttt|cf|rps)=([0-9a-f-]{36})$/i);if(invite){S.view='game';if(invite[1].toLowerCase()==='ttt'){S.game='ttt';S.tttGameId=invite[2]}else if(invite[1].toLowerCase()==='cf'){S.game='connect';S.cfGameId=invite[2]}else{S.game='rps';S.rpsMode='online';S.rpsGameId=invite[2]}}setUpRealtime();renderView();wireActions();$('#logout').onclick=()=>{db.auth.signOut();renderAuth()};const search=$('#search'),results=$('#search-results');let searchTimer;if(search&&results){search.oninput=()=>{clearTimeout(searchTimer);const term=search.value.trim();if(term.length<2){results.hidden=true;results.innerHTML='';return}searchTimer=setTimeout(async()=>{const safeTerm=term.replace(/[^\p{L}\p{N} '\-]/gu,'').trim();if(!safeTerm){results.hidden=true;results.innerHTML='';return}const [studentResult,schoolResult]=await Promise.all([db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).or('nickname.ilike.%'+safeTerm+'%,school.ilike.%'+safeTerm+'%').order('nickname').limit(20),db.from('profiles').select('school').not('school','is',null).ilike('school','%'+safeTerm+'%').limit(500)]);if(studentResult.error||schoolResult.error){results.innerHTML='<div class="search-result">Search unavailable</div>';results.hidden=false;return}const schoolMap=new Map();(schoolResult.data||[]).forEach(p=>{const name=(p.school||'').trim();const key=schoolKey(name);if(key&&!schoolMap.has(key))schoolMap.set(key,canonicalSchoolName(name))});const schoolButtons=Array.from(schoolMap.values()).slice(0,5).map(name=>'<button type="button" class="search-school-option" data-school="'+esc(name)+'"><span>🏫</span><span>View all students at <b>'+esc(name)+'</b></span></button>').join('');const studentRows=(studentResult.data||[]).map(p=>'<div class="search-result"><div style="display:flex;align-items:center;gap:8px">'+profileAvatarMarkup(p.nickname,p.avatar_url,'avatar')+'<div><b>'+esc(p.nickname)+'</b><div class="tiny">'+esc(p.school||'No school')+'</div></div></div><button class="btn btn-secondary" data-search-add="'+p.id+'">Add</button></div>').join('');results.innerHTML=(schoolButtons?'<div class="search-section-label">Schools</div>'+schoolButtons:'')+(studentRows?'<div class="search-section-label">Students</div>'+studentRows:'')||'<div class="search-result">No students or schools found</div>';results.hidden=false},250);}}}async function setUpRealtime(){
+function nav(v,ico,label){const selected=S.view===v||(S.view==='game'&&v==='games');return `<button type="button" class="navitem ${selected?'active':''}" data-view="${v}" aria-current="${selected?'page':'false'}" aria-pressed="${selected}"><span aria-hidden="true">${ico}</span><span>${label}</span></button>`}function shell(){return `<header class="header"><div style="display:flex;gap:16px;flex:1;align-items:center"><span style="font-weight:600;font-size:16px">StudentLink</span><div class="search-wrap"><input type="text" class="search" id="search" placeholder="Search students or schools…"><div id="search-results" class="search-results" hidden></div></div></div><div style="display:flex;align-items:center;gap:8px"><button class="btn btn-secondary" id="notifications-toggle" type="button" aria-label="Enable browser notifications">🔔 Enable</button><button class="btn btn-secondary" id="logout">Log out</button></div></header><section class="trending-mobile-wrap"><h3>Trending schools</h3><div id="trending-mobile" class="trending-mobile"></div></section><div class="layout"><div class="leftside">${nav('feed','📰','Feed')}${nav('friends','👥','Friends')}${nav('messages','💬','Messages')}${nav('games','🎮','Games')}${nav('profile','👤','Profile')}${nav('suggestions','💡','Feedback')}</div><div class="main" id="main"></div><aside class="rightside"><h3 style="margin:0 0 16px 0">Trending schools</h3><div id="trending"></div></aside></div>`}
+async function boot(){if(!db){renderAuth('signup','Setup needed: create a Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.');return}let {data:{session},error}=await db.auth.getSession();if(error||!session){renderAuth();return}S.session=session;await loadProfile();const pendingGoogleProfileKey='studentlink-google-signup-profile';const pendingGoogleProfileRaw=sessionStorage.getItem(pendingGoogleProfileKey);if(pendingGoogleProfileRaw){sessionStorage.removeItem(pendingGoogleProfileKey);try{const pending=JSON.parse(pendingGoogleProfileRaw);if(Date.now()-Number(pending.createdAt)<10*60*1000&&S.profile?.school===''&&String(S.profile?.nickname||'').startsWith('Student_')&&pending.nickname&&pending.school){const {error:profileError}=await db.from('profiles').update({nickname:pending.nickname,school:pending.school}).eq('id',S.session.user.id);if(profileError)throw profileError;await loadProfile()}}catch(profileError){console.warn('Google signup profile details could not be saved:',profileError);toast('Google sign-in worked, but your profile details could not be saved. You can update them from Profile.')}}if(S.profile?.deleted_at){renderDeletedProfile();return}$('#app').innerHTML=shell();const invite=location.hash.match(/^#(ttt|cf|rps)=([0-9a-f-]{36})$/i);if(invite){S.view='game';if(invite[1].toLowerCase()==='ttt'){S.game='ttt';S.tttGameId=invite[2]}else if(invite[1].toLowerCase()==='cf'){S.game='connect';S.cfGameId=invite[2]}else{S.game='rps';S.rpsMode='online';S.rpsGameId=invite[2]}}setupNotificationControl();setUpRealtime();renderView();wireActions();$('#logout').onclick=()=>{db.auth.signOut();renderAuth()};const search=$('#search'),results=$('#search-results');let searchTimer;if(search&&results){search.oninput=()=>{clearTimeout(searchTimer);const term=search.value.trim();if(term.length<2){results.hidden=true;results.innerHTML='';return}searchTimer=setTimeout(async()=>{const safeTerm=term.replace(/[^\p{L}\p{N} '\-]/gu,'').trim();if(!safeTerm){results.hidden=true;results.innerHTML='';return}const [studentResult,schoolResult]=await Promise.all([db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).or('nickname.ilike.%'+safeTerm+'%,school.ilike.%'+safeTerm+'%').order('nickname').limit(20),db.from('profiles').select('school').not('school','is',null).ilike('school','%'+safeTerm+'%').limit(500)]);if(studentResult.error||schoolResult.error){results.innerHTML='<div class="search-result">Search unavailable</div>';results.hidden=false;return}const schoolMap=new Map();(schoolResult.data||[]).forEach(p=>{const name=(p.school||'').trim();const key=schoolKey(name);if(key&&!schoolMap.has(key))schoolMap.set(key,canonicalSchoolName(name))});const schoolButtons=Array.from(schoolMap.values()).slice(0,5).map(name=>'<button type="button" class="search-school-option" data-school="'+esc(name)+'"><span>🏫</span><span>View all students at <b>'+esc(name)+'</b></span></button>').join('');const studentRows=(studentResult.data||[]).map(p=>'<div class="search-result"><div style="display:flex;align-items:center;gap:8px">'+profileAvatarMarkup(p.nickname,p.avatar_url,'avatar')+'<div><b>'+esc(p.nickname)+'</b><div class="tiny">'+esc(p.school||'No school')+'</div></div></div><button class="btn btn-secondary" data-search-add="'+p.id+'">Add</button></div>').join('');results.innerHTML=(schoolButtons?'<div class="search-section-label">Schools</div>'+schoolButtons:'')+(studentRows?'<div class="search-section-label">Students</div>'+studentRows:'')||'<div class="search-result">No students or schools found</div>';results.hidden=false},250);}}}function updateNotificationButton(){
+  const button=document.getElementById('notifications-toggle');
+  if(!button)return;
+  if(!('Notification' in window)){
+    button.textContent='🔔 Unavailable';
+    button.title='This browser does not support browser notifications.';
+    button.disabled=true;
+    return;
+  }
+  const permission=Notification.permission;
+  button.disabled=permission==='denied';
+  button.textContent=permission==='granted'?'🔔 On':permission==='denied'?'🔔 Blocked':'🔔 Enable';
+  button.title=permission==='granted'?'Browser notifications are enabled.':permission==='denied'?'Allow notifications for this site in your browser settings.':'Enable browser notifications for new messages and friend requests.';
+  button.setAttribute('aria-label',button.title);
+}
+function setupNotificationControl(){
+  const button=document.getElementById('notifications-toggle');
+  if(!button)return;
+  updateNotificationButton();
+  button.addEventListener('click',async()=>{
+    if(!('Notification' in window)){toast('This browser does not support browser notifications.');return;}
+    if(Notification.permission==='denied'){toast('Notifications are blocked by your browser. Allow them in the site settings, then reload StudentLink.');return;}
+    if(Notification.permission==='granted'){toast('Browser notifications are already enabled.');return;}
+    try{
+      const permission=await Notification.requestPermission();
+      updateNotificationButton();
+      if(permission==='granted')toast('Notifications enabled for new messages and friend requests.');
+      else toast('Notifications were not enabled. You can enable them later in your browser settings.');
+    }catch(error){console.warn('Could not request notification permission:',error);toast('Could not enable notifications in this browser.');}
+  });
+}
+function sendBrowserNotification(title,body,tag){
+  try{
+    if(!('Notification' in window)||Notification.permission!=='granted')return;
+    const notification=new Notification(title,{body,tag,icon:'favicon.ico',renotify:false});
+    notification.onclick=()=>{try{window.focus()}catch(_){};notification.close()};
+  }catch(error){console.warn('StudentLink browser notification failed:',error);}
+}
+async function notifyFriendRequest(payload){
+  try{
+    const row=payload?.new;
+    if(!row||payload.eventType!=='INSERT'||row.status!=='pending'||row.friend_id!==S.session?.user?.id||!row.user_id)return;
+    const id=String(row.id||row.user_id);
+    if(S.notifiedFriendshipIds.has(id))return;
+    S.notifiedFriendshipIds.add(id);
+    const {data:person,error}=await db.from('profiles').select('nickname').eq('id',row.user_id).maybeSingle();
+    if(error)console.warn('Could not load friend-request notification sender:',error);
+    sendBrowserNotification('New friend request',((person?.nickname||'A student')+' sent you a friend request.'),'friend-request-'+id);
+  }catch(error){console.warn('Could not process friend-request notification:',error);}
+}
+async function notifyIncomingMessage(payload){
+  try{
+    const row=payload?.new;
+    if(!row||!row.id||!row.conversation_id||row.sender_id===S.session?.user?.id)return;
+    const id=String(row.id);
+    if(S.notifiedMessageIds.has(id))return;
+    S.notifiedMessageIds.add(id);
+    const {data:conversation,error}=await db.from('conversations').select('user_a,user_b').eq('id',row.conversation_id).maybeSingle();
+    if(error){console.warn('Could not verify message conversation for notification:',error);return;}
+    if(!conversation||![conversation.user_a,conversation.user_b].includes(S.session?.user?.id))return;
+    if(S.view==='messages'&&S.chat===row.conversation_id&&document.visibilityState==='visible')return;
+    const {data:person,error:profileError}=await db.from('profiles').select('nickname').eq('id',row.sender_id).maybeSingle();
+    if(profileError)console.warn('Could not load message notification sender:',profileError);
+    const sender=person?.nickname||'A student';
+    const body=String(row.body||'').trim();
+    sendBrowserNotification('New message from '+sender,body.length>140?body.slice(0,137)+'…':body||'You received a new message.','message-'+id);
+  }catch(error){console.warn('Could not process message notification:',error);}
+}
+async function setUpRealtime(){
   if(!db||!S.session)return;
   if(S.channel){await db.removeChannel(S.channel);S.channel=null}
   const refreshFeed=()=>{if(S.view==='feed')renderView()};
   const refreshPosts=()=>{S.feedOrderIds=[];S.feedOrderMode='';if(S.view==='feed')renderView()};
   const refreshFriends=()=>{if(S.view==='friends')renderView()};
   const refreshMessages=()=>{if(S.view==='messages'){if(S.chat)openConversation(S.chat).catch(e=>console.warn('Could not refresh conversation:',e));else renderView()}};
-  const onFriendshipChange=()=>{refreshFriends()};
-  const onMessageChange=()=>{refreshMessages()};
+  const onFriendshipChange=payload=>{refreshFriends();notifyFriendRequest(payload)};
+  const onMessageChange=payload=>{refreshMessages();notifyIncomingMessage(payload)};
   S.channel=db.channel('studentlink-live-updates')
     .on('postgres_changes',{event:'*',schema:'public',table:'posts'},refreshPosts)
     .on('postgres_changes',{event:'*',schema:'public',table:'post_likes'},refreshFeed)
