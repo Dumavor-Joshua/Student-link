@@ -25,7 +25,7 @@ These are design references, not claims of affiliation or copied assets.
 
 ## Ghana school directory and canonical grouping
 
-The app's school checklist and alias index are in `data/ghana-shs-master.json`. It records the sources used, known aliases, and the current directory coverage. The frontend uses normalized school names plus explicit aliases and a conservative fuzzy matcher; uncertain matches are not automatically merged, and school/location distinctions such as SHS versus SHTS are preserved.
+The machine-readable school checklist and alias index are in `data/ghana-shs-master.json`; the same list is embedded in `assets/app.js` so school selection still works during offline startup. Keep the JSON and embedded list synchronized when adding entries. The JSON records the sources used, known aliases, and current coverage. The frontend uses normalized school names plus explicit aliases and a conservative fuzzy matcher; uncertain matches are not automatically merged, and school/location distinctions such as SHS versus SHTS are preserved.
 
 Trending-school counts are grouped by canonical name, and opening a school's student list filters profiles through the same canonicalization so existing spelling variants are shown together. Free-typed school names remain supported when the directory does not yet contain a name.
 
