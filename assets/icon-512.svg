@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="StudentLink">
+  <defs><linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#16b8ff"/><stop offset="1" stop-color="#0866ff"/></linearGradient></defs>
+  <rect width="512" height="512" rx="112" fill="#071b43"/>
+  <path d="M56 136 256 48 456 136 256 224Z" fill="#fff"/>
+  <path d="M104 160v96c0 40 64 72 152 72s152-32 152-72v-96L256 248Z" fill="#fff" opacity=".95"/>
+  <path d="M416 160v120" stroke="#fff" stroke-width="24" stroke-linecap="round"/><circle cx="416" cy="312" r="24" fill="url(#blue)"/>
+  <path d="M136 376a64 64 0 0 1 0-90l40-40a64 64 0 0 1 88 0" fill="none" stroke="#fff" stroke-width="36" stroke-linecap="round"/>
+  <path d="M376 344a64 64 0 0 1 0 90l-40 40a64 64 0 0 1-88 0" fill="none" stroke="url(#blue)" stroke-width="36" stroke-linecap="round"/>
+  <path d="m200 344 112-112" stroke="url(#blue)" stroke-width="36" stroke-linecap="round"/>
+</svg>
