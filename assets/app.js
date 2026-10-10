@@ -5,7 +5,20 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 function safeSessionGet(key){try{return window.sessionStorage.getItem(key)}catch(_){return null}}function safeSessionSet(key,value){try{window.sessionStorage.setItem(key,value);return true}catch(_){return false}}function safeSessionRemove(key){try{window.sessionStorage.removeItem(key)}catch(_){}}const S={session:null,profile:null,schools:[],view:'feed',publicProfileId:null,schoolFilter:'',feedMode:'all',feedOrderIds:[],feedOrderMode:'',friends:[],requests:[],convos:[],chat:null,replyOnOpen:false,channel:null,tttChannel:null,tttGameId:null,onlineGameChannel:null,cfGameId:null,rpsGameId:null,rpsMode:'computer',game:'',ttt:Array(9).fill(0),notifiedMessageIds:new Set(),notifiedFriendshipIds:new Set(),messageReadAt:{},};
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function initials(s='S'){return esc(s.trim().split(/\s+/).slice(0,2).map(x=>x[0].toUpperCase()).join(''))}
 function makeRandomId(){if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.crypto.randomUUID();const bytes=new Uint8Array(16);if(window.crypto&&typeof window.crypto.getRandomValues==='function')window.crypto.getRandomValues(bytes);else for(let i=0;i<bytes.length;i++)bytes[i]=Math.floor(Math.random()*256);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const h=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20)}
-function schoolKey(s=''){return String(s).normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase()}
+function schoolKey(s=''){
+  return String(s??'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('en')
+    .replace(/&/g,' and ').replace(/\b(sn?r|senior)\.?\s*high\s*(?:school)?\b/g,' shs ')
+    .replace(/\b(s\.?h\.?s\.?|senior\s+high)\b/g,' shs ')
+    .replace(/\b(senior\s+high\s*\/\s*technical|senior\s+high\s*\/\s*tech|senior\s+high\s+technical|shts|shst)\b/g,' shts ')
+    .replace(/\b(technical\s+institute|tech\.?\s+inst\.?|tech\.?\s+institute)\b/g,' techinst ')
+    .replace(/\b(comm\.?|community)\b/g,' community ')
+    .replace(/\b(presby)\b/g,' presbyterian ')
+    .replace(/\b(cath\.?|catholic)\b/g,' catholic ')
+    .replace(/\b(methodist)\b/g,' methodist ')
+    .replace(/\b(sda|s\.?d\.?a\.?)\b/g,' sda ')
+    .replace(/\b(st|saint)\.?\s+/g,' saint ')
+    .replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+}
 const VERIFIED_GHANA_SHS_TVET = [
   "Mim Senior High School","Ahafoman Senior High/Tech School","Kukuom Agric Senior High School","Sankore Senior High School","Acherensua Senior High School","Hwidiem Senior High School","Serwaa Kesse Girls Senior High School","Bechem Presby Senior High School",
   "Prempeh College","Yaa Asantewaa Girls Senior High School","Kumasi Girls Senior High School","Opoku Ware School","St. Louis Senior High School, Kumasi","KNUST Senior High School","T. I. Ahmadiyya Senior High School, Kumasi","Kumasi High School","Kumasi Academy","Konongo Odumase Senior High School","Agogo State College","Juaben Senior High School","Obuasi Senior High/Tech School",
@@ -23,8 +36,88 @@ const VERIFIED_GHANA_SHS_TVET = [
 // Sort and deduplicate the compiled Ghana school directory alphabetically.
 const uniqueSchoolNames=Array.from(new Map(VERIFIED_GHANA_SHS_TVET.map(name=>[schoolKey(name),name])).values()).sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'}));
 VERIFIED_GHANA_SHS_TVET.splice(0,VERIFIED_GHANA_SHS_TVET.length,...uniqueSchoolNames);
-function verifiedSchoolMatch(name=''){const key=schoolKey(name);return VERIFIED_GHANA_SHS_TVET.find(x=>schoolKey(x)===key)||''}
-function canonicalVerifiedSchoolName(name=''){return verifiedSchoolMatch(name)||String(name).trim().replace(/\s+/g,' ')}
+// Known informal names and spelling variants all point to one canonical school.
+// Keep location/campus words in the key so genuinely different schools are not merged.
+const SCHOOL_ALIASES={
+  'presec':'Presbyterian Boys Senior High School',
+  'presec legon':'Presbyterian Boys Senior High School',
+  'presby boys':'Presbyterian Boys Senior High School',
+  'presbyterian boys shs':'Presbyterian Boys Senior High School',
+  'legon presec':'Presbyterian Boys Senior High School',
+  'achimota':'Achimota Senior High School',
+  'adisco':'Adisadel College',
+  'adisco cape coast':'Adisadel College',
+  'mfantsipim':'Mfantsipim School',
+  'motown':'Mfantsipim School',
+  'prempeh':'Prempeh College',
+  'opoku ware':'Opoku Ware School',
+  'ows':'Opoku Ware School',
+  'yagshs':'Yaa Asantewaa Girls Senior High School',
+  'yagss':'Yaa Asantewaa Girls Senior High School',
+  'st louis kumasi':'St. Louis Senior High School, Kumasi',
+  'st louis shs kumasi':'St. Louis Senior High School, Kumasi',
+  'knust shs':'KNUST Senior High School',
+  'ti ahmadiyya kumasi':'T. I. Ahmadiyya Senior High School, Kumasi',
+  't i ahmadiyya shs kumasi':'T. I. Ahmadiyya Senior High School, Kumasi',
+  'wesco':'Wesley Girls Senior High School',
+  'wesley girls':'Wesley Girls Senior High School',
+  'holy child':'Holy Child School, Cape Coast',
+  'holico':'Holy Child School, Cape Coast',
+  'moh':'Mawuli School',
+  'mawuli':'Mawuli School',
+  'achimota shs':'Achimota Senior High School',
+  'ghana national':'Ghana National College',
+  'ghana national college cape coast':'Ghana National College',
+  'aggiss':'Aggrey Memorial A.M.E. Zion Senior High School',
+  'aggrey memorial':'Aggrey Memorial A.M.E. Zion Senior High School',
+  'wesley grammar':'Wesley Grammar School',
+  'presby legon':'Presbyterian Boys Senior High School',
+  'presec boys':'Presbyterian Boys Senior High School',
+  'opoku ware school kumasi':'Opoku Ware School',
+  'kumasihigh':'Kumasi High School',
+  'kumasi high shs':'Kumasi High School',
+  'st thomas aquinas':'St. Thomas Aquinas Senior High School',
+  'st thomas aquinas shs':'St. Thomas Aquinas Senior High School',
+  'tema secondary':'Tema Senior High School',
+  'tamale secondary':'Tamale Senior High School',
+  'ashanti school':'Ashanti Senior High School',
+  'ashantigold':'Obuasi Senior High/Tech School',
+  'prempeh college kumasi':'Prempeh College'
+};
+const SCHOOL_ALIAS_KEYS=new Map(Object.entries(SCHOOL_ALIASES).map(([alias,canonical])=>[schoolKey(alias),canonical]));
+function editDistance(a,b){
+  if(a===b)return 0;if(!a)return b.length;if(!b)return a.length;
+  let prev=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){const row=[i];for(let j=1;j<=b.length;j++)row[j]=Math.min(row[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=row}
+  return prev[b.length];
+}
+function schoolSimilarity(a,b){
+  const x=schoolKey(a),y=schoolKey(b);if(!x||!y)return 0;if(x===y)return 1;
+  const distance=editDistance(x,y),edit=1-distance/Math.max(x.length,y.length);
+  const xt=new Set(x.split(' ')),yt=new Set(y.split(' '));const overlap=[...xt].filter(t=>yt.has(t)).length/Math.max(xt.size,yt.size);
+  // Stronger token overlap prevents unrelated schools sharing a common word being merged.
+  return Math.max(edit,overlap*.96);
+}
+function verifiedSchoolMatch(name=''){
+  const key=schoolKey(name);if(!key)return '';
+  const exact=VERIFIED_GHANA_SHS_TVET.find(x=>schoolKey(x)===key);if(exact)return exact;
+  const alias=SCHOOL_ALIAS_KEYS.get(key);if(alias){
+    const target=VERIFIED_GHANA_SHS_TVET.find(x=>schoolKey(x)===schoolKey(alias));
+    if(target)return target;
+  }
+  // Auto-correct only very clear, unique near-matches; ambiguous school names stay separate.
+  if(key.length<6)return '';
+  const ranked=VERIFIED_GHANA_SHS_TVET.map(name=>({name,score:schoolSimilarity(key,name)}).sort?null:null);
+  const scores=VERIFIED_GHANA_SHS_TVET.map(candidate=>({name:candidate,score:schoolSimilarity(key,candidate)})).sort((a,b)=>b.score-a.score);
+  if(!scores.length||scores[0].score<0.91)return '';
+  if(scores[1]&&scores[0].score-scores[1].score<0.045)return '';
+  return scores[0].name;
+}
+function canonicalVerifiedSchoolName(name=''){
+  const original=String(name??'').trim().replace(/\s+/g,' ');
+  if(!original)return '';
+  return verifiedSchoolMatch(original)||original;
+}
 function schoolPickerHTML(id,value=''){
   const initial=String(value||'').trim();
   return '<input id="'+esc(id)+'" name="'+esc(id)+'" list="verified-gh-school-options" autocomplete="organization" placeholder="Start typing your school name…" maxlength="120" value="'+esc(initial)+'" required>'+
@@ -38,7 +131,7 @@ function wireSchoolPicker(id){
   input.addEventListener('blur',canonicalize);
 }
 
-function canonicalSchoolName(s=''){const key=schoolKey(s);return S.schools.find(x=>schoolKey(x)===key)||String(s).trim().replace(/\s+/g,' ')}
+function canonicalSchoolName(s=''){return canonicalVerifiedSchoolName(s)}
 function authHTML(tab='signup',message=''){return `<div class="auth"><div class="auth-layout"><section class="auth-intro"><div class="brand"><span class="brandicon" aria-hidden="true">🔗</span><span>StudentLink</span></div><h1>Connect with classmates and your school community.</h1><p>One place to share updates, meet classmates, find school communities, and learn together.</p><div class="auth-intro-note"><span aria-hidden="true">✓</span> Made for students. Built for connection.</div></section><section class="auth-panel"><div class="hero"><div class="auth-card-heading"><h2>${tab==='signup'?'Create an account':'Welcome back'}</h2><p>${tab==='signup'?'It’s quick and easy.':'Log in to continue to StudentLink.'}</p></div><div class="tab-buttons" role="group" aria-label="Account access"><button type="button" data-tab="signup" class="${tab==='signup'?'active':''}" aria-pressed="${tab==='signup'}">Sign up</button><button type="button" data-tab="login" class="${tab==='login'?'active':''}" aria-pressed="${tab==='login'}">Log in</button></div><form id="authform" novalidate>${tab==='signup'? `<div class="field"><label for="nick">Nickname</label><input id="nick" name="nickname" autocomplete="nickname" placeholder="What should classmates call you?" minlength="3" required></div><div class="field"><label for="school">School</label>${schoolPickerHTML('school')}</div>`:''}<div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div><div class="field"><label for="password">Password</label><div class="password-control"><input id="password" name="password" type="password" autocomplete="${tab==='signup'?'new-password':'current-password'}" minlength="6" required><button type="button" class="password-toggle" id="password-toggle" aria-controls="password" aria-pressed="false">Show</button></div>${tab==='signup'?'<p class="auth-help">Use at least 6 characters.</p>':''}</div>${tab==='login'?'<button type="button" class="auth-text-link" id="forgot-password">Forgot password?</button>':''}<button type="submit" class="btn auth-submit">${tab==='signup'?'Create account':'Log in'}</button><div class="auth-divider" aria-hidden="true"><span>or</span></div><button type="button" class="btn btn-secondary auth-google" id="google-signin"><svg aria-hidden="true" viewBox="0 0 48 48" width="18" height="18" focusable="false"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.4H5.8v5.3A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.3H5.8a20 20 0 0 0 0 17.8z"/><path fill="#EA4335" d="M24 12c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 6 29.5 4 24 4A20 20 0 0 0 5.8 15.1l6.8 5.3C14.2 15.6 18.7 12 24 12z"/></svg><span>Continue with Google</span></button></form><p id="auth-message" class="auth-message" role="status" aria-live="polite" ${message?'':'hidden'}>${esc(message)}</p></div><p class="auth-footer">StudentLink helps students connect with their school community.</p></section></div></div>`}function renderAuth(tab='signup', msg='') {
   $('#app').innerHTML = authHTML(tab, msg);
   wireSchoolPicker('school');
