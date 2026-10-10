@@ -19,6 +19,12 @@
       "title": "Ghana Education Service School Directory",
       "url": "https://ges.gov.gh/schools.php",
       "note": "Official directory for checking school names and status."
+    },
+    {
+      "title": "PatsTune — 2026 GES second-cycle register overview",
+      "url": "https://patstune.org/2026/07/01/senior-high-schools-in-ghana-and-their-categories/",
+      "publishedYear": 2026,
+      "note": "Reports a compiled register of 2,135 public and private second-cycle schools across categories A–G; the list is rendered dynamically and has not been fully imported into this file."
     }
   ],
   "completenessNote": "Expanded working checklist from the existing StudentLink directory and additional entries cross-checked against public GES/TVET register material. This is not yet a complete import of every public and private entry in the 2026 second-cycle register. Names absent from this list remain usable as typed values and are normalized for grouping.",
