@@ -21,7 +21,7 @@
       "note": "Official directory for checking school names and status."
     }
   ],
-  "completenessNote": "Current StudentLink checklist built from the application's established directory and additional entries cross-checked against the public GES/TVET register. It is not yet a complete import of every public and private entry in the 2026 second-cycle register. Names absent from this list remain usable as typed values and are normalized for grouping.",
+  "completenessNote": "Expanded working checklist from the existing StudentLink directory and additional entries cross-checked against public GES/TVET register material. This is not yet a complete import of every public and private entry in the 2026 second-cycle register. Names absent from this list remain usable as typed values and are normalized for grouping.",
   "normalizationPolicy": "Exact normalized names and explicit aliases canonicalize immediately. Fuzzy matching is restricted to unique, high-confidence matches; ambiguous names and different campuses remain separate.",
   "schools": [
     {
@@ -622,7 +622,7 @@
       "aliases": []
     },
     {
-      "name": "Fiase-man Senior High School",
+      "name": "Fiaseman Senior High School",
       "aliases": []
     },
     {
@@ -1051,11 +1051,11 @@
       "aliases": []
     },
     {
-      "name": "Nkroful Agricultural Senior High/Technical",
+      "name": "Nkroful Agricultural Senior High School",
       "aliases": []
     },
     {
-      "name": "Nkruful Agricultural Senior High School",
+      "name": "Nkroful Agricultural Senior High/Technical",
       "aliases": []
     },
     {
@@ -1116,9 +1116,7 @@
     },
     {
       "name": "Obuasi Senior High/Tech School",
-      "aliases": [
-        "ashantigold"
-      ]
+      "aliases": []
     },
     {
       "name": "Odomaseman Senior High",
