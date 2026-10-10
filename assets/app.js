@@ -480,10 +480,10 @@ async function openConversation(conversationId){
  S.chat=conversationId;const convo=S.convos.find(c=>c.id===conversationId);
  const {data:messages,error}=await db.from('messages').select('id,conversation_id,sender_id,body,created_at').eq('conversation_id',conversationId).order('created_at');
  if(error)throw error;const chat=$('#messenger-chat'),layout=$('#messenger-layout');
- if(!chat||!layout){await viewMessages();return}layout.classList.add('chat-open');
+ if(!chat||!layout){await viewMessages();return}layout.classList.add('chat-open');document.querySelector('.layout')?.classList.add('messages-chat-open');
  chat.innerHTML='<header class="messenger-chat-head"><button type="button" class="btn btn-secondary messenger-back" id="messenger-back" aria-label="Back to conversations">←</button>'+profileAvatarMarkup(convo?.otherNickname||'Student',convo?.otherAvatar||'','avatar')+'<div class="messenger-chat-person"><h2>'+esc(convo?.otherNickname||'Conversation')+'</h2><span class="tiny">StudentLink chat</span></div></header><div class="messenger-scroll" id="message-list">'+((messages||[]).map(m=>'<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+esc(m.body)+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>').join('')||'<div class="messenger-empty">This is the beginning of your conversation.</div>')+'</div><form id="msgform" class="messenger-composer"><textarea id="msgtext" maxlength="1500" rows="1" placeholder="Message…" aria-label="Message text" required></textarea><button type="submit" class="btn" id="send-message">Send</button></form>';
  const list=$('#message-list');if(list)list.scrollTop=list.scrollHeight;
- $('#messenger-back').onclick=()=>{layout.classList.remove('chat-open');S.chat=null};
+ $('#messenger-back').onclick=()=>{layout.classList.remove('chat-open');document.querySelector('.layout')?.classList.remove('messages-chat-open');S.chat=null};
  $('#msgtext').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#msgform').requestSubmit()}});
  $('#msgform').onsubmit=async e=>{e.preventDefault();const input=$('#msgtext'),body=input.value.trim(),send=$('#send-message');if(!body)return;send.disabled=true;try{const {error:sendError}=await db.from('messages').insert({conversation_id:conversationId,sender_id:S.session.user.id,body});if(sendError)throw sendError;input.value='';await loadConvos();await openConversation(conversationId)}catch(err){console.error(err);toast('Message could not be sent. Please try again.')}finally{if($('#send-message'))$('#send-message').disabled=false}};
 }
@@ -798,7 +798,7 @@ function setupInstallControl(){
   toast('Open your browser menu and choose Install app or Add to Home Screen.');
  };
 }
-function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));}); }
+function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));});const layout=document.querySelector('.layout');if(layout){layout.classList.toggle('messages-mode',S.view==='messages');if(S.view!=='messages')layout.classList.remove('messages-chat-open')}document.querySelector('.trending-mobile-wrap')?.classList.toggle('messages-view',S.view==='messages'); }
 function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();S.tttGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
 function modal(title,content){$('#modaltitle').textContent=title;$('#modalcontent').innerHTML=content;$('#modalbg').classList.add('show')}
 function closeModal(){$('#modalbg').classList.remove('show')}
