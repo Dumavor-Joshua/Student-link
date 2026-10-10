@@ -23,6 +23,14 @@ The interaction patterns are informed by established products without copying th
 
 These are design references, not claims of affiliation or copied assets.
 
+## Ghana school directory and canonical grouping
+
+The app's school checklist and alias index are in `data/ghana-shs-master.json`. It records the sources used, known aliases, and the current directory coverage. The frontend uses normalized school names plus explicit aliases and a conservative fuzzy matcher; uncertain matches are not automatically merged, and school/location distinctions such as SHS versus SHTS are preserved.
+
+Trending-school counts are grouped by canonical name, and opening a school's student list filters profiles through the same canonicalization so existing spelling variants are shown together. Free-typed school names remain supported when the directory does not yet contain a name.
+
+**Coverage note:** the directory is an expanded working checklist, not yet a complete import of all public and private entries in the 2026 second-cycle register. The 2021 GES/TVET register enumerates 721 public SHS/technical-vocational institutions, while a 2026 directory update reports 955 public schools. See the source links in the JSON file before using this list for official admissions or placement decisions.
+
 ## Games
 
 The game library currently includes six playable entries:
