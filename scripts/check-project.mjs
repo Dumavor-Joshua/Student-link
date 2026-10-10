@@ -5,6 +5,8 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf
 const html = read('index.html');
 const js = read('assets/app.js');
 const css = read('assets/app.css');
+const sw = read('sw.js');
+const schema = read('supabase_schema.sql');
 const migration = read('supabase/migrations/20261009_harden_poll_vote_policy.sql');
 const profileMigration = read('supabase/migrations/20261009_profile_photos_deactivation_and_feed.sql');
 const profileGuardMigration = read('supabase/migrations/20261009_active_profile_write_guards.sql');
@@ -134,7 +136,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-frontend-audit-3') && sw.includes('studentlink-frontend-audit-3'), 'Messages assets must use a fresh cache version');
+assert.ok(html.includes('studentlink-frontend-audit-4') && sw.includes('studentlink-frontend-audit-4'), 'Messages assets must use a fresh cache version');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -146,7 +148,7 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-frontend-audit-3') && sw.includes('studentlink-frontend-audit-3'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-frontend-audit-4') && sw.includes('studentlink-frontend-audit-4'), 'Updated messaging assets must bypass stale caches');
 
 assert.ok(js.includes('const relatedIds=[...new Set([...friendIds,...sent,...received])]'), 'Friends view must load all friend and pending-request profiles even when they are outside the discovery limit');
 assert.ok(js.includes("$('#main').innerHTML=html;\n wireActions();\n}\nfunction viewProfile()"), 'Public profile action buttons must be wired after rendering');

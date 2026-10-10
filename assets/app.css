@@ -926,3 +926,26 @@ input,textarea,select{font-size:16px}
  .messenger-composer .messenger-attach{order:2}
  .messenger-composer .message-file-input{order:1}
 }
+
+
+/* Feedback section reliability and small-screen polish */
+.feedback-inline-status{margin:0 0 14px;padding:11px 12px;border:1px solid rgba(22,134,108,.28);border-radius:9px;background:rgba(22,134,108,.07);color:#126b57;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.feedback-inline-status.is-warning{border-color:#e6bd74;background:#fff8e8;color:#765019}
+.feedback-counter-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.feedback-counter{display:block;text-align:right;margin-top:4px;font-variant-numeric:tabular-nums}
+.feedback-item-details{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.feedback-status{display:inline-flex;align-items:center;padding:3px 8px;border-radius:99px;background:#e8f7f1;color:#126b57;font-weight:700}
+.feedback-status.status-in_review,.feedback-status.status-planned{background:#fff4d9;color:#765019}
+.feedback-status.status-closed,.feedback-status.status-rejected{background:#eef1f5;color:#566174}
+.feedback-status.status-resolved{background:#e8f7f1;color:#126b57}
+.feedback-form-card .field{min-width:0}
+.feedback-form-card textarea{min-height:140px}
+.feedback-form-card .btn:disabled{cursor:wait}
+@media(max-width:680px){
+ .feedback-counter-row{display:block}
+ .feedback-counter-row .feedback-counter{margin-top:5px}
+ .feedback-form-card .section-heading{gap:8px}
+ .feedback-form-card .section-heading>div{min-width:0}
+ .feedback-item{padding:11px}
+ .feedback-inline-status{font-size:12px}
+}
