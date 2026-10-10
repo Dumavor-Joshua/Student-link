@@ -139,8 +139,6 @@ const SCHOOL_ALIASES={
   'st thomas aquinas shs':'St. Thomas Aquinas Senior High School',
   'tema secondary':'Tema Senior High School',
   'tamale secondary':'Tamale Senior High School',
-  'ashanti school':'Ashanti Senior High School',
-  'ashantigold':'Obuasi Senior High/Tech School',
   'prempeh college kumasi':'Prempeh College'
 };
 const SCHOOL_ALIAS_KEYS=new Map(Object.entries(SCHOOL_ALIASES).map(([alias,canonical])=>[schoolKey(alias),canonical]));
