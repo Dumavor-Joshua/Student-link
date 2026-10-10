@@ -341,17 +341,44 @@ async function openNotificationHistory(){
   panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button></div><div class="tiny">Loading notification history…</div>';
   document.body.appendChild(panel);
   panel.querySelector('#studentlink-notification-close').onclick=()=>panel.remove();
-  const {data,error}=await db.from('notifications').select('id,type,title,body,target_url,created_at,read_at').order('created_at',{ascending:false}).limit(50);
+  const {data,error}=await db.from('notifications').select('id,type,title,body,target_url,related_id,actor_id,created_at,read_at').order('created_at',{ascending:false}).limit(50);
   if(!panel.isConnected)return;
   if(error){panel.innerHTML='<strong>Notifications</strong><p class="tiny">Notification history could not load. Please try again.</p><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button>';panel.querySelector('button').onclick=()=>panel.remove();console.warn('Notification history could not load:',error);return}
   if(!data?.length){panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button></div><p class="tiny">No notifications yet. New messages and friend requests will appear here.</p>';panel.querySelector('button').onclick=()=>panel.remove();return}
-  panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button></div>'+data.map(item=>'<button type="button" data-notification-id="'+esc(item.id)+'" data-notification-type="'+esc(item.type)+'" style="display:block;width:100%;text-align:left;padding:11px 8px;border:0;border-bottom:1px solid var(--line);background:'+(item.read_at?'transparent':'var(--p2)')+';color:var(--txt);border-radius:8px;cursor:pointer"><strong>'+esc(item.title)+'</strong><div style="font-size:13px;margin-top:3px">'+esc(item.body||'')+'</div><div class="tiny" style="margin-top:5px">'+esc(new Date(item.created_at).toLocaleString())+(item.read_at?'':' · New')+'</div></button>').join('');
+  panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button></div>'+data.map(item=>'<article style="padding:10px 8px;border-bottom:1px solid var(--line);border-radius:8px;background:'+(item.read_at?'transparent':'var(--p2)')+'"><button type="button" data-notification-id="'+esc(item.id)+'" data-notification-type="'+esc(item.type)+'" style="display:block;width:100%;text-align:left;padding:0;border:0;background:transparent;color:var(--txt);cursor:pointer"><strong>'+esc(item.title)+'</strong><div style="font-size:13px;margin-top:3px">'+esc(item.body||'')+'</div><div class="tiny" style="margin-top:5px">'+esc(new Date(item.created_at).toLocaleString())+(item.read_at?'':' · New')+'</div></button>'+(item.type==='message'?'<form data-quick-reply="'+esc(item.id)+'" style="display:flex;gap:6px;margin-top:9px"><input name="reply" maxlength="1500" aria-label="Reply to '+esc(item.title)+'" placeholder="Reply…" style="min-width:0;flex:1;width:0;padding:9px 11px;border:1px solid var(--line);border-radius:18px;background:var(--p);color:var(--txt);font:inherit;font-size:14px" required><button type="submit" class="btn" style="padding:8px 12px;border-radius:18px;white-space:nowrap">Send</button></form>':'')+'</article>').join('');
   panel.querySelector('#studentlink-notification-close').onclick=()=>panel.remove();
   panel.querySelectorAll('[data-notification-id]').forEach(itemButton=>itemButton.onclick=async()=>{
     const item=data.find(row=>row.id===itemButton.dataset.notificationId);
-    if(item&&!item.read_at){await db.from('notifications').update({read_at:new Date().toISOString()}).eq('id',item.id);item.read_at=new Date().toISOString()}
+    if(item&&!item.read_at){const {error:readError}=await db.from('notifications').update({read_at:new Date().toISOString()}).eq('id',item.id);if(readError){console.warn('Could not mark notification read:',readError);return}item.read_at=new Date().toISOString()}
     panel.remove();await refreshNotificationHistoryBadge();
     if(item?.type==='friend_request')setView('friends');else setView('messages');
+  });
+  panel.querySelectorAll('[data-quick-reply]').forEach(form=>form.onsubmit=async event=>{
+    event.preventDefault();
+    const item=data.find(row=>row.id===form.dataset.quickReply);
+    const input=form.elements.reply;
+    const body=String(input?.value||'').trim();
+    const send=form.querySelector('button[type="submit"]');
+    if(!item||item.type!=='message'||!item.related_id||!body)return;
+    send.disabled=true;send.textContent='Sending…';
+    try{
+      const {data:original,error:originalError}=await db.from('messages').select('id,conversation_id').eq('id',item.related_id).maybeSingle();
+      if(originalError)throw originalError;
+      if(!original?.conversation_id)throw new Error('The original conversation is unavailable.');
+      const {data:conversation,error:conversationError}=await db.from('conversations').select('id,user_a,user_b').eq('id',original.conversation_id).maybeSingle();
+      if(conversationError)throw conversationError;
+      if(!conversation||(conversation.user_a!==S.session.user.id&&conversation.user_b!==S.session.user.id))throw new Error('You no longer have access to this conversation.');
+      const {error:sendError}=await db.from('messages').insert({conversation_id:original.conversation_id,sender_id:S.session.user.id,body});
+      if(sendError)throw sendError;
+      input.value='';
+      item.body='You: '+body;
+      const article=form.closest('article');
+      const preview=article?.querySelector('[data-notification-id] div');
+      if(preview)preview.textContent=item.body;
+      toast('Reply sent.');
+      await loadConvos();
+    }catch(error){console.error('Notification quick reply failed:',error);toast(error?.message||'Could not send reply. Please try again.')}
+    finally{if(send.isConnected){send.disabled=false;send.textContent='Send'}}
   });
   const unread=data.filter(item=>!item.read_at).map(item=>item.id);
   if(unread.length)await db.from('notifications').update({read_at:new Date().toISOString()}).in('id',unread);
