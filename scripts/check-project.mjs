@@ -146,4 +146,9 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-message-links-2') && sw.includes('studentlink-message-attachments-1'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-message-links-2') && sw.includes('studentlink-message-links-2'), 'Updated messaging assets must bypass stale caches');
+
+assert.ok(js.includes('const relatedIds=[...new Set([...friendIds,...sent,...received])]'), 'Friends view must load all friend and pending-request profiles even when they are outside the discovery limit');
+assert.ok(js.includes("$('#main').innerHTML=html;\n wireActions();\n}\nfunction viewProfile()"), 'Public profile action buttons must be wired after rendering');
+assert.ok(js.includes("stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null"), 'Leaving a multiplayer game must release realtime channels and reset stale game IDs');
+assert.equal((js.match(/function scrambleWord\(/g)||[]).length, 1, 'Word scramble helper should be declared once');
