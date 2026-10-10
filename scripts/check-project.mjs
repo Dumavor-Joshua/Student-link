@@ -195,10 +195,13 @@ assert.ok(js.includes(".not('school','is',null).neq('school','')") && js.include
 
 const schoolStart = js.indexOf('function schoolKey');
 const schoolEnd = js.indexOf('function schoolPickerHTML');
-assert.ok(schoolStart >= 0 && schoolEnd > schoolStart, 'School directory helpers must be available for regression testing');
+const schoolNameStart = js.indexOf('function canonicalSchoolName');
+const schoolNameEnd = js.indexOf('function authHTML', schoolNameStart);
+assert.ok(schoolStart >= 0 && schoolEnd > schoolStart && schoolNameStart > schoolEnd && schoolNameEnd > schoolNameStart, 'School directory helpers must be available for regression testing');
 const schoolHelpers = js.slice(schoolStart, schoolEnd);
-const schoolRuntime = {};
-runInNewContext(`${schoolHelpers};globalThis.schoolTest={schoolKey,verifiedSchoolMatch,canonicalVerifiedSchoolName,VERIFIED_GHANA_SHS_TVET}`, schoolRuntime);
+const schoolNameHelper = js.slice(schoolNameStart, schoolNameEnd);
+const schoolRuntime = {S:{schoolVariants:['Riverside Community Senior High School','Riverside Comunity Senior High School']}};
+runInNewContext(`${schoolHelpers};${schoolNameHelper};globalThis.schoolTest={schoolKey,verifiedSchoolMatch,canonicalVerifiedSchoolName,canonicalSchoolName,VERIFIED_GHANA_SHS_TVET}`, schoolRuntime);
 const schoolTest = schoolRuntime.schoolTest;
 assert.ok(schoolTest.VERIFIED_GHANA_SHS_TVET.length >= 350, 'Runtime school checklist must remain expanded');
 const appSchoolKeys = new Set(schoolTest.VERIFIED_GHANA_SHS_TVET.map(schoolTest.schoolKey));
@@ -206,6 +209,11 @@ assert.equal(schoolMaster.schools.length, appSchoolKeys.size, 'Master JSON and o
 for (const school of schoolMaster.schools) assert.ok(appSchoolKeys.has(schoolTest.schoolKey(school.name)), 'School master entry must exist in the app checklist: '+school.name);
 assert.equal(schoolTest.canonicalVerifiedSchoolName('PRESEC Legon'), "Presbyterian Boys' Senior High School, Legon", 'PRESEC aliases must resolve to one canonical school');
 assert.equal(schoolTest.canonicalVerifiedSchoolName('Presby Senior High School, Legon'), "Presbyterian Boys' Senior High School, Legon", 'Older PRESEC spellings must resolve to the same canonical school');
+assert.equal(schoolTest.canonicalSchoolName('Riverside Community Senior High School'), schoolTest.canonicalSchoolName('Riverside Comunity Senior High School'), 'Unlisted but observed school spelling variants must converge on one stable name');
+schoolRuntime.S.schoolVariants=['North Hill Senior High School','North Hill Senior High/Tech School'];
+assert.equal(schoolTest.canonicalSchoolName('North Hill Senior High School'), 'North Hill Senior High School', 'Observed schools with different SHS/SHTS types must not be merged');
+assert.equal(schoolTest.canonicalSchoolName('North Hill Senior High/Tech School'), 'North Hill Senior High/Tech School', 'Observed SHTS names must retain their distinct type');
+
 assert.equal(schoolTest.canonicalVerifiedSchoolName('Yaa Asantewaa Girl Senior High School'), 'Yaa Asantewaa Girls Senior High School', 'Obvious one-character spelling errors should resolve');
 assert.equal(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High School'), 'Vakpo Senior High School', 'The ordinary SHS campus must remain canonical');
 assert.equal(schoolTest.schoolKey(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High/Tech School')), schoolTest.schoolKey('Vakpo Senior High/Tech School'), 'A similarly named SHTS campus must retain its canonical key');
