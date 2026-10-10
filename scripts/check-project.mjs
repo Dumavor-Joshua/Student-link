@@ -14,6 +14,7 @@ const gameIndexMigration = read('supabase/migrations/20261010_add_missing_game_f
 const gameRpcHardeningMigration = read('supabase/migrations/20261010_harden_game_rpc_search_path.sql');
 const rlsOptimizationMigration = read('supabase/migrations/20261010_optimize_rls_auth_uid_policies.sql');
 const tablePrivilegeMigration = read('supabase/migrations/20261010_revoke_unused_table_privileges.sql');
+const messageReadMigration = read('supabase/migrations/20261010_add_conversation_read_receipts.sql');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(html.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
@@ -160,3 +161,8 @@ assert.ok(js.includes("stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;
 assert.equal((js.match(/function scrambleWord\(/g)||[]).length, 1, 'Word scramble helper should be declared once');
 
 assert.ok(css.includes('.navitem span.nav-unread-badge{display:inline-flex}'), 'Unread conversation count must remain visible in mobile navigation');
+
+assert.ok(js.includes("from('conversation_reads').select('conversation_id,last_read_at')"), 'Unread counts must use shared Supabase read receipts');
+assert.ok(js.includes("from('conversation_reads').upsert({conversation_id:conversationId,user_id:S.session.user.id,last_read_at:timestamp}"), 'Opening a conversation must persist its read cursor to Supabase');
+assert.ok(js.includes('data-message-header-badge') && js.includes('messages-shortcut'), 'The main app header must show the unread conversation count');
+assert.ok(messageReadMigration.includes('conversation_reads') && messageReadMigration.includes('enable row level security'), 'Read receipts must have a tracked RLS-enabled migration');
