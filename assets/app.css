@@ -974,3 +974,23 @@ input,textarea,select{font-size:16px}
 /* Home/feed shortcut shares the unread-conversation count with Messages. */
 .nav-unread-badge{box-shadow:0 0 0 2px var(--p)}
 @media(max-width:680px){.navitem [data-home-unread-badge],.navitem [data-message-nav-badge]{display:inline-flex}.navitem [data-home-unread-badge][hidden],.navitem [data-message-nav-badge][hidden]{display:none!important}}
+
+
+/* Messages should occupy the full app workspace: no school-trending strip or side navigation beside a chat. */
+.layout.messages-mode{grid-template-columns:minmax(0,1fr)!important;overflow:hidden!important}
+.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none!important}
+.trending-mobile-wrap.messages-view{display:none!important}
+.layout.messages-mode>.main{width:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.layout.messages-mode .messenger-layout{width:100%!important;min-width:0!important;max-width:none!important}
+@media(max-width:760px){
+  .layout.messages-mode{display:flex!important;flex-direction:column!important;width:100%!important;height:calc(100dvh - 58px)!important;min-height:0!important;overflow:hidden!important;flex:1 1 auto!important}
+  .layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none!important}
+  .layout.messages-mode>.main{flex:1 1 auto!important;height:100%!important;min-height:0!important;overflow:hidden!important;padding:8px!important}
+  .layout.messages-mode>.main>.head{flex:0 0 auto!important;margin:0 0 8px!important}
+  .layout.messages-mode .messenger-layout{display:block!important;flex:1 1 auto!important;width:100%!important;height:calc(100% - 46px)!important;min-height:0!important;max-height:none!important}
+  .layout.messages-mode .messenger-sidebar{height:100%!important;min-height:0!important;max-height:none!important}
+  .layout.messages-mode .messenger-chat{height:100%!important;min-height:0!important;max-height:none!important}
+  .layout.messages-mode .messenger-layout.chat-open .messenger-sidebar{display:none!important}
+  .layout.messages-mode .messenger-layout.chat-open .messenger-chat{display:flex!important;width:100%!important;height:100%!important}
+  .layout.messages-mode.messages-chat-open>.leftside{display:none!important}
+}
