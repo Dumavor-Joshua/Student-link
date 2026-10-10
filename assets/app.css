@@ -968,3 +968,8 @@ input,textarea,select{font-size:16px}
 @media(max-width:760px){.message-count-shortcut{padding:7px 8px;font-size:12px}.header .message-count-shortcut{gap:4px}}
 
 @media(max-width:420px){.message-shortcut-label{display:none}}
+
+
+/* Home/feed shortcut shares the unread-conversation count with Messages. */
+.nav-unread-badge{box-shadow:0 0 0 2px var(--p)}
+@media(max-width:680px){.navitem [data-home-unread-badge],.navitem [data-message-nav-badge]{display:inline-flex}.navitem [data-home-unread-badge][hidden],.navitem [data-message-nav-badge][hidden]{display:none!important}}
