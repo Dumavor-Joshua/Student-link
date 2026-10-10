@@ -325,14 +325,30 @@ async function notifyIncomingMessage(payload){
 async function setUpRealtime(){
   if(!db||!S.session)return;
   if(S.channel){await db.removeChannel(S.channel);S.channel=null}
-  const refreshFeed=()=>{if(S.view==='feed')renderView()};
   const refreshPosts=()=>{S.feedOrderIds=[];S.feedOrderMode='';if(S.view==='feed')renderView()};
   const refreshFriends=()=>{if(S.view==='friends')renderView()};
   const refreshMessages=()=>{if(S.view==='messages'){if(S.chat)openConversation(S.chat).catch(e=>console.warn('Could not refresh conversation:',e));else renderView()}};
+  const refreshLikeCount=payload=>{
+    const row=payload.eventType==='DELETE'?payload.old:payload.new;
+    if(!row||!row.post_id)return;
+    // The active tab already updates its own Like button after Supabase confirms the request.
+    // Ignore this user's event to avoid double-counting; update other users' visible buttons only.
+    if(row.user_id===S.session.user.id)return;
+    const delta=payload.eventType==='INSERT'?1:payload.eventType==='DELETE'?-1:0;
+    if(!delta)return;
+    $$('[data-like]').filter(button=>button.dataset.like===String(row.post_id)).forEach(button=>{
+      const match=(button.textContent||'').match(/(\d+)\s*$/);
+      const current=match?Number(match[1]):0;
+      const next=Math.max(0,current+delta);
+      button.textContent='❤️ '+next;
+      button.setAttribute('aria-label',(button.classList.contains('liked')?'Unlike':'Like')+' post; '+next+' likes');
+    });
+  };
   const onFriendshipChange=payload=>{refreshFriends();notifyFriendRequest(payload)};
   const onMessageChange=payload=>{refreshMessages();notifyIncomingMessage(payload)};
   S.channel=db.channel('studentlink-live-updates')
     .on('postgres_changes',{event:'*',schema:'public',table:'posts'},refreshPosts)
+    .on('postgres_changes',{event:'*',schema:'public',table:'post_likes'},refreshLikeCount)
     .on('postgres_changes',{event:'*',schema:'public',table:'friendships'},onFriendshipChange)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},onMessageChange)
     .subscribe(status=>{if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')console.warn('StudentLink realtime status:',status)});
@@ -406,7 +422,33 @@ async function openComments(postId){
   $('#closecomments').onclick=closeModal;
   $('#commentform').onsubmit=async e=>{e.preventDefault();const body=$('#commentbody').value.trim();if(!body){toast('Comment cannot be empty.');return}if(body.length>600){toast('Comments are limited to 600 characters.');return}const submit=$('#commentform button[type="submit"]');submit.disabled=true;submit.textContent='Submitting…';const {error:insertError}=await db.from('comments').insert({post_id:postId,user_id:S.session.user.id,body});if(insertError){toast(insertError.message);submit.disabled=false;submit.textContent='Submit comment';return}toast('Comment added.');await renderView();await openComments(postId)};
 }
-async function toggleLike(id,liked){const buttons=$('[data-like]').filter(button=>button.dataset.like===String(id));if(!buttons.length||buttons.some(button=>button.dataset.busy==='true'))return;buttons.forEach(button=>{button.dataset.busy='true';button.disabled=true});try{const q=liked?db.from('post_likes').delete().eq('post_id',id).eq('user_id',S.session.user.id):db.from('post_likes').insert({post_id:id,user_id:S.session.user.id});const {error}=await q;if(error){toast(error.message||'Could not update your like. Please try again.');return}buttons.forEach(button=>{const match=(button.textContent||'').match(/(\d+)\s*$/);const current=match?Number(match[1]):0;const next=Math.max(0,current+(liked?-1:1));button.textContent='❤️ '+next;button.classList.toggle('liked',!liked);button.setAttribute('aria-pressed',String(!liked));button.setAttribute('aria-label',(liked?'Like':'Unlike')+' post; '+next+' likes')})}catch(error){console.error(error);toast('Could not update your like. Check your connection and try again.')}finally{buttons.forEach(button=>{delete button.dataset.busy;button.disabled=false})}}
+async function toggleLike(id,liked){
+  const buttons=$$('[data-like]').filter(button=>button.dataset.like===String(id));
+  if(!buttons.length||buttons.some(button=>button.dataset.busy==='true'))return;
+  buttons.forEach(button=>{button.dataset.busy='true';button.disabled=true});
+  try{
+    const q=liked
+      ?db.from('post_likes').delete().eq('post_id',id).eq('user_id',S.session.user.id)
+      :db.from('post_likes').insert({post_id:id,user_id:S.session.user.id});
+    const {error}=await q;
+    if(error){toast(error.message||'Could not update your like. Please try again.');return}
+    buttons.forEach(button=>{
+      const match=(button.textContent||'').match(/(\d+)\s*$/);
+      const current=match?Number(match[1]):0;
+      const next=Math.max(0,current+(liked?-1:1));
+      button.textContent='❤️ '+next;
+      button.classList.toggle('liked',!liked);
+      button.setAttribute('aria-pressed',String(!liked));
+      button.setAttribute('aria-label',(liked?'Like':'Unlike')+' post; '+next+' likes');
+    });
+  }catch(error){
+    console.error('Could not update post like:',error);
+    toast('Could not update your like. Check your connection and try again.');
+  }finally{
+    buttons.forEach(button=>{delete button.dataset.busy;button.disabled=false});
+  }
+}
+
 async function viewFriends(){
   const {data:people,error:peopleError}=await db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).order('nickname').limit(100);
   if(peopleError)throw peopleError;
