@@ -195,15 +195,17 @@ function canonicalSchoolName(s=''){
   if(!original)return '';
   const known=verifiedSchoolMatch(original);
   if(known)return known;
-  const candidates=Array.from(new Set((S.schoolVariants||[]).map(value=>String(value||'').trim()).filter(Boolean)))
-    .filter(value=>schoolKey(value)!==schoolKey(original));
   const typeOf=value=>{const key=schoolKey(value);return /\bshts\b/.test(key)?'shts':/\bshs\b/.test(key)?'shs':/\btechinst\b/.test(key)?'techinst':''};
   const inputType=typeOf(original);
-  const ranked=candidates.filter(value=>{const type=typeOf(value);return !inputType||!type||inputType===type})
-    .map(value=>({value,score:schoolSimilarity(original,value)}))
-    .sort((a,b)=>b.score-a.score);
-  if(ranked[0]?.score>=0.95&&(!ranked[1]||ranked[0].score-ranked[1].score>=0.05)){
-    return canonicalVerifiedSchoolName(ranked[0].value);
+  const observed=Array.from(new Set([original,...(S.schoolVariants||[]).map(value=>String(value||'').trim()).filter(Boolean)]));
+  const cluster=observed.filter(value=>{
+    const type=typeOf(value);
+    return (!inputType||!type||inputType===type)&&schoolSimilarity(original,value)>=0.95;
+  });
+  if(cluster.length>1){
+    // Use one deterministic representative so A→B and B→A do not split the same group.
+    const canonical=cluster.sort((a,b)=>schoolKey(a).localeCompare(schoolKey(b),'en')||a.localeCompare(b,'en'))[0];
+    return canonicalVerifiedSchoolName(canonical);
   }
   return original;
 }
