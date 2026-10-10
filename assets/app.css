@@ -816,3 +816,26 @@ input,textarea,select{font-size:16px}
 @media(max-width:760px){.messenger-layout{display:block;height:auto;min-height:0}.messenger-sidebar{min-height:55vh}.messenger-chat{display:none;min-height:62vh;height:calc(100dvh - 190px);max-height:760px}.messenger-layout.chat-open .messenger-sidebar{display:none}.messenger-layout.chat-open .messenger-chat{display:flex}.messenger-back{display:inline-flex}.message-row{max-width:88%}}
 @media(max-width:520px){.messenger-sidebar,.messenger-chat{border-radius:8px}.messenger-chat{height:calc(100dvh - 160px)}.messenger-scroll{padding:10px}.messenger-composer{gap:6px;padding:8px}.messenger-composer .btn{padding:10px 12px}button,.btn,.navitem{touch-action:manipulation}input,textarea,select{font-size:16px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Keep the app header usable when installation is offered on small phones. */
+#install-app[hidden]{display:none!important}
+#install-app{white-space:nowrap}
+@media(max-width:680px){
+ .header{gap:6px}
+ .header>div:first-child{flex:1;min-width:0}
+ .header>div:first-child>span{font-size:14px!important;white-space:nowrap}
+ .header>div:last-child{gap:4px!important;flex-shrink:0}
+ .header .btn{padding:7px 8px;font-size:11px;white-space:nowrap}
+ #install-app{padding:7px 7px;font-size:11px}
+}
+@media(max-width:420px){
+ .header>div:first-child>span{font-size:12px!important}
+ .header .search-wrap{display:none}
+ #notifications-toggle{display:none}
+ .header .btn{padding:7px 8px}
+}
+@media(max-width:360px){
+ #theme-toggle{font-size:0;min-width:34px;padding:7px 8px}
+ #theme-toggle::before{content:"☀️";font-size:15px}
+ #install-app{font-size:10px;padding:7px 6px}
+}
