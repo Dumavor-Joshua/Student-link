@@ -831,7 +831,8 @@ input,textarea,select{font-size:16px}
 @media(max-width:420px){
  .header>div:first-child>span{font-size:12px!important}
  .header .search-wrap{display:none}
- #notifications-toggle{display:none}
+ /* Keep push opt-in available on narrow phones; hiding it prevents subscription setup. */
+ #notifications-toggle{display:inline-flex;flex:0 0 auto;min-width:max-content}
  .header .btn{padding:7px 8px}
 }
 @media(max-width:360px){
