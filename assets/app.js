@@ -657,7 +657,7 @@ async function setUpRealtime(){
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},onMessageChange)
     .subscribe(status=>{if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')console.warn('StudentLink realtime status:',status)});
 }
-async function loadProfile(){let {data,error}=await db.from('profiles').select('*').eq('id',S.session.user.id).maybeSingle();if(error)console.warn(error);S.profile=data||{id:S.session.user.id,nickname:'Student',school:''}}
+async function loadProfile(){let {data,error}=await db.from('profiles').select('*').eq('id',S.session.user.id).maybeSingle();if(error)console.warn(error);S.profile=data||{id:S.session.user.id,nickname:'Student',school:''};S.profile.school=canonicalSchoolName(S.profile.school||'')}
 async function renderView(){
   const main=$('#main');
   if(!main)return;
