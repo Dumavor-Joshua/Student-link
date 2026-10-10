@@ -645,3 +645,33 @@ body:not(:has(.auth)) .header #notifications-toggle{flex:0 0 auto;display:inline
   :root[data-theme="light"] .btn,
   :root[data-theme="light"] button{transition:none}
 }
+
+
+/* Light mode requirement: all text uses black, including muted labels and controls. */
+:root[data-theme="light"]{--txt:#000000;--muted:#000000}
+:root[data-theme="light"] body,
+:root[data-theme="light"] body *,
+:root[data-theme="light"] .auth,
+:root[data-theme="light"] .auth *,
+:root[data-theme="light"] input,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] select,
+:root[data-theme="light"] option,
+:root[data-theme="light"] button,
+:root[data-theme="light"] .navitem,
+:root[data-theme="light"] .tiny,
+:root[data-theme="light"] .muted,
+:root[data-theme="light"] .comment,
+:root[data-theme="light"] .comment *,
+:root[data-theme="light"] .trending-school,
+:root[data-theme="light"] .trending-school *,
+:root[data-theme="light"] .profile-name-link,
+:root[data-theme="light"] .post-content{color:#000000!important}
+:root[data-theme="light"] input::placeholder,
+:root[data-theme="light"] textarea::placeholder,
+:root[data-theme="light"] .header .search::placeholder{color:#000000!important;opacity:.72}
+:root[data-theme="light"] .navitem.active,
+:root[data-theme="light"] .btn-primary,
+:root[data-theme="light"] .auth-submit,
+:root[data-theme="light"] .btn-primary *,
+:root[data-theme="light"] .auth-submit *{color:#fff!important}
