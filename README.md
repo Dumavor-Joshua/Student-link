@@ -17,7 +17,7 @@ StudentLink is a student-focused social platform for school communities, posts, 
 The game library currently includes six playable entries:
 
 - **Online multiplayer:** Tic-Tac-Toe, Connect Four, and Rock Paper Scissors.
-- **Solo:** Student Quiz, Number Guess, and Word Scramble. Rock Paper Scissors also offers a computer opponent from its online game screen.
+- **Solo:** Student Quiz (15 sets of 10 questions, 150 total), Number Guess, and Word Scramble. Rock Paper Scissors also offers a computer opponent from its online game screen.
 
 Online multiplayer requires a signed-in account, Supabase RPCs/tables from the game SQL migrations, and Realtime enabled for the relevant game tables. The game library labels solo and online modes so users do not mistake a local game for an online match.
 
