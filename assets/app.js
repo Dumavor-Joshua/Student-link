@@ -505,14 +505,14 @@ async function openConversation(conversationId){
 
 }
 function messageBodyHTML(value=''){
- const text=String(value),urlPattern=/(https?:\\/\\/[^\\s<>"']+|www\\.[^\\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+(?:com|org|net|edu|gov|gh|io|co|uk|app|dev|info|biz|me|ai|tech|online|site|store|school)(?:\\/[^\\s<>"']*)?)/gi;
+ const text=String(value),urlPattern=/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|org|net|edu|gov|gh|io|co|uk|app|dev|info|biz|me|ai|tech|online|site|store|school)(?:\/[^\s<>"']*)?)/gi;
  let html='',lastIndex=0,match;
  while((match=urlPattern.exec(text))){
    let raw=match[0],trailing='';
-   while(/[.,!?;:)}\\]]$/.test(raw)){trailing=raw.slice(-1)+trailing;raw=raw.slice(0,-1)}
+   while(/[.,!?;:)}\]]$/.test(raw)){trailing=raw.slice(-1)+trailing;raw=raw.slice(0,-1)}
    html+=esc(text.slice(lastIndex,match.index));
    if(raw){
-     const href=/^www\\./i.test(raw)?'https://'+raw:raw;
+     const href=/^www\./i.test(raw)?'https://'+raw:raw;
      try{const parsed=new URL(href);if(parsed.protocol==='http:'||parsed.protocol==='https:')html+='<a class="message-link" href="'+esc(parsed.href)+'" target="_blank" rel="noopener noreferrer">'+esc(raw)+'</a>';else html+=esc(raw)}
      catch(_){html+=esc(raw)}
    }
