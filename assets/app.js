@@ -329,7 +329,7 @@ async function setUpRealtime(){
   if(S.channel){await db.removeChannel(S.channel);S.channel=null}
   const refreshPosts=()=>{S.feedOrderIds=[];S.feedOrderMode='';if(S.view==='feed')renderView()};
   const refreshFriends=()=>{if(S.view==='friends')renderView()};
-  const refreshMessages=()=>{if(S.view==='messages'){if(S.chat)openConversation(S.chat).catch(e=>console.warn('Could not refresh conversation:',e));else renderView()}};
+  const refreshMessages=()=>{if(S.view==='messages'){(async()=>{await loadConvos();if(S.chat)await openConversation(S.chat);else await viewMessages()})().catch(e=>console.warn('Could not refresh messages:',e))}};
   const refreshLikeCount=payload=>{
     const row=payload.eventType==='DELETE'?payload.old:payload.new;
     if(!row||!row.post_id)return;
@@ -484,16 +484,18 @@ async function openConversation(conversationId){
  chat.innerHTML='<header class="messenger-chat-head"><button type="button" class="btn btn-secondary messenger-back" id="messenger-back" aria-label="Back to conversations">←</button>'+profileAvatarMarkup(convo?.otherNickname||'Student',convo?.otherAvatar||'','avatar')+'<div class="messenger-chat-person"><h2>'+esc(convo?.otherNickname||'Conversation')+'</h2><span class="tiny">StudentLink chat</span></div></header><div class="messenger-scroll" id="message-list">'+((messages||[]).map(m=>'<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+esc(m.body)+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>').join('')||'<div class="messenger-empty">This is the beginning of your conversation.</div>')+'</div><form id="msgform" class="messenger-composer"><textarea id="msgtext" maxlength="1500" rows="1" placeholder="Message…" aria-label="Message text" required></textarea><button type="submit" class="btn" id="send-message">Send</button></form>';
  const list=$('#message-list');if(list)list.scrollTop=list.scrollHeight;
  $('#messenger-back').onclick=()=>{layout.classList.remove('chat-open');S.chat=null};
+ $('#msgtext').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#msgform').requestSubmit()}});
  $('#msgform').onsubmit=async e=>{e.preventDefault();const input=$('#msgtext'),body=input.value.trim(),send=$('#send-message');if(!body)return;send.disabled=true;try{const {error:sendError}=await db.from('messages').insert({conversation_id:conversationId,sender_id:S.session.user.id,body});if(sendError)throw sendError;input.value='';await loadConvos();await openConversation(conversationId)}catch(err){console.error(err);toast('Message could not be sent. Please try again.')}finally{if($('#send-message'))$('#send-message').disabled=false}};
 }
 async function loadConvos(){
   const {data,error}=await db.from('conversations').select('id,user_a,user_b,updated_at').or(`user_a.eq.${S.session.user.id},user_b.eq.${S.session.user.id}`).order('updated_at',{ascending:false});
   if(error)throw error;
   const rows=data||[];const otherIds=rows.map(c=>c.user_a===S.session.user.id?c.user_b:c.user_a);
-  const {data:profiles,error:profileError}=otherIds.length?await db.from('profiles').select('id,nickname').in('id',otherIds):{data:[],error:null};
+  const {data:profiles,error:profileError}=otherIds.length?await db.from('profiles').select('id,nickname,avatar_url').in('id',otherIds):{data:[],error:null};
   if(profileError)throw profileError;
-  const names=Object.fromEntries((profiles||[]).map(p=>[p.id,p.nickname]));
-  S.convos=await Promise.all(rows.map(async c=>{const {data:lastMessages,error:messageError}=await db.from('messages').select('body,created_at').eq('conversation_id',c.id).order('created_at',{ascending:false}).limit(1);if(messageError)throw messageError;const otherId=c.user_a===S.session.user.id?c.user_b:c.user_a;return{id:c.id,otherNickname:names[otherId]||'Student',otherAvatar:'',lastMessage:lastMessages?.[0]?.body||''}}));
+  const profilesById=Object.fromEntries((profiles||[]).map(p=>[p.id,p]));
+  S.convos=await Promise.all(rows.map(async c=>{const {data:lastMessages,error:messageError}=await db.from('messages').select('body,created_at').eq('conversation_id',c.id).order('created_at',{ascending:false}).limit(1);if(messageError)throw messageError;const otherId=c.user_a===S.session.user.id?c.user_b:c.user_a,person=profilesById[otherId]||{};return{id:c.id,otherNickname:person.nickname||'Student',otherAvatar:person.avatar_url||'',lastMessage:lastMessages?.[0]?.body||'',lastMessageAt:lastMessages?.[0]?.created_at||c.updated_at||c.created_at}}));
+  S.convos.sort((a,b)=>new Date(b.lastMessageAt||0)-new Date(a.lastMessageAt||0));
 }
 function viewGames(){let gs=[['⭕❌','Tic-Tac-Toe','Online multiplayer — play from anywhere','ttt'],['🧠','Student Quiz','General knowledge','quiz'],['🔵🟡','Connect Four','Connect four in a row','connect'],['✊✋✌️','Rock Paper Scissors','Play a quick round against the computer','rps'],['🔢','Number Guess','Find the secret number from 1 to 100','guess'],['🔤','Word Scramble','Unscramble words and build your score','scramble']];$('#main').innerHTML='<div class="head"><h1 class="title">Games</h1><p class="tiny">Choose a game to play.</p></div>'+gs.map(g=>'<div class="card" data-game="'+g[3]+'" style="cursor:pointer"><span style="font-size:24px">'+g[0]+'</span> <b>'+g[1]+'</b><div class="tiny">'+g[2]+'</div></div>').join('');$$('[data-game]').forEach(el=>{el.onclick=()=>{S.game=el.dataset.game;S.view='game';renderView()}})}
 
