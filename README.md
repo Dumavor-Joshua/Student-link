@@ -12,6 +12,17 @@ StudentLink is a student-focused social platform for school communities, posts, 
 - `supabase/migrations/` — incremental database changes. Apply each migration to an existing database in chronological order.
 - `scripts/check-project.mjs` — static regression checks for routes, authentication, messaging, game navigation, accessibility hooks, cache versions, and migration safeguards.
 
+## UI design direction
+
+StudentLink uses a consistent, responsive visual system: deep-navy and bright-blue surfaces, clear typography, rounded cards, visible focus states, and a compact bottom navigation on phones. The layout keeps the feed central while making school discovery, messages, games, and profile actions easy to find.
+
+The interaction patterns are informed by established products without copying their branding or layouts:
+- [Discord](https://support.discord.com/hc/en-us/articles/12654190110999-New-Mobile-App-Updates-Layout) — clear separation between direct messages, communities, and notifications.
+- [Reddit](https://support.reddithelp.com/hc/en-us/articles/17881389378196-How-do-I-browse-and-find-communities-on-the-Reddit-app) — community discovery and topic-based navigation.
+- [Kahoot!](https://kahoot.com/what-is-kahoot/) and [Blooket](https://www.blooket.com/) — approachable quiz flows, game-mode discovery, and useful feedback after answering.
+
+These are design references, not claims of affiliation or copied assets.
+
 ## Games
 
 The game library currently includes six playable entries:
