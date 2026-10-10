@@ -1,6 +1,6 @@
-const CACHE_NAME='studentlink-shell-v17';
+const CACHE_NAME='studentlink-shell-v18';
 const BASE=new URL('./',self.location.href);
-const APP_SHELL=[new URL('./',BASE).href,new URL('./manifest.json',BASE).href,new URL('./assets/app.css?v=studentlink-notifications-inline-reply-14',BASE).href,new URL('./assets/app.js?v=studentlink-notifications-inline-reply-14',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.svg',BASE).href,new URL('./assets/icon-512.svg',BASE).href];
+const APP_SHELL=[new URL('./',BASE).href,new URL('./manifest.json',BASE).href,new URL('./assets/app.css?v=studentlink-notifications-reply-route-15',BASE).href,new URL('./assets/app.js?v=studentlink-notifications-reply-route-15',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.svg',BASE).href,new URL('./assets/icon-512.svg',BASE).href];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('studentlink-')&&key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
@@ -28,7 +28,7 @@ self.addEventListener('push',event=>{
       notificationId:typeof payload.notificationId==='string'?payload.notificationId:''
     },
     actions:typeof payload.notificationId==='string'&&payload.notificationId?[
-      {action:'reply',title:'Reply',type:'text',placeholder:'Write a reply'}
+      {action:'reply',title:'Reply'}
     ]:[]
   };
   const tasks=[self.registration.showNotification(title,options)];
@@ -53,28 +53,11 @@ self.addEventListener('notificationclick',event=>{
   const data=event.notification.data||{};
   const destination=new URL(data.url||'?openMessages=1',self.registration.scope).href;
   if(event.action==='reply'){
-    event.waitUntil((async()=>{
-      const replyText=typeof event.reply==='string'?event.reply.trim():'';
-      const notificationId=typeof data.notificationId==='string'?data.notificationId:'';
-      if(replyText&&notificationId){
-        try{
-          const subscription=await self.registration.pushManager.getSubscription();
-          if(!subscription)throw new Error('No push subscription');
-          const response=await fetch('https://fpdcetkvxdryogtvldax.supabase.co/functions/v1/studentlink-push',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-              action:'reply',
-              endpoint:subscription.endpoint,
-              notificationId,
-              replyText:replyText.slice(0,1500)
-            })
-          });
-          if(response.ok)return;
-        }catch(error){console.warn('StudentLink background reply failed:',error);}
-      }
-      await openStudentLinkDestination(destination);
-    })());
+    // Web Push notification actions are buttons, not native text-input reply fields.
+    // Route Reply directly into the matching chat and focus its composer in the app.
+    const replyDestination=new URL(destination);
+    replyDestination.searchParams.set('reply','1');
+    event.waitUntil(openStudentLinkDestination(replyDestination.href));
     return;
   }
   event.waitUntil(openStudentLinkDestination(destination));
