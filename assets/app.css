@@ -1021,3 +1021,15 @@ input,textarea,select{font-size:16px}
 .games-footnote{margin:17px 2px 0;color:var(--muted);font-size:12px;line-height:1.6}
 @media(max-width:680px){.games-intro{align-items:flex-start;padding:18px;border-radius:17px}.games-count{flex-basis:70px;min-height:70px;border-radius:14px}.games-count strong{font-size:23px}.games-count span{font-size:10px}.games-grid{grid-template-columns:minmax(0,1fr);gap:10px}.game-tile{min-height:132px;padding:16px;gap:12px}.game-tile-icon{flex-basis:44px;width:44px;height:44px;border-radius:13px;font-size:23px}.games-section-heading{align-items:flex-start;flex-direction:column;gap:3px}}
 @media(prefers-reduced-motion:reduce){.game-tile{transition:none}.game-tile:hover{transform:none}}
+
+/* Global polish pass: consistent surfaces, focus states, and interaction feedback. */
+body:not(:has(.auth)){background:var(--bg);text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+body:not(:has(.auth)) .header{border-bottom:1px solid var(--line);box-shadow:0 3px 18px rgba(15,30,60,.045)}
+body:not(:has(.auth)) .card{border:1px solid var(--line);border-radius:14px;box-shadow:0 3px 14px rgba(15,30,60,.035)}
+body:not(:has(.auth)) .btn{min-height:40px;border-radius:10px;font-weight:650;transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+body:not(:has(.auth)) .btn:not(:disabled):hover{box-shadow:0 5px 14px rgba(25,55,100,.11)}
+body:not(:has(.auth)) .btn:active:not(:disabled){transform:translateY(1px)}
+body:not(:has(.auth)) input:not([type=checkbox]):not([type=radio]),body:not(:has(.auth)) textarea,body:not(:has(.auth)) select{border-radius:10px}
+body:not(:has(.auth)) input:focus-visible,body:not(:has(.auth)) textarea:focus-visible,body:not(:has(.auth)) select:focus-visible,body:not(:has(.auth)) button:focus-visible{outline:3px solid var(--mint);outline-offset:2px}
+body:not(:has(.auth)) .navitem{border-radius:10px;transition:background-color .16s ease,color .16s ease}
+@media(prefers-reduced-motion:reduce){body:not(:has(.auth)) .btn,body:not(:has(.auth)) .navitem{transition:none}body:not(:has(.auth)) .btn:active:not(:disabled){transform:none}}
