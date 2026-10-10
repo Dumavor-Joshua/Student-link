@@ -1,0 +1,1739 @@
+{
+  "schemaVersion": 1,
+  "title": "StudentLink Ghana SHS and second-cycle school directory",
+  "lastReviewed": "2026-10-10",
+  "sources": [
+    {
+      "title": "Ghana Education Service — Senior High and Technical Vocational Schools",
+      "url": "https://ntc.gov.gh/wp-content/uploads/2021/12/SHSTVET_SCHOOLS.pdf",
+      "publishedYear": 2021,
+      "note": "Official historical directory listing 721 numbered public SHS/technical-vocational institutions."
+    },
+    {
+      "title": "SchoolsInGH — 2026 SHS category and programme register update",
+      "url": "https://schoolsingh.com/news/2026-shs-category-and-programme-register-update",
+      "publishedYear": 2026,
+      "note": "Reports the 2026 GES register covers 955 public schools."
+    },
+    {
+      "title": "Ghana Education Service School Directory",
+      "url": "https://ges.gov.gh/schools.php",
+      "note": "Official directory for checking school names and status."
+    }
+  ],
+  "completenessNote": "Current StudentLink checklist built from the application's established directory and additional entries cross-checked against the public GES/TVET register. It is not yet a complete import of every public and private entry in the 2026 second-cycle register. Names absent from this list remain usable as typed values and are normalized for grouping.",
+  "normalizationPolicy": "Exact normalized names and explicit aliases canonicalize immediately. Fuzzy matching is restricted to unique, high-confidence matches; ambiguous names and different campuses remain separate.",
+  "schools": [
+    {
+      "name": "Abakrampa Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Abeadze State College",
+      "aliases": []
+    },
+    {
+      "name": "Abeaseman Community Day Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Abetifi Presby Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Abetifi Presby Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Abor Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Abuakwa State College",
+      "aliases": []
+    },
+    {
+      "name": "Aburaman Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Aburi Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Abutia Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Academy of Christ the King",
+      "aliases": []
+    },
+    {
+      "name": "Accra Academy",
+      "aliases": []
+    },
+    {
+      "name": "Accra Girls Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Accra Grammar School",
+      "aliases": []
+    },
+    {
+      "name": "Accra High School",
+      "aliases": []
+    },
+    {
+      "name": "Accra Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Accra Wesley Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Acherensua Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Achiase Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Achimota Senior High School",
+      "aliases": [
+        "achimota",
+        "achimota shs"
+      ]
+    },
+    {
+      "name": "Achinakrom Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Adaklu Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Adanwomase Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Adiembra Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Adisadel College",
+      "aliases": [
+        "adisco",
+        "adisco cape coast"
+      ]
+    },
+    {
+      "name": "Adjoafua Community Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Adonten Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Adrobaa Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Afadjato Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Afia Kobi Ampem Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Aggrey Memorial A.M.E. Zion Senior High School",
+      "aliases": [
+        "aggiss",
+        "aggrey memorial"
+      ]
+    },
+    {
+      "name": "Agogo State College",
+      "aliases": []
+    },
+    {
+      "name": "Agomeda Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Agona Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Ahafoman Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Ahantaman Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Akim Asafo Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Akim Swedru Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Akontombra Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Akontombra Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Akuapem Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Akwamuman Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Alavanyo Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Amankwakrom Fisheries Agricultural Technical Institute",
+      "aliases": []
+    },
+    {
+      "name": "Amanten Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Amasaman Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Amenfiman Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Ameyaw Akumfi Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Anfoega Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Anfoega Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Anfoeta Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Anlo Afiadenyigba Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Anlo Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Annor Adjaye Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Anum Presbyterian Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Apam Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Archbishop Porter Girls Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Asamankese Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Asankrangwa Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Asanteman Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Asawinso Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Asawinso Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Asuogyaman Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Asuom Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Atebubu Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Atebubu Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Atiavi Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Attafuah Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Awudome Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Awutu Bawjiase Community Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Awutu Winton Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Axim Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Axim Girls Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Banka Community Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Barekese Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Battor Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Bawku Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bawku Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Bechem Presby Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Benso Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Beposo Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Berekum Presby Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Berekum Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bia Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Bibiani Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Bimbilla Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Bisease Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Bishop Aglionby Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bishop Herman College",
+      "aliases": []
+    },
+    {
+      "name": "Boa Amponsem Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bodi Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bodi Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Bolgatanga Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bolgatanga Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bomaa Community Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bompeh Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Bongo Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Bonzo-Kaku Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Bosome Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Bosomtwe Girls STEM Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bosomtwe STEM Academy",
+      "aliases": []
+    },
+    {
+      "name": "Breman Asikuma Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Bueman Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Buipe Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Buipe Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Cambridge Senior High Technical School",
+      "aliases": []
+    },
+    {
+      "name": "Chemu Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Chiana Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Chiraa Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Chirano Community Day Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Christian Methodist Senior High",
+      "aliases": []
+    },
+    {
+      "name": "City Business Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Cosmos Senior High School, Ejura",
+      "aliases": []
+    },
+    {
+      "name": "Dabala Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Dabokpa Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Daceland Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Dadease Agricultural Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Dadieso Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Dadieso Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Daffiamah Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Dagbon State Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Dagbon State Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Dambai Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Dansoman Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Diabene Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Diaso Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Dofor Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Domaa College",
+      "aliases": []
+    },
+    {
+      "name": "Dompoase Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Donkorkrom Agricultural Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Dormaa Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Drobo Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Drobonso Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Dwamena Akenten Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Dzodze-Penyi Senior High",
+      "aliases": []
+    },
+    {
+      "name": "E.P. Agric Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "E.P. Senior High, Amedzofe",
+      "aliases": []
+    },
+    {
+      "name": "E.P.C. Mawuko Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Ebenezer Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Edinaman Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Effiduase Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Ejuraman Anglican Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Elite College, Kumasi",
+      "aliases": []
+    },
+    {
+      "name": "Enyan Denkyira Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Esiama Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Fame Senior High School, Shama",
+      "aliases": []
+    },
+    {
+      "name": "Fanteakwa Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Fiase-man Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Fijai Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Gambaga Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Ghana Muslim Mission Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Ghana National College, Cape Coast",
+      "aliases": [
+        "ghana national",
+        "ghana national college cape coast"
+      ]
+    },
+    {
+      "name": "Ghana Senior High School, Koforidua",
+      "aliases": []
+    },
+    {
+      "name": "Ghana Senior High School, Tamale",
+      "aliases": []
+    },
+    {
+      "name": "Ghana Senior High/Tech School, Takoradi",
+      "aliases": []
+    },
+    {
+      "name": "Ghana Senior High/Technical School, Takoradi",
+      "aliases": []
+    },
+    {
+      "name": "Ghanata Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Gushegu Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Gwiraman Community Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Half Assini Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Half Assini Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Have Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Holy Child School, Cape Coast",
+      "aliases": [
+        "holy child",
+        "holico"
+      ]
+    },
+    {
+      "name": "Holy Trinity Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Huni Valley Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Huni Valley Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Hwidiem Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Ideal College, East Legon",
+      "aliases": []
+    },
+    {
+      "name": "Islamic Girls Senior High, Suhum",
+      "aliases": []
+    },
+    {
+      "name": "Islamic Senior High, Kumasi",
+      "aliases": []
+    },
+    {
+      "name": "Jachie-Pramso Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Jema Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Jirapa Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Jireh Senior High School, Teshie",
+      "aliases": []
+    },
+    {
+      "name": "Joy Standard College, Kumasi",
+      "aliases": []
+    },
+    {
+      "name": "Juaben Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Juaboso Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Kade Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Kaleo Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Kalpohin Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Kanton Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Ken Hammer Senior High Technical School, Goaso",
+      "aliases": []
+    },
+    {
+      "name": "Keta Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Keta Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Kibi Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "King David Community College, Kpong",
+      "aliases": []
+    },
+    {
+      "name": "Kintampo Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Klikor Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Klikor Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "KNUST Senior High School",
+      "aliases": [
+        "knust shs"
+      ]
+    },
+    {
+      "name": "Koforidua Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Konongo Odumase Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Kpando Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Kpando Technical Institute",
+      "aliases": []
+    },
+    {
+      "name": "Kpeve Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Krobo Community Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Kukuom Agric Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Kumasi Academy",
+      "aliases": []
+    },
+    {
+      "name": "Kumasi Anglican Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Kumasi Girls Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Kumasi High School",
+      "aliases": [
+        "kumasihigh",
+        "kumasi high shs"
+      ]
+    },
+    {
+      "name": "Kumasi Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Kumasi Wesley Girls High School",
+      "aliases": []
+    },
+    {
+      "name": "Kumbungu Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Kwabre Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Kwahu Tafo Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Kwanyako Senior High",
+      "aliases": []
+    },
+    {
+      "name": "La Presby Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Labone Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Lambussie Community Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Lashibi Community Day Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Lawra Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Mabang Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Mankessim Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Mankranso Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Mansen Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Manso-Adubia Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Manso-Amenfi Community Day Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Mansoman Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Mawuli School, Ho",
+      "aliases": [
+        "moh",
+        "mawuli"
+      ]
+    },
+    {
+      "name": "Mepe St. Kizito Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Mepe St. Kizito Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Methodist Senior High School, Saltpond",
+      "aliases": []
+    },
+    {
+      "name": "Methodist Senior High School, Sekondi",
+      "aliases": []
+    },
+    {
+      "name": "Methodist Senior High, Sekondi",
+      "aliases": []
+    },
+    {
+      "name": "Mfantsiman Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Mfantsipim School",
+      "aliases": [
+        "mfantsipim",
+        "motown"
+      ]
+    },
+    {
+      "name": "Mim Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Mint Senior High School, Yeji",
+      "aliases": []
+    },
+    {
+      "name": "Modern Senior High School, Kpong",
+      "aliases": []
+    },
+    {
+      "name": "Moree Community Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Morso Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Mount Hebron College, Dunkwa-On-Offin",
+      "aliases": []
+    },
+    {
+      "name": "Mozano Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Mpohor Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Mpohor Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Nakpanduri Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Nalerigu Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Nana Brentu Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Nana Brentu Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Nandom Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Nankpanduri Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Navrongo Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Ndewura Jakpa Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "New Abirem Senior High",
+      "aliases": []
+    },
+    {
+      "name": "New Juaben Senior High/Commercial",
+      "aliases": []
+    },
+    {
+      "name": "Nifa Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Nkawkaw Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Nkoranman Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Nkoranza Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Nkroful Agricultural Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Nkruful Agricultural Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Nkyeraa Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Northern School of Business",
+      "aliases": []
+    },
+    {
+      "name": "Notre Dame Girls Senior High School, Sunyani",
+      "aliases": []
+    },
+    {
+      "name": "Notre Dame Seminary/Senior High School, Navrongo",
+      "aliases": []
+    },
+    {
+      "name": "Nsawora Edumafah Community Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Nsein Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Nsutaman Catholic Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Nungua Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Nuru-Ameen Islamic Senior High, Asewase",
+      "aliases": []
+    },
+    {
+      "name": "Nyakrom Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Nyankumasi Ahenkro Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Nyinahin Catholic Senior High",
+      "aliases": []
+    },
+    {
+      "name": "O'Reilly Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Obrachire Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Obuasi Senior High/Tech School",
+      "aliases": [
+        "ashantigold"
+      ]
+    },
+    {
+      "name": "Odomaseman Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Odorgonno Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Ofori Panin Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Oguaa Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Ogyeedom Community Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Okomfo Anokye Senior High",
+      "aliases": []
+    },
+    {
+      "name": "OLA Girls Senior High School, Ho",
+      "aliases": []
+    },
+    {
+      "name": "Opoku Ware School",
+      "aliases": [
+        "opoku ware",
+        "ows",
+        "opoku ware school kumasi"
+      ]
+    },
+    {
+      "name": "Osei Bonsu Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Osei Kyeretwie Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Osei Tutu Senior High, Akropong",
+      "aliases": []
+    },
+    {
+      "name": "Osudoku Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Otou Memorial Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Our Lady of Fatima Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Our Lady of Mercy Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Our Lady of Mount Carmel Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Our Lady of Providence Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Owerriman Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Oyoko Methodist Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Pank Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Peki Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Peki Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Peki Senior High/Technical School",
+      "aliases": []
+    },
+    {
+      "name": "Pope John Senior High and Minor Seminary",
+      "aliases": []
+    },
+    {
+      "name": "Potsin T.I. Ahmadiyya Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Prang Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Prempeh College",
+      "aliases": [
+        "prempeh",
+        "prempeh college kumasi"
+      ]
+    },
+    {
+      "name": "Presby Senior High School, Begoro",
+      "aliases": []
+    },
+    {
+      "name": "Presby Senior High School, Tamale",
+      "aliases": []
+    },
+    {
+      "name": "Presby Senior High School, Tema",
+      "aliases": []
+    },
+    {
+      "name": "Presby Senior High, Bompata",
+      "aliases": []
+    },
+    {
+      "name": "Presby Senior High, Osu",
+      "aliases": []
+    },
+    {
+      "name": "Presby Senior High, Tema",
+      "aliases": []
+    },
+    {
+      "name": "Presby Senior High/Technical, Adukrom",
+      "aliases": []
+    },
+    {
+      "name": "Presbyterian Boys' Senior High School, Legon",
+      "aliases": [
+        "presec",
+        "presec legon",
+        "presby boys",
+        "presbyterian boys shs",
+        "legon presec",
+        "presby legon",
+        "presec boys"
+      ]
+    },
+    {
+      "name": "Preset Pacesetters Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Prestea Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Prestea Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Queens Girls Senior High School, Sefwi Awhiaso",
+      "aliases": []
+    },
+    {
+      "name": "Ramseyer Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Reputable Senior High School, Wiaga",
+      "aliases": []
+    },
+    {
+      "name": "Rugari College, Bongo",
+      "aliases": []
+    },
+    {
+      "name": "Sacred Heart Senior High School, Nsoatre",
+      "aliases": []
+    },
+    {
+      "name": "Sakafia Islamic Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Salaga Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Samme Senior High School, Mankessim",
+      "aliases": []
+    },
+    {
+      "name": "Samtet Oxford Senior High School, Atachem",
+      "aliases": []
+    },
+    {
+      "name": "Sandema Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Sankor Community Day Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Sankore Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Savelugu Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Sawla Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Sefwi Bekwai Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Sefwi Bekwai Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Sefwi-Wiawso Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Sefwi-Wiawso Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Sekondi College",
+      "aliases": []
+    },
+    {
+      "name": "Serwaa Kesse Girls Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Serwaah Nyarko Girls Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Sogakope Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Sogakope Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Somanya Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "St. Augustine's College, Cape Coast",
+      "aliases": []
+    },
+    {
+      "name": "St. Augustine's Senior High School, Bogoso",
+      "aliases": []
+    },
+    {
+      "name": "St. Catherine Girls Senior High School, Agbakope",
+      "aliases": []
+    },
+    {
+      "name": "St. Francis Xavier Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "St. Gregory Catholic Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "St. Hubert Seminary/Senior High, Kumasi",
+      "aliases": []
+    },
+    {
+      "name": "St. James Seminary and Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "St. Jerome Senior High, Abofour",
+      "aliases": []
+    },
+    {
+      "name": "St. John's Grammar Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "St. John's Integrated Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "St. John's Senior High School, Sekondi",
+      "aliases": []
+    },
+    {
+      "name": "St. Joseph Senior High School, Sefwi Wiawso",
+      "aliases": []
+    },
+    {
+      "name": "St. Joseph Senior High, Sefwi Wiawso",
+      "aliases": []
+    },
+    {
+      "name": "St. Louis Senior High School, Kumasi",
+      "aliases": [
+        "st louis kumasi",
+        "st louis shs kumasi"
+      ]
+    },
+    {
+      "name": "St. Luke Senior High School, Mankessim",
+      "aliases": []
+    },
+    {
+      "name": "St. Margaret-Mary Senior High",
+      "aliases": []
+    },
+    {
+      "name": "St. Martins Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "St. Mary's Boys Senior High School, Apowa",
+      "aliases": []
+    },
+    {
+      "name": "St. Mary's Senior High School, Konongo",
+      "aliases": []
+    },
+    {
+      "name": "St. Mary's Senior High, Konongo",
+      "aliases": []
+    },
+    {
+      "name": "St. Michael's Senior High, Ahenkro",
+      "aliases": []
+    },
+    {
+      "name": "St. Monica's Senior High School, Mampong",
+      "aliases": []
+    },
+    {
+      "name": "St. Monica's Senior High, Mampong",
+      "aliases": []
+    },
+    {
+      "name": "St. Paul's Senior High, Denu",
+      "aliases": []
+    },
+    {
+      "name": "St. Peter's Senior High School, Nkwatia",
+      "aliases": []
+    },
+    {
+      "name": "St. Richard's Senior High School, Assin Foso",
+      "aliases": []
+    },
+    {
+      "name": "St. Rose's Senior High, Akwatia",
+      "aliases": []
+    },
+    {
+      "name": "St. Stephen's Presbyterian Senior High",
+      "aliases": []
+    },
+    {
+      "name": "St. Thomas Aquinas Senior High School",
+      "aliases": [
+        "st thomas aquinas",
+        "st thomas aquinas shs"
+      ]
+    },
+    {
+      "name": "St. Vincent College",
+      "aliases": []
+    },
+    {
+      "name": "Suhum Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Sunyani Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Swedru Senior High",
+      "aliases": []
+    },
+    {
+      "name": "T. I. Ahmadiyya Senior High School, Kumasi",
+      "aliases": [
+        "ti ahmadiyya kumasi",
+        "t i ahmadiyya shs kumasi"
+      ]
+    },
+    {
+      "name": "T.I. Ahmadiyya Senior High School, Wa",
+      "aliases": []
+    },
+    {
+      "name": "Takoradi Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Tamale Business Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Tamale Girls Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Tamale Senior High School",
+      "aliases": [
+        "tamale secondary"
+      ]
+    },
+    {
+      "name": "Tanyigbe Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Tapaman Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Tarkwa Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Taviefe Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Techiman Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Tema Methodist Day Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Tema Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Terchire Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Teshie Presby Secondary",
+      "aliases": []
+    },
+    {
+      "name": "Toase Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Tongo Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Tongo Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Tongor Senior High Technical School",
+      "aliases": []
+    },
+    {
+      "name": "Tsiame Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Tumu Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Tuna Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Tuna Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Twifo Hemang Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Twifo Praso Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Uthman Bin Afam Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Uthman Bin Affan Islamic Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Vakpo Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Vakpo Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Vakpo Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Vitting Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Volo Community Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Wa Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Wallahs Academy Senior High School, Ho",
+      "aliases": []
+    },
+    {
+      "name": "Wapuli Community Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Wassa East Daboase Senior High/Tech School",
+      "aliases": []
+    },
+    {
+      "name": "Wenchi Methodist Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Wenchi Methodist Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Wesley Girls' Senior High School, Cape Coast",
+      "aliases": [
+        "wesco"
+      ]
+    },
+    {
+      "name": "Wesley High School, Bekwai",
+      "aliases": []
+    },
+    {
+      "name": "West Africa Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Weta Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Winneba Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Wulensi Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Wulugu Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Yaa Asantewaa Girls Senior High School",
+      "aliases": [
+        "yagshs",
+        "yagss"
+      ]
+    },
+    {
+      "name": "Yamfo Anglican Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Zabzugu Senior High",
+      "aliases": []
+    },
+    {
+      "name": "Zamse Senior High/Technical",
+      "aliases": []
+    },
+    {
+      "name": "Zorkor Senior High School",
+      "aliases": []
+    },
+    {
+      "name": "Zuarungu Senior High",
+      "aliases": []
+    }
+  ]
+}
