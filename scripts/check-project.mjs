@@ -83,9 +83,20 @@ assert.ok(navigationStateCode.includes("S.view==='game'&&link.dataset.view==='ga
 const renderViewStart = js.indexOf('async function renderView()');
 const renderViewEnd = js.indexOf('async function viewFeed()', renderViewStart);
 const renderViewCode = js.slice(renderViewStart, renderViewEnd);
-for (const route of ['feed','friends','messages','games','profile','suggestions']) {
-  assert.ok(renderViewCode.includes("S.view==='"+route+"'"), 'Navigation destination must render: '+route);
+for (const [route,renderer] of Object.entries({
+  feed:'viewFeed',friends:'viewFriends',messages:'viewMessages',games:'viewGames',
+  game:'viewGame',profile:'viewProfile',suggestions:'viewSuggestions',school:'viewSchoolStudents'
+})) {
+  assert.ok(renderViewCode.includes(route+':()=>'+renderer+'(') || renderViewCode.includes(route+':()=>'+renderer+'()'),
+    'Navigation destination must have an isolated renderer: '+route);
 }
+assert.ok(renderViewCode.includes('const renderers={'), 'Page renderers must be dispatched through an explicit route map');
+assert.ok(renderViewCode.includes('Other StudentLink sections remain available.'), 'A page failure must offer recovery without blocking other sections');
+assert.ok(renderViewCode.includes('await viewSchools()'), 'Trending schools must load independently of the selected page');
+assert.ok(js.includes("window.addEventListener('unhandledrejection'"), 'Unexpected async errors must be logged for diagnosis');
+assert.ok(js.includes("window.addEventListener('error'"), 'Unexpected runtime errors must be logged for diagnosis');
+assert.doesNotMatch(js, /awardWinnerPoints|loadMyGamePoints|studentlink_award_game_points|game_point_awards/,
+  'Paused game rewards must not be wired into the main app code');
 
 console.log('StudentLink static checks passed.');
 
@@ -93,7 +104,7 @@ assert.ok(html.includes('rel="icon" type="image/svg+xml" href="assets/favicon.sv
 assert.ok(js.includes("document.getElementById('google-signin')"), 'Google button must be located during auth rendering');
 assert.ok(js.includes("googleButton?.addEventListener('click'") , 'Continue with Google must have a click handler');
 assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), 'Continue with Google must use Supabase Google OAuth');
-assert.ok(html.includes('studentlink-google-oauth-fix-1'), 'App script cache version must be refreshed after Google sign-in fixes');
+assert.ok(html.includes('studentlink-fault-isolation-1'), 'App script cache version must be refreshed after fault-isolation changes');
 assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
