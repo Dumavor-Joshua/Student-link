@@ -14,6 +14,7 @@ const gameIndexMigration = read('supabase/migrations/20261010_add_missing_game_f
 const gameRpcHardeningMigration = read('supabase/migrations/20261010_harden_game_rpc_search_path.sql');
 const rlsOptimizationMigration = read('supabase/migrations/20261010_optimize_rls_auth_uid_policies.sql');
 const tablePrivilegeMigration = read('supabase/migrations/20261010_revoke_unused_table_privileges.sql');
+const messageReadMigration = read('supabase/migrations/20261010_add_conversation_read_receipts.sql');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(html.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
@@ -136,7 +137,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-message-unread-mobile-7') && sw.includes('studentlink-message-unread-mobile-7'), 'Messages assets must use a fresh cache version');
+assert.ok(html.includes('studentlink-unread-read-receipts-8') && sw.includes('studentlink-unread-read-receipts-8'), 'Messages assets must use a fresh cache version');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -148,7 +149,7 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-message-unread-mobile-7') && sw.includes('studentlink-message-unread-mobile-7'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-unread-read-receipts-8') && sw.includes('studentlink-unread-read-receipts-8'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('data-message-nav-badge') && js.includes('messenger-unread-badge'), 'Messages navigation and chat rows must render unread badges');
 assert.ok(js.includes("count:'exact',head:true") && js.includes('updateMessageReadCursor'), 'Unread message counts must be computed and cleared when a visible chat is opened');
 assert.ok(js.includes("S.publicProfileId=null;S.view='messages';syncNavigationState();await renderView()}"), 'Profile and friends Message actions must use the shared view renderer');
@@ -160,3 +161,8 @@ assert.ok(js.includes("stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;
 assert.equal((js.match(/function scrambleWord\(/g)||[]).length, 1, 'Word scramble helper should be declared once');
 
 assert.ok(css.includes('.navitem span.nav-unread-badge{display:inline-flex}'), 'Unread conversation count must remain visible in mobile navigation');
+
+assert.ok(js.includes("from('conversation_reads').select('conversation_id,last_read_at')"), 'Unread counts must use shared Supabase read receipts');
+assert.ok(js.includes("from('conversation_reads').upsert({conversation_id:conversationId,user_id:S.session.user.id,last_read_at:timestamp}"), 'Opening a conversation must persist its read cursor to Supabase');
+assert.ok(js.includes('data-message-header-badge') && js.includes('messages-shortcut'), 'The main app header must show the unread conversation count');
+assert.ok(messageReadMigration.includes('conversation_reads') && messageReadMigration.includes('enable row level security'), 'Read receipts must have a tracked RLS-enabled migration');

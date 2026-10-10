@@ -962,3 +962,9 @@ input,textarea,select{font-size:16px}
 
 /* The mobile navigation hides its label span; keep the unread count visible. */
 @media(max-width:680px){.navitem span.nav-unread-badge{display:inline-flex}}
+
+/* Main-app shortcut shares the unread-conversation count with the sidebar. */
+.message-count-shortcut{white-space:nowrap;display:inline-flex;align-items:center;gap:6px}.header-message-badge{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#e5484d;color:#fff;font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}.header-message-badge[hidden]{display:none!important}
+@media(max-width:760px){.message-count-shortcut{padding:7px 8px;font-size:12px}.header .message-count-shortcut{gap:4px}}
+
+@media(max-width:420px){.message-shortcut-label{display:none}}
