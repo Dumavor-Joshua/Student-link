@@ -994,3 +994,30 @@ input,textarea,select{font-size:16px}
   .layout.messages-mode .messenger-layout.chat-open .messenger-chat{display:flex!important;width:100%!important;height:100%!important}
   .layout.messages-mode.messages-chat-open>.leftside{display:none!important}
 }
+
+/* StudentLink Games — cohesive, accessible game-library refresh */
+.games-page{max-width:1050px;margin:0 auto;padding-bottom:28px}
+.games-intro{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:clamp(18px,3vw,30px);margin-bottom:26px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(125deg,var(--p),var(--p2));box-shadow:0 14px 36px rgba(20,45,85,.08)}
+.games-intro .eyebrow{margin:0 0 8px;font-size:11px;letter-spacing:.14em;font-weight:800;color:var(--mint)}
+.games-intro .title{margin:0;font-size:clamp(25px,4vw,36px);letter-spacing:-.035em}
+.games-subtitle{max-width:520px;margin:9px 0 0;color:var(--muted);line-height:1.6}
+.games-count{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 100px;min-height:92px;border:1px solid var(--line);border-radius:18px;background:var(--bg)}
+.games-count strong{font-size:30px;line-height:1.1;letter-spacing:-.04em}
+.games-count span{margin-top:6px;color:var(--muted);font-size:11px;text-align:center}
+.games-section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 2px 13px}
+.games-section-heading h2{margin:0;font-size:18px;letter-spacing:-.02em}
+.games-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.game-tile{position:relative;display:flex;align-items:flex-start;gap:15px;min-width:0;min-height:160px;padding:20px;text-align:left;color:var(--txt);border:1px solid var(--line);border-radius:18px;background:var(--p);cursor:pointer;box-shadow:0 4px 16px rgba(15,30,60,.035);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.game-tile:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 12px 28px rgba(25,55,100,.12)}
+.game-tile:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+.game-tile-icon{display:flex;align-items:center;justify-content:center;flex:0 0 52px;width:52px;height:52px;border-radius:15px;background:var(--p2);font-size:27px}
+.tone-blue .game-tile-icon{background:rgba(49,95,206,.13)}.tone-purple .game-tile-icon{background:rgba(118,85,200,.14)}.tone-coral .game-tile-icon{background:rgba(217,93,89,.14)}.tone-green .game-tile-icon{background:rgba(22,134,108,.14)}.tone-amber .game-tile-icon{background:rgba(189,122,23,.14)}.tone-sky .game-tile-icon{background:rgba(37,137,189,.14)}
+.game-tile-copy{display:flex;flex:1;flex-direction:column;align-items:flex-start;min-width:0}
+.game-tile-heading{font-size:16px;font-weight:800;line-height:1.35}
+.game-tile-description{margin-top:7px;color:var(--muted);font-size:13px;line-height:1.5}
+.game-tile-mode{display:inline-flex;align-items:center;margin-top:13px;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.08em}
+.mode-online{background:rgba(49,95,206,.12);color:var(--blue)}.mode-solo{background:rgba(22,134,108,.12);color:var(--mint)}
+.game-tile-arrow{margin-left:auto;color:var(--muted);font-size:18px}
+.games-footnote{margin:17px 2px 0;color:var(--muted);font-size:12px;line-height:1.6}
+@media(max-width:680px){.games-intro{align-items:flex-start;padding:18px;border-radius:17px}.games-count{flex-basis:70px;min-height:70px;border-radius:14px}.games-count strong{font-size:23px}.games-count span{font-size:10px}.games-grid{grid-template-columns:minmax(0,1fr);gap:10px}.game-tile{min-height:132px;padding:16px;gap:12px}.game-tile-icon{flex-basis:44px;width:44px;height:44px;border-radius:13px;font-size:23px}.games-section-heading{align-items:flex-start;flex-direction:column;gap:3px}}
+@media(prefers-reduced-motion:reduce){.game-tile{transition:none}.game-tile:hover{transform:none}}
