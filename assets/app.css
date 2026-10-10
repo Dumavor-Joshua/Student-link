@@ -675,3 +675,45 @@ body:not(:has(.auth)) .header #notifications-toggle{flex:0 0 auto;display:inline
 :root[data-theme="light"] .auth-submit,
 :root[data-theme="light"] .btn-primary *,
 :root[data-theme="light"] .auth-submit *{color:#fff!important}
+
+
+/* Feed composer box */
+.post-composer{
+  padding:16px 18px;
+  border:1px solid #dbe4f3;
+  background:linear-gradient(125deg,#ffffff 0%,#f7f9ff 65%,#f1fbf8 100%);
+  box-shadow:0 5px 18px rgba(39,67,117,.07);
+}
+.post-composer-top{display:flex;align-items:center;gap:12px}
+.post-composer-avatar{
+  display:flex;align-items:center;justify-content:center;flex:0 0 42px;height:42px;
+  border-radius:50%;background:#e6edff;color:#315fce;font-size:21px;font-weight:800;
+}
+.post-composer-prompt{
+  flex:1;min-width:0;text-align:left;padding:12px 15px;border:1px solid #e0e6f0;
+  border-radius:999px;background:#f4f6fa;color:#515d70;font:inherit;cursor:pointer;
+  transition:border-color .16s ease,background .16s ease,box-shadow .16s ease;
+}
+.post-composer-prompt:hover{background:#fff;border-color:#8aa7ed;box-shadow:0 0 0 3px rgba(49,95,206,.08)}
+.post-composer-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 0;padding-top:12px;border-top:1px solid #e8edf5}
+.post-composer-actions .tiny{display:inline-flex;align-items:center;gap:5px}
+.post-composer-actions .btn{margin-left:auto}
+.feed-head{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.feed-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.feed-controls label{margin:0}
+@media(max-width:600px){
+  .post-composer{padding:13px}
+  .post-composer-top{gap:9px}
+  .post-composer-avatar{flex-basis:36px;height:36px}
+  .post-composer-prompt{padding:10px 12px;font-size:12px}
+  .post-composer-actions{gap:10px}
+  .post-composer-actions .tiny{font-size:11px}
+  .post-composer-actions .btn{width:100%;margin-left:0}
+  .feed-head{align-items:flex-start;flex-direction:column}
+  .feed-controls{width:100%}
+  .feed-controls select{flex:1;min-width:0}
+}
+:root[data-theme="dark"] .post-composer{background:linear-gradient(125deg,#172746,#1b2e4a);border-color:#354a6d}
+:root[data-theme="dark"] .post-composer-prompt{background:#203454;border-color:#354a6d;color:#f5f7ff}
+:root[data-theme="dark"] .post-composer-actions{border-color:#354a6d}
+:root[data-theme="dark"] .post-composer-avatar{background:#2b4166;color:#cbdcff}
