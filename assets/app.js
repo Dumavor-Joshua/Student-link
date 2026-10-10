@@ -453,16 +453,23 @@ async function toggleLike(id,liked){
 }
 
 async function viewFriends(){
-  const {data:people,error:peopleError}=await db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).order('nickname').limit(100);
-  if(peopleError)throw peopleError;
   const {data:rows,error}=await db.from('friendships').select('user_id,friend_id,status').or(`user_id.eq.${S.session.user.id},friend_id.eq.${S.session.user.id}`);
   if(error)throw error;
   const sent=new Set((rows||[]).filter(r=>r.status==='pending'&&r.user_id===S.session.user.id).map(r=>r.friend_id));
   const received=new Set((rows||[]).filter(r=>r.status==='pending'&&r.friend_id===S.session.user.id).map(r=>r.user_id));
   const friendIds=new Set((rows||[]).filter(r=>r.status==='accepted').map(r=>r.user_id===S.session.user.id?r.friend_id:r.user_id));
-  S.friends=(people||[]).filter(p=>friendIds.has(p.id));
+  const {data:people,error:peopleError}=await db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).order('nickname').limit(100);
+  if(peopleError)throw peopleError;
+  // Keep discovery bounded, but always load all friends and pending-request participants.
+  const relatedIds=[...new Set([...friendIds,...sent,...received])].filter(id=>id!==S.session.user.id);
+  const relatedResult=relatedIds.length?await db.from('profiles').select('id,nickname,school,avatar_url').in('id',relatedIds):{data:[],error:null};
+  if(relatedResult.error)throw relatedResult.error;
+  const visibleById=new Map((people||[]).map(p=>[p.id,p]));
+  (relatedResult.data||[]).forEach(p=>visibleById.set(p.id,p));
+  const visiblePeople=[...visibleById.values()].sort((a,b)=>String(a.nickname||'').localeCompare(String(b.nickname||'')));
+  S.friends=visiblePeople.filter(p=>friendIds.has(p.id));
   let html=`<div class='head'><h1 class='title'>Friends</h1><span class='tiny'>${S.friends.length} friends</span></div>`;
-  html+=(people||[]).map(p=>`<div class='card'><div style='display:flex;justify-content:space-between;align-items:center;gap:12px'><div style='display:flex;align-items:center;gap:10px;min-width:0'><button type="button" class="profile-open" data-public-profile="${esc(p.id)}" aria-label="View ${esc(p.nickname)}'s profile">${profileAvatarMarkup(p.nickname,p.avatar_url,'avatar')}</button><div><button type="button" class="profile-name-link" data-public-profile="${esc(p.id)}">${esc(p.nickname)}</button><div class='tiny'>${esc(p.school||'No school')}</div></div></div><div style='display:flex;gap:8px;flex-wrap:wrap'>${friendIds.has(p.id)?`<button class='btn btn-secondary' data-messagefriend='${p.id}'>Message</button>`:received.has(p.id)?`<button class='btn' data-accept='${p.id}'>Accept</button><button class='btn btn-secondary' data-decline='${p.id}'>Decline</button>`:sent.has(p.id)?`<button class='btn btn-secondary' disabled>Requested</button>`:`<button class='btn' data-add='${p.id}'>Add friend</button>`}</div></div></div>`).join('');
+  html+=visiblePeople.map(p=>`<div class='card'><div style='display:flex;justify-content:space-between;align-items:center;gap:12px'><div style='display:flex;align-items:center;gap:10px;min-width:0'><button type="button" class="profile-open" data-public-profile="${esc(p.id)}" aria-label="View ${esc(p.nickname)}'s profile">${profileAvatarMarkup(p.nickname,p.avatar_url,'avatar')}</button><div><button type="button" class="profile-name-link" data-public-profile="${esc(p.id)}">${esc(p.nickname)}</button><div class='tiny'>${esc(p.school||'No school')}</div></div></div><div style='display:flex;gap:8px;flex-wrap:wrap'>${friendIds.has(p.id)?`<button type='button' class='btn btn-secondary' data-messagefriend='${esc(p.id)}'>Message</button>`:received.has(p.id)?`<button type='button' class='btn' data-accept='${esc(p.id)}'>Accept</button><button type='button' class='btn btn-secondary' data-decline='${esc(p.id)}'>Decline</button>`:sent.has(p.id)?`<button type='button' class='btn btn-secondary' disabled>Requested</button>`:`<button type='button' class='btn' data-add='${esc(p.id)}'>Add friend</button>`}</div></div></div>`).join('');
   $('#main').innerHTML=html;wireActions();
 }
 async function startConversation(friendId){if(!S.friends.some(f=>f.id===friendId))return toast('Add this student as a friend first.');const me=S.session.user.id;const [user_a,user_b]=[me,friendId].sort();let {data,error}=await db.from('conversations').select('id').eq('user_a',user_a).eq('user_b',user_b).maybeSingle();if(error)throw error;if(!data){let {data:newConvo,error:createErr}=await db.from('conversations').insert({user_a,user_b}).select();if(createErr)throw createErr;data=newConvo[0]}S.chat=data.id;await viewMessages()}
@@ -549,7 +556,7 @@ const STUDENT_QUIZ_QUESTIONS=[
 {q:'Which instrument measures atmospheric pressure?',options:['Thermometer','Barometer','Ammeter','Hygrometer'],answer:1,why:'A barometer measures atmospheric pressure.'},
 {q:'Which branch of government interprets laws?',options:['Executive','Legislature','Judiciary','Electoral commission'],answer:2,why:'The judiciary interprets and applies the law in cases.'}
 ];
-function scrambleWord(word){let chars=word.split(''),mixed=word;for(let i=0;i<12&&mixed===word;i++){for(let j=chars.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[chars[j],chars[k]]=[chars[k],chars[j]]}mixed=chars.join('')}return mixed===word?word.split('').reverse().join(''):mixed}
+
 function renderLocalGame(){
   const game=S.game;
   const titles={quiz:'Student Quiz',rps:'Rock Paper Scissors',guess:'Number Guess',scramble:'Word Scramble'};
@@ -739,7 +746,11 @@ async function viewPublicProfile(userId){
  const {data:p,error}=await db.from('profiles').select('id,nickname,school,avatar_url,bio,class_year,interests').eq('id',userId).maybeSingle();
  if(error)throw error;
  if(!p){$('#main').innerHTML='<section class="card"><h2>Profile unavailable</h2><p class="tiny">This profile may be hidden or no longer available.</p><button class="btn btn-secondary" type="button" data-public-back>Back</button></section>';return}
- const action=S.friends.some(f=>f.id===p.id)?'<button type="button" class="btn" data-messagefriend="'+esc(p.id)+'">Message</button>':'<button type="button" class="btn" data-add="'+esc(p.id)+'">Add friend</button>';
+ const {data:friendshipRows,error:friendshipError}=await db.from('friendships').select('user_id,friend_id,status').or(`user_id.eq.${S.session.user.id},friend_id.eq.${S.session.user.id}`);
+ if(friendshipError)console.warn('Could not determine this profile relationship:',friendshipError);
+ const relation=(friendshipRows||[]).find(r=>(r.user_id===p.id&&r.friend_id===S.session.user.id)||(r.friend_id===p.id&&r.user_id===S.session.user.id));
+ const isFriend=relation?.status==='accepted'||S.friends.some(f=>f.id===p.id);
+ const action=isFriend?'<button type="button" class="btn" data-messagefriend="'+esc(p.id)+'">Message</button>':relation?.status==='pending'&&relation.user_id===S.session.user.id?'<button type="button" class="btn btn-secondary" disabled>Requested</button>':relation?.status==='pending'&&relation.friend_id===S.session.user.id?'<button type="button" class="btn" data-accept="'+esc(p.id)+'">Accept request</button><button type="button" class="btn btn-secondary" data-decline="'+esc(p.id)+'">Decline</button>':'<button type="button" class="btn" data-add="'+esc(p.id)+'">Add friend</button>';
  const interests=String(p.interests||'').split(',').map(x=>x.trim()).filter(Boolean);
  const {data:posts,error:postsError}=await db.from('posts').select('id,body,created_at,image_url').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10);
  if(postsError)console.warn('Could not load public profile posts:',postsError);
@@ -749,6 +760,7 @@ async function viewPublicProfile(userId){
  '<div class="profile-public-details"><section class="card"><h2>About</h2><p class="profile-public-bio">'+esc(p.bio||'No bio provided yet.')+'</p>'+(p.class_year?'<p><b>Class / year:</b> '+esc(p.class_year)+'</p>':'')+'<div class="profile-public-interests">'+(interests.length?interests.map(x=>'<span class="interest-chip">'+esc(x)+'</span>').join(''):'<span class="tiny">No interests added yet.</span>')+'</div></section>'+
  '<section class="card"><h2>Posts</h2>'+(posts?.length?posts.map(post=>'<article class="card profile-public-post"><p>'+esc(post.body||'')+'</p>'+(post.image_url?'<img class="post-image" src="'+esc(post.image_url)+'" alt="Post image" loading="lazy">':'')+'<div class="tiny">'+esc(new Date(post.created_at).toLocaleString())+'</div></article>').join(''):'<p class="tiny">No posts to show yet.</p>')+'</section></div>';
  $('#main').innerHTML=html;
+ wireActions();
 }
 function viewProfile(){
  const p=S.profile||{},draft=readProfileDraft(),nickname=p.nickname||'',school=p.school||'',bio=p.bio??draft.bio??'',year=p.class_year??draft.year??'',interests=p.interests??draft.interests??'',photo=p.avatar_url||'';
@@ -833,7 +845,7 @@ function setupInstallControl(){
  };
 }
 function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));});const layout=document.querySelector('.layout');if(layout){layout.classList.toggle('messages-mode',S.view==='messages');if(S.view!=='messages')layout.classList.remove('messages-chat-open')}document.querySelector('.trending-mobile-wrap')?.classList.toggle('messages-view',S.view==='messages'); }
-function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();S.tttGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
+function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
 function modal(title,content){$('#modaltitle').textContent=title;$('#modalcontent').innerHTML=content;$('#modalbg').classList.add('show')}
 function closeModal(){$('#modalbg').classList.remove('show')}
 document.addEventListener('click',e=>{if(e.target.closest('#modalclose')){e.preventDefault();closeModal()}});
