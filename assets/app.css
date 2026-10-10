@@ -949,3 +949,19 @@ input,textarea,select{font-size:16px}
  .feedback-item{padding:11px}
  .feedback-inline-status{font-size:12px}
 }
+
+
+/* WhatsApp-style unread conversation badges */
+.navitem{position:relative}
+.navitem .nav-label{min-width:0}
+.unread-badge{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:20px;height:20px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#e53955;color:#fff;font-size:11px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.unread-badge[hidden]{display:none!important}
+.navitem .unread-badge{margin-left:auto}
+.messenger-conversation.has-unread .messenger-conversation-copy strong{font-weight:800}
+.messenger-conversation .chat-unread-badge{margin-left:auto;align-self:center}
+.messenger-conversation.has-unread .messenger-preview{color:var(--txt);font-weight:600}
+@media(max-width:680px){
+ .navitem .nav-label{display:none}
+ .navitem .unread-badge{position:absolute;top:3px;right:4px;min-width:17px;height:17px;padding:0 4px;font-size:10px}
+ .navitem{position:relative}
+}
