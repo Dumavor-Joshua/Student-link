@@ -412,3 +412,96 @@ body:not(:has(.auth)) .header #notifications-toggle{flex:0 0 auto;display:inline
 :root[data-theme="light"] .btn-secondary{background:#edf2fa;color:#17243b;border-color:var(--line)}
 :root[data-theme="light"] .navitem{color:#263751}
 :root[data-theme="light"] .navitem.active{color:#fff}
+
+
+/* Accessible theme contrast pass: consistent readable text and soft surfaces. */
+:root[data-theme="light"]{
+  --bg:#f4f4f0;
+  --p:#eeefeb;
+  --p2:#e4e6e1;
+  --line:#d0d3cc;
+  --txt:#171a17;
+  --muted:#565d56;
+  --blue:#245edb;
+  --mint:#087f67;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#101827;
+  --p:#182337;
+  --p2:#222f45;
+  --line:#35445b;
+  --txt:#f7f8fa;
+  --muted:#c0cad8;
+  --blue:#477df0;
+  --mint:#54d6b0;
+  color-scheme:dark;
+}
+:root[data-theme="light"] body,
+:root[data-theme="dark"] body{background:var(--bg);color:var(--txt)}
+:root[data-theme="light"] .header,
+:root[data-theme="light"] .leftside,
+:root[data-theme="light"] .rightside,
+:root[data-theme="light"] .trending-mobile-wrap,
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .modal,
+:root[data-theme="light"] .search-results{background:var(--p);color:var(--txt);border-color:var(--line)}
+:root[data-theme="dark"] .header,
+:root[data-theme="dark"] .leftside,
+:root[data-theme="dark"] .rightside,
+:root[data-theme="dark"] .trending-mobile-wrap,
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .modal,
+:root[data-theme="dark"] .search-results{background:var(--p);color:var(--txt);border-color:var(--line)}
+:root[data-theme="light"] .layout,
+:root[data-theme="light"] .main{background:var(--bg);color:var(--txt)}
+:root[data-theme="dark"] .layout,
+:root[data-theme="dark"] .main{background:var(--bg);color:var(--txt)}
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3,
+:root[data-theme="light"] .title,
+:root[data-theme="light"] .profile-name-link,
+:root[data-theme="light"] .post-content,
+:root[data-theme="light"] .comment,
+:root[data-theme="light"] .comment-content,
+:root[data-theme="light"] .trending-school b{color:#171a17}
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] .title,
+:root[data-theme="dark"] .profile-name-link,
+:root[data-theme="dark"] .post-content,
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-content,
+:root[data-theme="dark"] .trending-school b{color:#f7f8fa}
+:root[data-theme="light"] .tiny,
+:root[data-theme="light"] .trending-school .tiny{color:var(--muted)}
+:root[data-theme="dark"] .tiny,
+:root[data-theme="dark"] .trending-school .tiny{color:var(--muted)}
+:root[data-theme="light"] input,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] select,
+:root[data-theme="light"] .header .search{background:#fafaf7;color:#171a17;border-color:var(--line)}
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] .header .search{background:var(--p2);color:#f7f8fa;border-color:var(--line)}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder,
+:root[data-theme="dark"] .header .search::placeholder{color:#c0cad8}
+:root[data-theme="light"] .btn-secondary,
+:root[data-theme="light"] .trending-school,
+:root[data-theme="light"] .comment,
+:root[data-theme="light"] .comment-item{background:#e8e9e4;color:#171a17;border-color:var(--line)}
+:root[data-theme="dark"] .btn-secondary,
+:root[data-theme="dark"] .trending-school,
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-item{background:#222f45;color:#f7f8fa;border-color:var(--line)}
+:root[data-theme="dark"] .interest-chip{background:#26384b;color:#c8ffed;border-color:#3b5c62}
+:root[data-theme="light"] .navitem{color:#252c27}
+:root[data-theme="dark"] .navitem{color:#e3e9f2}
+:root[data-theme="light"] .navitem.active{color:#fff}
+:root[data-theme="dark"] .navitem.active{color:#fff}
+:root[data-theme="light"] .auth{color:#171a17}
+:root[data-theme="dark"] .auth{color:#f7f8fa}
