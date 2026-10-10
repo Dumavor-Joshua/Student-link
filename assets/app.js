@@ -7,16 +7,16 @@ function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 function makeRandomId(){if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.crypto.randomUUID();const bytes=new Uint8Array(16);if(window.crypto&&typeof window.crypto.getRandomValues==='function')window.crypto.getRandomValues(bytes);else for(let i=0;i<bytes.length;i++)bytes[i]=Math.floor(Math.random()*256);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const h=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20)}
 function schoolKey(s=''){
   return String(s??'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('en')
-    .replace(/&/g,' and ').replace(/\b(sn?r|senior)\.?\s*high\s*(?:school)?\b/g,' shs ')
-    .replace(/\b(s\.?h\.?s\.?|senior\s+high)\b/g,' shs ')
-    .replace(/\b(senior\s+high\s*\/\s*technical|senior\s+high\s*\/\s*tech|senior\s+high\s+technical|shts|shst)\b/g,' shts ')
+    .replace(/&/g,' and ')
+    .replace(/\b(senior\s+high\s*\/\s*technical|senior\s+high\s*\/\s*tech|senior\s+high\s+technical|shts|shst|shst\.?|senior high tech)\b/g,' shts ')
     .replace(/\b(technical\s+institute|tech\.?\s+inst\.?|tech\.?\s+institute)\b/g,' techinst ')
+    .replace(/\b(snr\.?\s*high|senior\s+high(?:\s+school)?|s\.?h\.?s\.?)\b/g,' shs ')
     .replace(/\b(comm\.?|community)\b/g,' community ')
     .replace(/\b(presby)\b/g,' presbyterian ')
     .replace(/\b(cath\.?|catholic)\b/g,' catholic ')
-    .replace(/\b(methodist)\b/g,' methodist ')
     .replace(/\b(sda|s\.?d\.?a\.?)\b/g,' sda ')
     .replace(/\b(st|saint)\.?\s+/g,' saint ')
+    .replace(/\bhigh\s+school\b/g,' high ')
     .replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
 }
 const VERIFIED_GHANA_SHS_TVET = [
@@ -32,18 +32,77 @@ const VERIFIED_GHANA_SHS_TVET = [
   "St. John's Senior High School, Sekondi","Fijai Senior High School","Takoradi Senior High School","Ghana Senior High/Tech School, Takoradi","Tarkwa Senior High School","Amenfiman Senior High School","Sefwi-Wiawso Senior High School","Bibiani Senior High/Tech School"
 ,
   ...["Cambridge Senior High Technical School","City Business Senior High","Cosmos Senior High School, Ejura","Daceland Senior High School","Domaa College","Elite College, Kumasi","Fame Senior High School, Shama","Ideal College, East Legon","Jireh Senior High School, Teshie","Joy Standard College, Kumasi","Ken Hammer Senior High Technical School, Goaso","King David Community College, Kpong","Mount Hebron College, Dunkwa-On-Offin","Otou Memorial Senior High School","Samme Senior High School, Mankessim","Samtet Oxford Senior High School, Atachem","St. Luke Senior High School, Mankessim","St. Richard's Senior High School, Assin Foso","Wallahs Academy Senior High School, Ho","Abakrampa Senior High/Technical","Abeadze State College","Abeaseman Community Day Senior High","Abetifi Presby Senior High","Abor Senior High","Abuakwa State College","Aburaman Senior High","Aburi Girls Senior High","Abutia Senior High/Technical","Academy of Christ the King","Accra Academy","Accra Grammar School","Accra High School","Accra Wesley Girls Senior High","Achinakrom Senior High","Achiase Senior High School","Adaklu Senior High School","Adanwomase Senior High","Adisadel College","Adonten Senior High","Adrobaa Senior High/Technical","Afadjato Senior High/Technical","Afia Kobi Ampem Girls Senior High","Agona Senior High/Technical","Agomeda Senior High/Technical","Ahantaman Girls Senior High","Akim Asafo Senior High","Akim Swedru Senior High","Akontombra Senior High","Akuapem Senior High School","Akwamuman Senior High School","Alavanyo Senior High/Technical","Amankwakrom Fisheries Agricultural Technical Institute","Amanten Senior High","Ameyaw Akumfi Senior High/Technical","Anfoega Senior High","Anfoeta Senior High/Technical","Anlo Afiadenyigba Senior High","Anum Presbyterian Senior High","Asamankese Senior High","Asanteman Senior High","Asawinso Senior High","Asuom Senior High School","Asuogyaman Senior High School","Atebubu Senior High","Atiavi Senior High/Technical","Attafuah Senior High/Technical","Awudome Senior High","Awutu Bawjiase Community Senior High","Awutu Winton Senior High","Axim Girls Senior High","Barekese Senior High School","Banka Community Senior High","Bawku Senior High","Bawku Senior High/Technical","Beposo Senior High","Berekum Senior High","Berekum Presby Senior High","Bisease Senior High School","Bimbilla Senior High School","Bishop Aglionby Senior High","Bodi Senior High","Boa Amponsem Senior High","Bolgatanga Girls Senior High","Bolgatanga Senior High","Bomaa Community Senior High","Bosome Senior High/Technical","Bosomtwe Girls STEM Senior High","Bosomtwe STEM Academy","Breman Asikuma Senior High","Bueman Senior High","Buipe Senior High","Chemu Senior High/Technical","Chiana Senior High","Chiraa Senior High","Christian Methodist Senior High","Dabokpa Senior High","Dadease Agricultural Senior High","Dadieso Senior High","Daffiamah Senior High","Dagbon State Senior High/Technical","Dambai Senior High/Technical","Dansoman Senior High","Diaso Senior High","Dofor Senior High","Dompoase Senior High","Donkorkrom Agricultural Senior High","Dormaa Senior High","Drobo Senior High","Drobonso Senior High","Dwamena Akenten Senior High","Dzodze-Penyi Senior High","E.P. Senior High, Amedzofe","E.P. Agric Senior High/Technical","E.P.C. Mawuko Girls Senior High","Ebenezer Senior High School","Effiduase Senior High","Ejuraman Anglican Senior High","Enyan Denkyira Senior High","Fanteakwa Senior High","Gambaga Girls Senior High","Ghana Muslim Mission Senior High","Ghana Senior High School, Koforidua","Ghana Senior High School, Tamale","Ghana Senior High/Technical School, Takoradi","Gushegu Senior High","Half Assini Senior High","Have Senior High/Technical","Holy Trinity Senior High School","Huni Valley Senior High","Islamic Senior High, Kumasi","Islamic Girls Senior High, Suhum","Jachie-Pramso Senior High","Jema Senior High","Jirapa Senior High","Kaleo Senior High/Technical","Kalpohin Senior High","Kanton Senior High","Keta Senior High/Technical","Klikor Senior High/Technical","Koforidua Senior High/Technical","Krobo Community Senior High","Kumasi Anglican Senior High","Kumasi Senior High/Technical","Kumasi Wesley Girls High School","Kumbungu Senior High","Kwabre Senior High","Kwahu Tafo Senior High","Kwanyako Senior High","Lashibi Community Day Senior High","La Presby Senior High","Lambussie Community Senior High","Lawra Senior High","Mabang Senior High/Technical","Mankessim Senior High/Technical","Mankranso Senior High","Mansen Senior High","Manso-Adubia Senior High","Mansoman Senior High","Mepe St. Kizito Senior High/Technical","Methodist Senior High, Sekondi","Methodist Senior High School, Saltpond","Mfantsiman Girls Senior High","Mint Senior High School, Yeji","Modern Senior High School, Kpong","Moree Community Senior High","Morso Senior High/Technical","Mozano Senior High","Mpohor Senior High","Nalerigu Senior High School","Nana Brentu Senior High/Technical","Nankpanduri Senior High/Technical","Ndewura Jakpa Senior High/Technical","New Abirem Senior High","New Juaben Senior High/Commercial","Nifa Senior High","Nkawkaw Senior High","Nkroful Agricultural Senior High/Technical","Nkoranman Senior High","Nkyeraa Senior High School","Nungua Senior High School","Nuru-Ameen Islamic Senior High, Asewase","Nsutaman Catholic Senior High","Nyakrom Senior High/Technical","Nyankumasi Ahenkro Senior High","Nyinahin Catholic Senior High","Obrachire Senior High/Technical","Odomaseman Senior High","Oguaa Senior High/Technical","Ogyeedom Community Senior High/Technical","Okomfo Anokye Senior High","Osudoku Senior High/Technical","Osei Kyeretwie Senior High","Osei Tutu Senior High, Akropong","Our Lady of Fatima Senior High","Our Lady of Mercy Senior High","Our Lady of Mount Carmel Girls Senior High","Our Lady of Providence Senior High","Owerriman Senior High/Technical","Pank Senior High School","Peki Senior High/Technical","Presby Senior High, Bompata","Presby Senior High, Osu","Presby Senior High, Tema","Presby Senior High/Technical, Adukrom","Prang Senior High","Prestea Senior High/Technical","Preset Pacesetters Senior High School","Ramseyer Senior High School","Reputable Senior High School, Wiaga","Rugari College, Bongo","Sakafia Islamic Senior High","Savelugu Senior High","Sawla Senior High School","Sekondi College","Serwaah Nyarko Girls Senior High","Sefwi Bekwai Senior High","Somanya Senior High/Technical","St. Gregory Catholic Senior High School","St. Hubert Seminary/Senior High, Kumasi","St. Jerome Senior High, Abofour","St. John's Integrated Senior High/Technical","St. Joseph Senior High, Sefwi Wiawso","St. Michael's Senior High, Ahenkro","St. Monica's Senior High, Mampong","St. Mary's Senior High, Konongo","St. Rose's Senior High, Akwatia","St. Stephen's Presbyterian Senior High","St. Francis Xavier Senior High School","St. Margaret-Mary Senior High","St. Martins Senior High School","St. Paul's Senior High, Denu","St. Vincent College","Sogakope Senior High","Suhum Senior High","Swedru Senior High","Tamale Business Senior High","Tanyigbe Senior High","Tapaman Senior High/Technical","Taviefe Senior High","Techiman Senior High","Tema Senior High","Terchire Senior High","Teshie Presby Secondary","Toase Senior High","Tongo Senior High/Technical","Tsiame Senior High","Tuna Senior High/Technical","Twifo Hemang Senior High/Technical","Twifo Praso Senior High","Uthman Bin Affan Islamic Senior High","Vakpo Senior High","Vitting Senior High/Technical","Wa Senior High School","Wapuli Community Senior High","Wesley High School, Bekwai","Wenchi Methodist Senior High","Weta Senior High/Technical","Wulensi Senior High","Yamfo Anglican Senior High School","Zabzugu Senior High","Zamse Senior High/Technical","Zorkor Senior High School","Zuarungu Senior High"]
-];
+,
+  "Presbyterian Boys Senior High School, Legon",
+  "Aggrey Memorial A.M.E. Zion Senior High School",
+  "Ghana National College, Cape Coast",
+  "St. Monica's Senior High School, Mampong",
+  "St. Mary's Senior High School, Konongo",
+  "Anfoega Senior High School",
+  "Vakpo Senior High/Tech School",
+  "Vakpo Senior High School",
+  "Dabala Senior High/Tech School",
+  "Klikor Senior High/Tech School",
+  "Kpando Technical Institute",
+  "Mepe St. Kizito Senior High/Tech School",
+  "Battor Senior High School",
+  "Volo Community Senior High School",
+  "Kpeve Senior High School",
+  "Tongor Senior High Technical School",
+  "Peki Senior High School",
+  "Peki Senior High/Technical School",
+  "St. Catherine Girls Senior High School, Agbakope",
+  "Sogakope Senior High School",
+  "Asankrangwa Senior High/Tech School",
+  "St. Mary's Boys Senior High School, Apowa",
+  "Sankor Community Day Senior High School",
+  "Bonzo-Kaku Senior High School",
+  "Uthman Bin Afam Senior High School",
+  "Nkruful Agricultural Senior High School",
+  "Esiama Senior High/Tech School",
+  "Half Assini Senior High School",
+  "Annor Adjaye Senior High School",
+  "Mpohor Senior High School",
+  "Wassa East Daboase Senior High/Tech School",
+  "Gwiraman Community Senior High School",
+  "Nsein Senior High School",
+  "Axim Girls Senior High School",
+  "St. Augustine's Senior High School, Bogoso",
+  "Huni Valley Senior High School",
+  "Prestea Senior High/Tech School",
+  "Diabene Senior High/Tech School",
+  "Archbishop Porter Girls Senior High School",
+  "Adiembra Senior High School",
+  "Methodist Senior High School, Sekondi",
+  "Bompeh Senior High/Tech School",
+  "Fiase-man Senior High School",
+  "Benso Senior High/Tech School",
+  "Nana Brentu Senior High/Tech School",
+  "Bia Senior High/Tech School",
+  "Adjoafua Community Senior High School",
+  "Queens Girls Senior High School, Sefwi Awhiaso",
+  "Chirano Community Day Senior High School",
+  "Sefwi Bekwai Senior High School",
+  "Bodi Senior High School",
+  "Juaboso Senior High School",
+  "Nsawora Edumafah Community Senior High School",
+  "Akontombra Senior High School",
+  "Asawinso Senior High School",
+  "Sefwi-Wiawso Senior High/Tech School",
+  "St. Joseph Senior High School, Sefwi Wiawso",
+  "Dadieso Senior High School",
+  "Manso-Amenfi Community Day Senior High School"];
 // Sort and deduplicate the compiled Ghana school directory alphabetically.
 const uniqueSchoolNames=Array.from(new Map(VERIFIED_GHANA_SHS_TVET.map(name=>[schoolKey(name),name])).values()).sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'}));
 VERIFIED_GHANA_SHS_TVET.splice(0,VERIFIED_GHANA_SHS_TVET.length,...uniqueSchoolNames);
 // Known informal names and spelling variants all point to one canonical school.
 // Keep location/campus words in the key so genuinely different schools are not merged.
 const SCHOOL_ALIASES={
-  'presec':'Presbyterian Boys Senior High School',
-  'presec legon':'Presbyterian Boys Senior High School',
-  'presby boys':'Presbyterian Boys Senior High School',
-  'presbyterian boys shs':'Presbyterian Boys Senior High School',
-  'legon presec':'Presbyterian Boys Senior High School',
+  'presec':'Presbyterian Boys Senior High School, Legon',
+  'presec legon':'Presbyterian Boys Senior High School, Legon',
+  'presby boys':'Presbyterian Boys Senior High School, Legon',
+  'presbyterian boys shs':'Presbyterian Boys Senior High School, Legon',
+  'legon presec':'Presbyterian Boys Senior High School, Legon',
   'achimota':'Achimota Senior High School',
   'adisco':'Adisadel College',
   'adisco cape coast':'Adisadel College',
@@ -59,20 +118,20 @@ const SCHOOL_ALIASES={
   'knust shs':'KNUST Senior High School',
   'ti ahmadiyya kumasi':'T. I. Ahmadiyya Senior High School, Kumasi',
   't i ahmadiyya shs kumasi':'T. I. Ahmadiyya Senior High School, Kumasi',
-  'wesco':'Wesley Girls Senior High School',
-  'wesley girls':'Wesley Girls Senior High School',
+  'wesco':'Accra Wesley Girls Senior High',
+  'wesley girls':'Accra Wesley Girls Senior High',
   'holy child':'Holy Child School, Cape Coast',
   'holico':'Holy Child School, Cape Coast',
-  'moh':'Mawuli School',
-  'mawuli':'Mawuli School',
+  'moh':'Mawuli School, Ho',
+  'mawuli':'Mawuli School, Ho',
   'achimota shs':'Achimota Senior High School',
-  'ghana national':'Ghana National College',
-  'ghana national college cape coast':'Ghana National College',
+  'ghana national':'Ghana National College, Cape Coast',
+  'ghana national college cape coast':'Ghana National College, Cape Coast',
   'aggiss':'Aggrey Memorial A.M.E. Zion Senior High School',
   'aggrey memorial':'Aggrey Memorial A.M.E. Zion Senior High School',
   'wesley grammar':'Wesley Grammar School',
-  'presby legon':'Presbyterian Boys Senior High School',
-  'presec boys':'Presbyterian Boys Senior High School',
+  'presby legon':'Presbyterian Boys Senior High School, Legon',
+  'presec boys':'Presbyterian Boys Senior High School, Legon',
   'opoku ware school kumasi':'Opoku Ware School',
   'kumasihigh':'Kumasi High School',
   'kumasi high shs':'Kumasi High School',
