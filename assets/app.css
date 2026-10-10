@@ -505,3 +505,53 @@ body:not(:has(.auth)) .header #notifications-toggle{flex:0 0 auto;display:inline
 :root[data-theme="dark"] .navitem.active{color:#fff}
 :root[data-theme="light"] .auth{color:#171a17}
 :root[data-theme="dark"] .auth{color:#f7f8fa}
+
+
+/* Light mode refresh: soft blue-lilac canvas with layered white cards. */
+:root[data-theme="light"]{
+  --bg:#eaf0fb;
+  --p:#fdfdff;
+  --p2:#e0e8f7;
+  --line:#c7d4eb;
+  --txt:#17243b;
+  --muted:#53647f;
+  --blue:#245edb;
+  --mint:#087f67;
+  color-scheme:light;
+}
+:root[data-theme="light"] body{background:linear-gradient(145deg,#e8effb 0%,#f4efff 48%,#e7f3f3 100%);color:#17243b}
+:root[data-theme="light"] .layout,
+:root[data-theme="light"] .main{background:transparent;color:#17243b}
+:root[data-theme="light"] .header,
+:root[data-theme="light"] .leftside,
+:root[data-theme="light"] .rightside,
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .modal,
+:root[data-theme="light"] .modal-content,
+:root[data-theme="light"] .search-results{background:rgba(253,253,255,.94);color:#17243b;border-color:#c7d4eb}
+:root[data-theme="light"] .card{box-shadow:0 5px 18px rgba(47,72,120,.07)}
+:root[data-theme="light"] .trending-mobile-wrap{background:#e1eafa;color:#17243b;border-color:#c7d4eb}
+:root[data-theme="light"] .trending-school,
+:root[data-theme="light"] .comment,
+:root[data-theme="light"] .comment-item{background:#e2eaf9;color:#17243b;border-color:#c7d4eb}
+:root[data-theme="light"] .comment-content,
+:root[data-theme="light"] .trending-school b,
+:root[data-theme="light"] .post-content,
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3{color:#17243b}
+:root[data-theme="light"] input,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] select,
+:root[data-theme="light"] .header .search{background:#fff;color:#17243b;border-color:#c7d4eb}
+:root[data-theme="light"] .btn-secondary{background:#e2eaf9;color:#17243b;border-color:#c7d4eb}
+:root[data-theme="light"] .navitem{color:#263751}
+:root[data-theme="light"] .navitem.active{color:#fff}
+/* In dark mode, make the comment text bright without whitening the comment panel. */
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-content,
+:root[data-theme="dark"] .comment-item,
+:root[data-theme="dark"] .comment-item p,
+:root[data-theme="dark"] .comment-item span{color:#fff}
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-item{background:#222f45}
