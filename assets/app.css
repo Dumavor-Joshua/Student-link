@@ -366,3 +366,17 @@ body:not(:has(.auth)) .leftside .navitem{background:transparent!important;color:
   .navitem{min-height:44px}
 }
 
+
+
+/* Ensure the notification control stays visible beside Log out on narrow screens. */
+body:not(:has(.auth)) .header>div:first-child{min-width:0;flex:1 1 0}
+body:not(:has(.auth)) .header>div:last-child{flex:0 0 auto;flex-shrink:0;white-space:nowrap}
+body:not(:has(.auth)) .header .search-wrap{min-width:0}
+body:not(:has(.auth)) .header #notifications-toggle{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 10px;white-space:nowrap}
+@media(max-width:760px){
+  body:not(:has(.auth)) .header{padding-left:8px;padding-right:8px}
+  body:not(:has(.auth)) .header>div:first-child{gap:6px!important}
+  body:not(:has(.auth)) .header>div:last-child{gap:4px!important}
+  body:not(:has(.auth)) .header #logout{padding:7px 8px;font-size:11px}
+  body:not(:has(.auth)) .header #notifications-toggle{padding:7px 8px;font-size:11px}
+}
