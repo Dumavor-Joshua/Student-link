@@ -109,7 +109,7 @@ function authHTML(tab='signup',message=''){return `<div class="auth"><div class=
       });
       if (error) throw error;
     } catch (err) {
-      sessionStorage.removeItem(pendingKey);
+      safeSessionRemove(pendingKey);
       console.error(err);
       const status = document.getElementById('auth-message');
       if (status) {
