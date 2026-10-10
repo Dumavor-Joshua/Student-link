@@ -131,6 +131,8 @@ const SCHOOL_ALIASES={
   'aggrey memorial':'Aggrey Memorial A.M.E. Zion Senior High School',
   'wesley grammar':'Wesley Grammar School',
   'presby legon':"Presbyterian Boys' Senior High School, Legon",
+  'presby senior high school legon':"Presbyterian Boys' Senior High School, Legon",
+  'presby shs legon':"Presbyterian Boys' Senior High School, Legon",
   'presec boys':"Presbyterian Boys' Senior High School, Legon",
   'opoku ware school kumasi':'Opoku Ware School',
   'kumasihigh':'Kumasi High School',
