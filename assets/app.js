@@ -468,8 +468,9 @@ async function viewFriends(){
 async function startConversation(friendId){if(!S.friends.some(f=>f.id===friendId))return toast('Add this student as a friend first.');const me=S.session.user.id;const [user_a,user_b]=[me,friendId].sort();let {data,error}=await db.from('conversations').select('id').eq('user_a',user_a).eq('user_b',user_b).maybeSingle();if(error)throw error;if(!data){let {data:newConvo,error:createErr}=await db.from('conversations').insert({user_a,user_b}).select();if(createErr)throw createErr;data=newConvo[0]}S.chat=data.id;await viewMessages()}
 async function viewMessages(){
  await loadConvos();
- $('#main').innerHTML='<div class="head"><h1 class="title">Messages</h1><p class="tiny">Chat privately with accepted friends.</p></div><section class="messenger-layout" id="messenger-layout"><aside class="messenger-sidebar"><div class="messenger-sidebar-head"><h2>Chats</h2><input class="messenger-search" id="messenger-search" type="search" placeholder="Search conversations" aria-label="Search conversations"></div><div class="messenger-conversation-list" id="convos"></div></aside><section class="messenger-chat" id="messenger-chat"><div class="messenger-empty">Choose a conversation to start chatting.</div></section></section>';
+ $('#main').innerHTML='<div class="head messages-page-head"><button type="button" class="btn btn-secondary messages-back-feed" id="messages-back-feed" aria-label="Back to feed">← Feed</button><div class="messages-page-title"><h1 class="title">Messages</h1><p class="tiny">Chat privately with accepted friends.</p></div></div><section class="messenger-layout" id="messenger-layout"><aside class="messenger-sidebar"><div class="messenger-sidebar-head"><h2>Chats</h2><input class="messenger-search" id="messenger-search" type="search" placeholder="Search conversations" aria-label="Search conversations"></div><div class="messenger-conversation-list" id="convos"></div></aside><section class="messenger-chat" id="messenger-chat"><div class="messenger-empty">Choose a conversation to start chatting.</div></section></section>';
  const container=$('#convos'),layout=$('#messenger-layout');
+ $('#messages-back-feed').onclick=()=>{S.chat=null;setView('feed')};
  const renderList=(filter='')=>{const q=filter.trim().toLowerCase(),items=S.convos.filter(c=>c.otherNickname.toLowerCase().includes(q)||String(c.lastMessage||'').toLowerCase().includes(q));
  container.innerHTML=items.length?items.map(c=>'<button type="button" class="messenger-conversation '+(S.chat===c.id?'active':'')+'" data-convo="'+esc(c.id)+'">'+profileAvatarMarkup(c.otherNickname,c.otherAvatar||'','avatar')+'<span class="messenger-conversation-copy"><strong>'+esc(c.otherNickname)+'</strong><span class="tiny messenger-preview">'+esc(c.lastMessage||'No messages yet')+'</span></span></button>').join(''):'<div class="messenger-empty">'+(S.convos.length?'No matching conversations.':'No conversations yet. Add a friend to start chatting.')+'</div>';
  container.querySelectorAll('[data-convo]').forEach(el=>el.onclick=()=>openConversation(el.dataset.convo));};
@@ -478,10 +479,22 @@ async function viewMessages(){
 }
 async function openConversation(conversationId){
  S.chat=conversationId;const convo=S.convos.find(c=>c.id===conversationId);
- const {data:messages,error}=await db.from('messages').select('id,conversation_id,sender_id,body,created_at').eq('conversation_id',conversationId).order('created_at');
+ const {data:messages,error}=await db.from('messages').select('id,conversation_id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size').eq('conversation_id',conversationId).order('created_at');
  if(error)throw error;const chat=$('#messenger-chat'),layout=$('#messenger-layout');
  if(!chat||!layout){await viewMessages();return}layout.classList.add('chat-open');document.querySelector('.layout')?.classList.add('messages-chat-open');
- chat.innerHTML='<header class="messenger-chat-head"><button type="button" class="btn btn-secondary messenger-back" id="messenger-back" aria-label="Back to conversations">←</button>'+profileAvatarMarkup(convo?.otherNickname||'Student',convo?.otherAvatar||'','avatar')+'<div class="messenger-chat-person"><h2>'+esc(convo?.otherNickname||'Conversation')+'</h2><span class="tiny">StudentLink chat</span></div></header><div class="messenger-scroll" id="message-list">'+((messages||[]).map(m=>'<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+esc(m.body)+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>').join('')||'<div class="messenger-empty">This is the beginning of your conversation.</div>')+'</div><form id="msgform" class="messenger-composer"><textarea id="msgtext" maxlength="1500" rows="1" placeholder="Message…" aria-label="Message text" required></textarea><button type="submit" class="btn" id="send-message">Send</button></form>';
+ const renderedMessages=await Promise.all((messages||[]).map(async m=>{
+   let attachmentHTML='';
+   if(m.attachment_path){
+     try{
+       const {data:signed,error:signedError}=await db.storage.from('message-files').createSignedUrl(m.attachment_path,3600,{download:true});
+       if(signedError)throw signedError;
+       if(signed?.signedUrl)attachmentHTML='<a class="message-attachment" href="'+esc(signed.signedUrl)+'" target="_blank" rel="noopener noreferrer" download="'+esc(m.attachment_name||'attachment')+'">📎 '+esc(m.attachment_name||'Download attachment')+' <span class="message-attachment-size">'+esc(formatAttachmentSize(m.attachment_size))+'</span></a>';
+       else attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>';
+     }catch(_){attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>'}
+   }
+   return '<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+messageBodyHTML(m.body||'')+(attachmentHTML?'<div class="message-attachment-wrap">'+attachmentHTML+'</div>':'')+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>';
+ }));
+ chat.innerHTML='<header class="messenger-chat-head"><button type="button" class="btn btn-secondary messenger-back" id="messenger-back" aria-label="Back to conversations">← Chats</button>'+profileAvatarMarkup(convo?.otherNickname||'Student',convo?.otherAvatar||'','avatar')+'<div class="messenger-chat-person"><h2>'+esc(convo?.otherNickname||'Conversation')+'</h2><span class="tiny">StudentLink chat</span></div></header><div class="messenger-scroll" id="message-list">'+(renderedMessages.join('')||'<div class="messenger-empty">This is the beginning of your conversation.</div>')+'</div><form id="msgform" class="messenger-composer"><input id="message-file" class="message-file-input" type="file" aria-label="Choose a file to attach"><button type="button" class="btn btn-secondary messenger-attach" id="attach-file" aria-label="Attach a file" title="Attach a file">📎</button><textarea id="msgtext" maxlength="1500" rows="1" placeholder="Message…" aria-label="Message text"></textarea><button type="submit" class="btn" id="send-message">Send</button></form><div id="attachment-status" class="messenger-attachment-status" hidden></div>';
  const list=$('#message-list');if(list)list.scrollTop=list.scrollHeight;
  $('#messenger-back').onclick=()=>{layout.classList.remove('chat-open');document.querySelector('.layout')?.classList.remove('messages-chat-open');S.chat=null};
  const fileInput=$('#message-file'),attachButton=$('#attach-file'),attachmentStatus=$('#attachment-status');
@@ -490,6 +503,22 @@ async function openConversation(conversationId){
  $('#msgtext').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#msgform').requestSubmit()}});
  $('#msgform').onsubmit=async e=>{e.preventDefault();const input=$('#msgtext'),body=input.value.trim(),send=$('#send-message'),file=fileInput.files?.[0];if(!body&&!file)return;if(file&&(file.size<=0||file.size>=5*1024*1024)){toast('Choose a non-empty file smaller than 5 MB.');return;}send.disabled=true;attachButton.disabled=true;let uploadedPath=null;try{if(file){const extension=(file.name.match(/\.([a-zA-Z0-9]{1,12})$/)||[])[1]||'bin';uploadedPath=conversationId+'/'+S.session.user.id+'/'+makeRandomId()+'.'+extension.toLowerCase();const {error:uploadError}=await db.storage.from('message-files').upload(uploadedPath,file,{cacheControl:'3600',upsert:false,contentType:file.type||'application/octet-stream'});if(uploadError)throw uploadError;}const {error:sendError}=await db.from('messages').insert({conversation_id:conversationId,sender_id:S.session.user.id,body:body||(file?'📎 File attached':'Message'),attachment_path:uploadedPath,attachment_name:file?.name||null,attachment_mime_type:file?.type||null,attachment_size:file?.size||null});if(sendError)throw sendError;input.value='';fileInput.value='';attachmentStatus.hidden=true;attachmentStatus.textContent='';await loadConvos();await openConversation(conversationId)}catch(err){console.error(err);if(uploadedPath){const {error:cleanupError}=await db.storage.from('message-files').remove([uploadedPath]);if(cleanupError)console.warn('Could not clean up an unsent attachment:',cleanupError)}toast(file?'The message or attachment could not be sent. Please try again.':'Message could not be sent. Please try again.')}finally{if($('#send-message'))$('#send-message').disabled=false;if($('#attach-file'))$('#attach-file').disabled=false}};
 
+}
+function messageBodyHTML(value=''){
+ const text=String(value),urlPattern=/(https?:\\/\\/[^\\s<>"']+|www\\.[^\\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+(?:com|org|net|edu|gov|gh|io|co|uk|app|dev|info|biz|me|ai|tech|online|site|store|school)(?:\\/[^\\s<>"']*)?)/gi;
+ let html='',lastIndex=0,match;
+ while((match=urlPattern.exec(text))){
+   let raw=match[0],trailing='';
+   while(/[.,!?;:)}\\]]$/.test(raw)){trailing=raw.slice(-1)+trailing;raw=raw.slice(0,-1)}
+   html+=esc(text.slice(lastIndex,match.index));
+   if(raw){
+     const href=/^www\\./i.test(raw)?'https://'+raw:raw;
+     try{const parsed=new URL(href);if(parsed.protocol==='http:'||parsed.protocol==='https:')html+='<a class="message-link" href="'+esc(parsed.href)+'" target="_blank" rel="noopener noreferrer">'+esc(raw)+'</a>';else html+=esc(raw)}
+     catch(_){html+=esc(raw)}
+   }
+   html+=esc(trailing);lastIndex=match.index+match[0].length;
+ }
+ return html+esc(text.slice(lastIndex));
 }
 function formatAttachmentSize(bytes){const size=Number(bytes)||0;return size<1024*1024?Math.max(1,Math.round(size/1024))+' KB':(size/(1024*1024)).toFixed(2)+' MB'}
 async function loadConvos(){
