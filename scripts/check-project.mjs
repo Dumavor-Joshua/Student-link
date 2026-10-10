@@ -14,7 +14,8 @@ const rlsOptimizationMigration = read('supabase/migrations/20261010_optimize_rls
 const tablePrivilegeMigration = read('supabase/migrations/20261010_revoke_unused_table_privileges.sql');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
-assert.ok(html.includes('src="assets/app.js?v='), 'HTML must load the extracted application script, including its cache version');
+assert.ok(html.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
+assert.ok(html.includes('loadLibrary(0)') && html.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
 assert.ok(js.includes('body:body||q'), 'Poll posts must provide a non-empty posts.body field');
 assert.ok(js.includes('data-vote'), 'Poll options must expose voting controls');
 assert.ok(js.includes("if(data.length)") || js.includes("if(data?.length)"), 'An empty feed must not issue queries using an empty post-ID list');
@@ -26,6 +27,8 @@ assert.ok(js.includes("$$('[data-cell]').forEach"), 'Tic-Tac-Toe must bind board
 assert.ok(css.includes('.header .search{display:block'), 'Search must remain available on small screens');
 assert.ok(migration.includes('option_index < jsonb_array_length(p.poll_options)'), 'Poll vote policy must validate the selected option');
 assert.ok(js.includes('SUPABASE_ANON_KEY'), 'Frontend must use a publishable/anon key configuration');
+assert.ok(js.includes('function safeSessionGet') && js.includes('function safeSessionSet'), 'Session storage failures must not block mobile authentication');
+assert.ok(js.includes('function makeRandomId()') && js.includes('makeRandomId()+\'.\'+ext'), 'Image uploads must work when crypto.randomUUID is unavailable');
 assert.doesNotMatch(js, /SUPABASE_SERVICE_ROLE_KEY\s*=/i, 'A service-role key must never be configured in browser code');
 assert.ok(js.includes('db.auth.signInWithPassword({ email, password })'), 'Login must call Supabase password authentication');
 assert.ok(js.includes('const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);'), 'Email validation must use a correctly escaped regular expression');
@@ -114,7 +117,7 @@ assert.ok(html.includes('rel="icon" type="image/svg+xml" href="assets/favicon.sv
 assert.ok(js.includes("document.getElementById('google-signin')"), 'Google button must be located during auth rendering');
 assert.ok(js.includes("googleButton?.addEventListener('click'") , 'Continue with Google must have a click handler');
 assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), 'Continue with Google must use Supabase Google OAuth');
-assert.match(html, /src="assets\/app\.js\?v=studentlink-[^"]+"/, 'App script cache version must be refreshed after application changes');
+assert.match(html, /var appSrc='assets\/app\.js\?v=studentlink-[^']+'/, 'App script cache version must be refreshed after application changes');
 assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');

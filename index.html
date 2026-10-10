@@ -1,1 +1,31 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101b35"><title>StudentLink — Connect with classmates</title><link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=studentlink-blue-cap-favicon-2"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/app.css?v=studentlink-iphone-compat-1"></head><body><div id="app" style="padding:30px;text-align:center">Loading StudentLink…</div><div class="modalbg" id="modalbg" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modal"><button type="button" id="modalclose" aria-label="Close window" onclick="document.getElementById('modalbg').classList.remove('show')" style="position:absolute;top:10px;right:10px">✕</button><div id="modaltitle" style="font-size:18px;font-weight:600;margin-bottom:16px"></div><div id="modalcontent"></div></div></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="assets/app.js?v=studentlink-iphone-compat-1" defer></script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101b35"><title>StudentLink — Connect with classmates</title><link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=studentlink-blue-cap-favicon-2"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/app.css?v=studentlink-iphone-compat-1"></head><body><div id="app" style="padding:30px;text-align:center">Loading StudentLink…</div><div class="modalbg" id="modalbg" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modal"><button type="button" id="modalclose" aria-label="Close window" onclick="document.getElementById('modalbg').classList.remove('show')" style="position:absolute;top:10px;right:10px">✕</button><div id="modaltitle" style="font-size:18px;font-weight:600;margin-bottom:16px"></div><div id="modalcontent"></div></div></div><script>
+(function(){
+  var appSrc='assets/app.js?v=studentlink-iphone-startup-2';
+  var sources=[
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
+    'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'
+  ];
+  function loadApp(){
+    var app=document.createElement('script');
+    app.src=appSrc;
+    app.onerror=function(){
+      var root=document.getElementById('app');
+      if(root)root.innerHTML='<section style="max-width:620px;margin:24px auto;padding:24px;text-align:left;font-family:system-ui,sans-serif"><h2>StudentLink could not load</h2><p>The app script could not be downloaded. Check your connection, then reload this page.</p><button type="button" onclick="window.location.reload()">Reload StudentLink</button></section>';
+    };
+    document.body.appendChild(app);
+  }
+  function loadLibrary(index){
+    if(window.supabase&&typeof window.supabase.createClient==='function'){loadApp();return;}
+    if(index>=sources.length){loadApp();return;}
+    var script=document.createElement('script');
+    script.src=sources[index];
+    script.onload=function(){
+      if(window.supabase&&typeof window.supabase.createClient==='function')loadApp();
+      else loadLibrary(index+1);
+    };
+    script.onerror=function(){loadLibrary(index+1);};
+    document.head.appendChild(script);
+  }
+  loadLibrary(0);
+})();
+</script></body></html>
