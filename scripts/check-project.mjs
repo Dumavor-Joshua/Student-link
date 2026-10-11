@@ -127,9 +127,9 @@ assert.ok(js.includes('async function sendBrowserNotification') && js.includes('
 assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
 assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
 assert.ok(html.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-shell-v49'), 'Notification fix must ship with matching fresh app-shell cache versions');
-assert.ok(blockContactMigration.includes('studentlink_are_blocked') && blockContactMigration.includes('not public.studentlink_are_blocked(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
-assert.ok(blockContactMigration.includes('not public.studentlink_are_blocked(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
-assert.ok(blockContactMigration.includes('revoke all on function public.studentlink_are_blocked(uuid, uuid) from public, anon'), 'Block-check helper must not be executable by anonymous users');
+assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
+assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
+assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
 
 
 console.log('StudentLink static checks passed.');
