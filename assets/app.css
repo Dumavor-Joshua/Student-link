@@ -1457,3 +1457,27 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
     box-sizing:border-box!important;
   }
 }
+
+
+/* Mobile game-card icons: keep the symbols compact and centered inside their icon boxes. */
+@media(max-width:680px){
+  body:not(:has(.auth)) .game-tile{
+    align-items:center;
+  }
+  body:not(:has(.auth)) .game-tile-icon{
+    flex:0 0 36px!important;
+    width:36px!important;
+    height:36px!important;
+    min-width:36px!important;
+    min-height:36px!important;
+    padding:0!important;
+    margin:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    font-size:19px!important;
+    line-height:1!important;
+    overflow:hidden;
+  }
+}
