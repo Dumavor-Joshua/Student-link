@@ -1427,3 +1427,33 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
     padding:5px!important;
   }
 }
+
+
+/* Mobile content area: remove outer body gutters so the feed uses the full width. */
+@media(max-width:760px){
+  html,body{
+    margin:0!important;
+    padding:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:hidden!important;
+  }
+  body:not(:has(.auth)){
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+  body:not(:has(.auth)) #app,
+  body:not(:has(.auth)) .app,
+  body:not(:has(.auth)) .layout,
+  body:not(:has(.auth)) .main,
+  body:not(:has(.auth)) .feed,
+  body:not(:has(.auth)) .content{
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+}
