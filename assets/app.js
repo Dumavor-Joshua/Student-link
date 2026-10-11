@@ -240,6 +240,9 @@ function installCanonicalSchoolDirectory(names){
   for(const [alias,target] of aliases){
     if(canonicalNames.some(n=>schoolKey(n)===schoolKey(target)))SCHOOL_ALIAS_KEYS.set(schoolKey(alias),target);
   }
+  // Reapply this observed typo alias after rebuilding the directory-backed map.
+  const aborCanonical=canonicalNames.find(n=>schoolKey(n)===schoolKey('Abor Senior High'));
+  if(aborCanonical)SCHOOL_ALIAS_KEYS.set(schoolKey('A or senior high school'),aborCanonical);
   return true;
 }
 async function loadCanonicalSchoolDirectory(){
