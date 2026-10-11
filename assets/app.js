@@ -1279,16 +1279,6 @@ if(!window.__studentLinkTrendingScrollBound){
  document.addEventListener('scroll',event=>{
   if(event.target instanceof HTMLElement&&event.target.matches('.main'))queueScrollUpdate(event.target);
  },{passive:true,capture:true});
- document.addEventListener('click',event=>{
-  if(event.target.closest('#header-brand-home')){
-   event.preventDefault();
-   document.querySelector('.trending-mobile-wrap')?.classList.remove('scroll-collapsed');
-   setView('feed');
-   window.scrollTo({top:0,behavior:'smooth'});
-   const main=document.querySelector('.main');
-   if(main)main.scrollTo({top:0,behavior:'smooth'});
-  }
- });
 }
  }
 function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
@@ -1301,7 +1291,7 @@ function toast(msg){
   el.textContent=String(msg);el.style.display='block';clearTimeout(el._hideTimer);el._hideTimer=setTimeout(()=>{el.style.display='none'},3500);
 }
 function wireActions(){$$('[data-messagefriend]').forEach(b=>b.onclick=()=>startConversation(b.dataset.messagefriend).catch(error=>{console.error(error);toast('Could not open this conversation. Please try again.')}));$$('[data-add]').forEach(b=>b.onclick=()=>addFriend(b.dataset.add).catch(error=>{console.error(error);toast('Could not send the friend request. Please try again.')}));$$('[data-accept]').forEach(b=>b.onclick=()=>acceptFriend(b.dataset.accept).catch(error=>{console.error(error);toast('Could not accept the friend request. Please try again.')}));$$('[data-decline]').forEach(b=>b.onclick=()=>declineFriend(b.dataset.decline).catch(error=>{console.error(error);toast('Could not decline the friend request. Please try again.')}))}
-document.addEventListener('click',e=>{if(e.target.closest('#header-brand-home')){e.preventDefault();setView('feed');return}if(e.target.closest('#theme-toggle')){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');return}const publicProfile=e.target.closest('[data-public-profile]');if(publicProfile){e.preventDefault();openPublicProfile(publicProfile.dataset.publicProfile);return}if(e.target.closest('[data-public-back]')){setView('friends');return}const sr=$('#search-results');if(sr&&!e.target.closest('.search-wrap'))sr.hidden=true;const school=e.target.closest('[data-school]');if(school){e.preventDefault();S.schoolFilter=school.dataset.school;S.view='school';syncNavigationState();if(sr)sr.hidden=true;renderView();return}const messageShortcut=e.target.closest('#messages-shortcut');if(messageShortcut){e.preventDefault();setView('messages');return}let v=e.target.closest('[data-view]');if(v){e.preventDefault();setView(v.dataset.view);return}let add=e.target.closest('[data-search-add]');if(add){addFriend(add.dataset.searchAdd).catch(error=>{console.error(error);toast('Could not send the friend request. Please try again.')});if(sr)sr.hidden=true}});
+document.addEventListener('click',e=>{if(e.target.closest('#header-brand-home')){e.preventDefault();document.querySelector('.trending-mobile-wrap')?.classList.remove('scroll-collapsed');setView('feed');window.scrollTo({top:0,behavior:'smooth'});requestAnimationFrame(()=>document.querySelector('.main')?.scrollTo({top:0,behavior:'smooth'}));return}if(e.target.closest('#theme-toggle')){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');return}const publicProfile=e.target.closest('[data-public-profile]');if(publicProfile){e.preventDefault();openPublicProfile(publicProfile.dataset.publicProfile);return}if(e.target.closest('[data-public-back]')){setView('friends');return}const sr=$('#search-results');if(sr&&!e.target.closest('.search-wrap'))sr.hidden=true;const school=e.target.closest('[data-school]');if(school){e.preventDefault();S.schoolFilter=school.dataset.school;S.view='school';syncNavigationState();if(sr)sr.hidden=true;renderView();return}const messageShortcut=e.target.closest('#messages-shortcut');if(messageShortcut){e.preventDefault();setView('messages');return}let v=e.target.closest('[data-view]');if(v){e.preventDefault();setView(v.dataset.view);return}let add=e.target.closest('[data-search-add]');if(add){addFriend(add.dataset.searchAdd).catch(error=>{console.error(error);toast('Could not send the friend request. Please try again.')});if(sr)sr.hidden=true}});
 async function startStudentLink(){
   const app=document.getElementById('app');
   try{
