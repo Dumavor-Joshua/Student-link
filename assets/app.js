@@ -183,18 +183,29 @@ function installCanonicalSchoolDirectory(names){
     .sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'}));
   if(canonicalNames.length<500)return false;
   const legacyNames=[...VERIFIED_GHANA_SHS_TVET];
+  const schoolType=value=>{
+    const key=schoolKey(value);
+    return /\\bshts\\b/.test(key)?'shts':/\\bshs\\b/.test(key)?'shs':/\\btechinst\\b/.test(key)?'techinst':'';
+  };
+  const core=value=>schoolKey(value)
+    .replace(/\\b(shts|shs|techinst|senior|high|technical|institute|school|college|academy|of|the|and|for|girls|boys|community|presbyterian|presby|catholic|methodist|anglican|islamic|sda|stem|vocational|training|centre|center)\\b/g,' ')
+    .replace(/\\s+/g,' ').trim();
   const candidatesFor=value=>{
-    const inputType=/\\bshts\\b/.test(schoolKey(value))?'shts':/\\bshs\\b/.test(schoolKey(value))?'shs':/\\btechinst\\b/.test(schoolKey(value))?'techinst':'';
+    const inputType=schoolType(value),inputCore=core(value),a=schoolKey(value);
+    const locationWords=['accra','kumasi','tamale','koforidua','cape coast','sekondi','takoradi','navrongo','mankessim','bekwai','suhum','aburi','legon','obuasi','ejisu','fiapre','sun y ani','sunyani','dunkwa','nkwatia','akw atia','mampong','asokwa','hohoe'];
+    const hasWord=(key,word)=>(' '+key+' ').includes(' '+word+' ');
     const scored=canonicalNames.map(name=>{
-      const candidateType=/\\bshts\\b/.test(schoolKey(name))?'shts':/\\bshs\\b/.test(schoolKey(name))?'shs':/\\btechinst\\b/.test(schoolKey(name))?'techinst':'';
-      const a=schoolKey(value),b=schoolKey(name);
-      const locationWords=['accra','kumasi','tamale','koforidua','cape coast','sekondi','takoradi','ho','wa','sun y ani','navrongo','mankessim','bekwai','suhum','aburi','legon','obuasi','ejisu','fiapre'];
-      const locationMismatch=locationWords.some(w=>a.includes(w)!==b.includes(w));
+      const candidateType=schoolType(name),b=schoolKey(name);
       if(inputType&&candidateType&&inputType!==candidateType)return {name,score:0};
+      const locationMismatch=locationWords.some(w=>hasWord(a,w)!==hasWord(b,w));
       if(locationMismatch)return {name,score:0};
-      return {name,score:schoolSimilarity(value,name)};
-    }).sort((a,b)=>b.score-a.score);
-    if(!scored.length||scored[0].score<0.82||(scored[1]&&scored[0].score-scored[1].score<0.06))return '';
+      const candidateCore=core(name);
+      const coreScore=inputCore&&candidateCore?schoolSimilarity(inputCore,candidateCore):0;
+      const fullScore=schoolSimilarity(value,name);
+      const score=Math.max(fullScore,coreScore*.94);
+      return {name,score};
+    }).sort((x,y)=>y.score-x.score);
+    if(!scored.length||scored[0].score<0.86||(scored[1]&&scored[0].score-scored[1].score<0.08))return '';
     return scored[0].name;
   };
   VERIFIED_GHANA_SHS_TVET.splice(0,VERIFIED_GHANA_SHS_TVET.length,...canonicalNames);
