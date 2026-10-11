@@ -954,13 +954,46 @@ async function viewMessages(){
 }
 async function openConversation(conversationId){
  S.chat=conversationId;const convo=S.convos.find(c=>c.id===conversationId);
- const {data:messages,error}=await db.from('messages').select('id,conversation_id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size').eq('conversation_id',conversationId).order('created_at');
+ const {data:messages,error}=await db.from('messages').select('id,conversation_id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size').eq('conversation_id',conversationId).order('created_at',{ascending:false}).limit(50);
  if(error)throw error;
+ (messages||[]).reverse();
+ let displayedMessages=messages||[];
  const isVisibleChat=S.view==='messages'&&S.chat===conversationId&&document.visibilityState==='visible';
  if(isVisibleChat){const latestKnown=(messages||[]).reduce((latest,m)=>!latest||String(m.created_at)>latest?String(m.created_at):latest,'')||new Date().toISOString();try{await updateMessageReadCursor(conversationId,latestKnown);const stateConvo=S.convos.find(c=>c.id===conversationId);if(stateConvo)stateConvo.unreadCount=0;updateMessageBadges()}catch(readError){console.warn('Could not sync this conversation read status:',readError);toast('Messages opened, but read status could not sync. Please try again.')}}
  const chat=$('#messenger-chat'),layout=$('#messenger-layout');
  if(!chat||!layout){await viewMessages();return}layout.classList.add('chat-open');document.querySelector('.layout')?.classList.add('messages-chat-open');
- const renderedMessages=await Promise.all((messages||[]).map(async m=>{
+ const renderedMessages=await renderMessageRows(messages||[]);
+ chat.innerHTML='<header class="messenger-chat-head"><button type="button" class="btn btn-secondary messenger-back" id="messenger-back" aria-label="Back to conversations">← Chats</button>'+profileAvatarMarkup(convo?.otherNickname||'Student',convo?.otherAvatar||'','avatar')+'<div class="messenger-chat-person"><h2>'+esc(convo?.otherNickname||'Conversation')+'</h2><span class="tiny">StudentLink chat</span></div></header><div class="messenger-scroll" id="message-list">'+((messages||[]).length===50?'<button type="button" class="btn btn-secondary" id="load-older-messages">Load older messages</button>':'')+(renderedMessages.join('')||'<div class="messenger-empty">This is the beginning of your conversation.</div>')+'</div><form id="msgform" class="messenger-composer"><input id="message-file" class="message-file-input" type="file" aria-label="Choose a file to attach"><button type="button" class="btn btn-secondary messenger-attach" id="attach-file" aria-label="Attach a file" title="Attach a file">📎</button><textarea id="msgtext" maxlength="1500" rows="1" placeholder="Message…" aria-label="Message text"></textarea><button type="submit" class="btn" id="send-message">Send</button></form><div id="attachment-status" class="messenger-attachment-status" hidden></div>';
+ if(S.replyOnOpen){S.replyOnOpen=false;const composer=$('#msgtext');if(composer){composer.placeholder='Write your reply…';composer.focus();}}
+ const list=$('#message-list');if(list)list.scrollTop=list.scrollHeight;
+ const olderButton=$('#load-older-messages');
+ if(olderButton)olderButton.onclick=async()=>{
+   const oldest=displayedMessages[0];if(!oldest)return;
+   olderButton.disabled=true;
+   try{
+     const {data:olderRows,error:olderError}=await db.from('messages').select('id,conversation_id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size').eq('conversation_id',conversationId).lt('created_at',oldest.created_at).order('created_at',{ascending:false}).limit(50);
+     if(olderError)throw olderError;
+     const older=(olderRows||[]).reverse();
+     if(!older.length){olderButton.remove();return;}
+     const markup=await renderMessageRows(older);
+     const previousHeight=list.scrollHeight,previousTop=list.scrollTop;
+     olderButton.insertAdjacentHTML('afterend',markup.join(''));
+     displayedMessages=[...older,...displayedMessages];
+     list.scrollTop=previousTop+(list.scrollHeight-previousHeight);
+     if(older.length<50)olderButton.remove();
+   }catch(error){console.warn('Could not load older messages:',error);toast('Older messages could not be loaded. Try again.');}
+   finally{if(olderButton.isConnected)olderButton.disabled=false;}
+ };
+ $('#messenger-back').onclick=()=>{layout.classList.remove('chat-open');document.querySelector('.layout')?.classList.remove('messages-chat-open');S.chat=null};
+ const fileInput=$('#message-file'),attachButton=$('#attach-file'),attachmentStatus=$('#attachment-status');
+ attachButton.onclick=()=>fileInput.click();
+ fileInput.onchange=()=>{const file=fileInput.files?.[0];if(!file){attachmentStatus.hidden=true;attachmentStatus.textContent='';return;}if(file.size<=0||file.size>=5*1024*1024){toast('Choose a non-empty file smaller than 5 MB.');fileInput.value='';attachmentStatus.hidden=true;attachmentStatus.textContent='';return;}attachmentStatus.textContent='📎 '+file.name+' · '+formatAttachmentSize(file.size)+' · ready to send';attachmentStatus.hidden=false;};
+ $('#msgtext').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#msgform').requestSubmit()}});
+ $('#msgform').onsubmit=async e=>{e.preventDefault();const input=$('#msgtext'),body=input.value.trim(),send=$('#send-message'),file=fileInput.files?.[0];if(!body&&!file)return;if(file&&(file.size<=0||file.size>=5*1024*1024)){toast('Choose a non-empty file smaller than 5 MB.');return;}send.disabled=true;attachButton.disabled=true;let uploadedPath=null;try{if(file){const extension=(file.name.match(/\.([a-zA-Z0-9]{1,12})$/)||[])[1]||'bin';uploadedPath=conversationId+'/'+S.session.user.id+'/'+makeRandomId()+'.'+extension.toLowerCase();const {error:uploadError}=await db.storage.from('message-files').upload(uploadedPath,file,{cacheControl:'3600',upsert:false,contentType:file.type||'application/octet-stream'});if(uploadError)throw uploadError;}const {error:sendError}=await db.from('messages').insert({conversation_id:conversationId,sender_id:S.session.user.id,body:body||(file?'📎 File attached':'Message'),attachment_path:uploadedPath,attachment_name:file?.name||null,attachment_mime_type:file?.type||null,attachment_size:file?.size||null});if(sendError)throw sendError;input.value='';fileInput.value='';attachmentStatus.hidden=true;attachmentStatus.textContent='';await loadConvos();await openConversation(conversationId)}catch(err){console.error(err);if(uploadedPath){const {error:cleanupError}=await db.storage.from('message-files').remove([uploadedPath]);if(cleanupError)console.warn('Could not clean up an unsent attachment:',cleanupError)}toast(file?'The message or attachment could not be sent. Please try again.':'Message could not be sent. Please try again.')}finally{if($('#send-message'))$('#send-message').disabled=false;if($('#attach-file'))$('#attach-file').disabled=false}};
+
+}
+async function renderMessageRows(rows){
+ return Promise.all((rows||[]).map(async m=>{
    let attachmentHTML='';
    if(m.attachment_path){
      try{
@@ -972,16 +1005,6 @@ async function openConversation(conversationId){
    }
    return '<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+messageBodyHTML(m.body||'')+(attachmentHTML?'<div class="message-attachment-wrap">'+attachmentHTML+'</div>':'')+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>';
  }));
- chat.innerHTML='<header class="messenger-chat-head"><button type="button" class="btn btn-secondary messenger-back" id="messenger-back" aria-label="Back to conversations">← Chats</button>'+profileAvatarMarkup(convo?.otherNickname||'Student',convo?.otherAvatar||'','avatar')+'<div class="messenger-chat-person"><h2>'+esc(convo?.otherNickname||'Conversation')+'</h2><span class="tiny">StudentLink chat</span></div></header><div class="messenger-scroll" id="message-list">'+(renderedMessages.join('')||'<div class="messenger-empty">This is the beginning of your conversation.</div>')+'</div><form id="msgform" class="messenger-composer"><input id="message-file" class="message-file-input" type="file" aria-label="Choose a file to attach"><button type="button" class="btn btn-secondary messenger-attach" id="attach-file" aria-label="Attach a file" title="Attach a file">📎</button><textarea id="msgtext" maxlength="1500" rows="1" placeholder="Message…" aria-label="Message text"></textarea><button type="submit" class="btn" id="send-message">Send</button></form><div id="attachment-status" class="messenger-attachment-status" hidden></div>';
- if(S.replyOnOpen){S.replyOnOpen=false;const composer=$('#msgtext');if(composer){composer.placeholder='Write your reply…';composer.focus();}}
- const list=$('#message-list');if(list)list.scrollTop=list.scrollHeight;
- $('#messenger-back').onclick=()=>{layout.classList.remove('chat-open');document.querySelector('.layout')?.classList.remove('messages-chat-open');S.chat=null};
- const fileInput=$('#message-file'),attachButton=$('#attach-file'),attachmentStatus=$('#attachment-status');
- attachButton.onclick=()=>fileInput.click();
- fileInput.onchange=()=>{const file=fileInput.files?.[0];if(!file){attachmentStatus.hidden=true;attachmentStatus.textContent='';return;}if(file.size<=0||file.size>=5*1024*1024){toast('Choose a non-empty file smaller than 5 MB.');fileInput.value='';attachmentStatus.hidden=true;attachmentStatus.textContent='';return;}attachmentStatus.textContent='📎 '+file.name+' · '+formatAttachmentSize(file.size)+' · ready to send';attachmentStatus.hidden=false;};
- $('#msgtext').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#msgform').requestSubmit()}});
- $('#msgform').onsubmit=async e=>{e.preventDefault();const input=$('#msgtext'),body=input.value.trim(),send=$('#send-message'),file=fileInput.files?.[0];if(!body&&!file)return;if(file&&(file.size<=0||file.size>=5*1024*1024)){toast('Choose a non-empty file smaller than 5 MB.');return;}send.disabled=true;attachButton.disabled=true;let uploadedPath=null;try{if(file){const extension=(file.name.match(/\.([a-zA-Z0-9]{1,12})$/)||[])[1]||'bin';uploadedPath=conversationId+'/'+S.session.user.id+'/'+makeRandomId()+'.'+extension.toLowerCase();const {error:uploadError}=await db.storage.from('message-files').upload(uploadedPath,file,{cacheControl:'3600',upsert:false,contentType:file.type||'application/octet-stream'});if(uploadError)throw uploadError;}const {error:sendError}=await db.from('messages').insert({conversation_id:conversationId,sender_id:S.session.user.id,body:body||(file?'📎 File attached':'Message'),attachment_path:uploadedPath,attachment_name:file?.name||null,attachment_mime_type:file?.type||null,attachment_size:file?.size||null});if(sendError)throw sendError;input.value='';fileInput.value='';attachmentStatus.hidden=true;attachmentStatus.textContent='';await loadConvos();await openConversation(conversationId)}catch(err){console.error(err);if(uploadedPath){const {error:cleanupError}=await db.storage.from('message-files').remove([uploadedPath]);if(cleanupError)console.warn('Could not clean up an unsent attachment:',cleanupError)}toast(file?'The message or attachment could not be sent. Please try again.':'Message could not be sent. Please try again.')}finally{if($('#send-message'))$('#send-message').disabled=false;if($('#attach-file'))$('#attach-file').disabled=false}};
-
 }
 function messageBodyHTML(value=''){
  const text=String(value),urlPattern=/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|org|net|edu|gov|gh|io|co|uk|app|dev|info|biz|me|ai|tech|online|site|store|school)(?:\/[^\s<>"']*)?)/gi;
@@ -1025,25 +1048,18 @@ function startUnreadBadgeSync(){
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshUnreadMessageBadges()});
 }
 async function loadConvos(){
-  const {data,error}=await db.from('conversations').select('id,user_a,user_b,updated_at').or(`user_a.eq.${S.session.user.id},user_b.eq.${S.session.user.id}`).order('updated_at',{ascending:false});
+  const {data:rows,error}=await db.rpc('studentlink_conversation_summaries');
   if(error)throw error;
-  const rows=data||[];const otherIds=rows.map(c=>c.user_a===S.session.user.id?c.user_b:c.user_a);
+  const conversations=rows||[];
+  const otherIds=[...new Set(conversations.map(c=>c.user_a===S.session.user.id?c.user_b:c.user_a))];
   const {data:profiles,error:profileError}=otherIds.length?await db.from('profiles').select('id,nickname,avatar_url').in('id',otherIds):{data:[],error:null};
   if(profileError)throw profileError;
   const profilesById=Object.fromEntries((profiles||[]).map(p=>[p.id,p]));
-  const {data:readRows,error:readError}=rows.length?await db.from('conversation_reads').select('conversation_id,last_read_at').eq('user_id',S.session.user.id):{data:[],error:null};
-  if(readError)throw readError;
-  S.messageReadAt=Object.fromEntries((readRows||[]).map(r=>[r.conversation_id,r.last_read_at]));
-  S.convos=await Promise.all(rows.map(async c=>{
+  S.messageReadAt=Object.fromEntries(conversations.map(c=>[c.conversation_id,c.last_read_at]).filter(r=>r[1]));
+  S.convos=conversations.map(c=>{
     const otherId=c.user_a===S.session.user.id?c.user_b:c.user_a,person=profilesById[otherId]||{};
-    const {data:lastMessages,error:messageError}=await db.from('messages').select('body,created_at,sender_id').eq('conversation_id',c.id).order('created_at',{ascending:false}).limit(1);
-    if(messageError)throw messageError;
-    const last=lastMessages?.[0]||null;
-    const cursor=S.messageReadAt[c.id]||'1970-01-01T00:00:00.000Z';
-    const {count:unreadCount,error:unreadError}=await db.from('messages').select('id',{count:'exact',head:true}).eq('conversation_id',c.id).neq('sender_id',S.session.user.id).gt('created_at',cursor);
-    if(unreadError)throw unreadError;
-    return{id:c.id,otherId,otherNickname:person.nickname||'Student',otherAvatar:person.avatar_url||'',lastMessage:last?.body||'',lastMessageAt:last?.created_at||c.updated_at||c.created_at,unreadCount:Number(unreadCount)||0};
-  }));
+    return{id:c.conversation_id,otherId,otherNickname:person.nickname||'Student',otherAvatar:person.avatar_url||'',lastMessage:c.last_message_body||'',lastMessageAt:c.last_message_at||c.updated_at,unreadCount:Number(c.unread_count)||0};
+  });
   S.convos.sort((a,b)=>new Date(b.lastMessageAt||0)-new Date(a.lastMessageAt||0));
   updateMessageBadges();
 }
@@ -1126,15 +1142,30 @@ function renderLocalGame(){
 
 
 
-async function stopOnlineGameChannel(){if(S.onlineGameChannel){const channel=S.onlineGameChannel;S.onlineGameChannel=null;await db.removeChannel(channel)}}
+async function stopOnlineGameChannel(){
+  if(S.onlineGamePollTimer){window.clearInterval(S.onlineGamePollTimer);S.onlineGamePollTimer=null;}
+  if(S.onlineGameChannel){const channel=S.onlineGameChannel;S.onlineGameChannel=null;await db.removeChannel(channel)}
+}
 async function watchOnlineGameChannel(game,gameId=null){
   await stopOnlineGameChannel();
   if(!db||!S.session||S.view!=='game')return;
-  const table=game==='connect'?'connect_four_games':'rps_games';
+  // RPS game rows contain private moves. Read active state only through the masking RPC,
+  // and poll it while visible rather than subscribing to raw table changes.
+  if(game==='rps'){
+    let refreshing=false;
+    S.onlineGamePollTimer=window.setInterval(async()=>{
+      if(refreshing||document.visibilityState!=='visible'||S.view!=='game'||S.game!=='rps'||S.rpsGameId!==gameId)return;
+      refreshing=true;
+      try{await viewOnlineGame('rps')}catch(error){console.warn('Could not refresh online RPS game:',error)}
+      finally{refreshing=false}
+    },4000);
+    return;
+  }
+  const table='connect_four_games';
   const filter={event:'*',schema:'public',table};
   if(gameId)filter.filter='id=eq.'+gameId;
-  const channel=db.channel((game==='connect'?'connect-four':'rps')+'-'+(gameId||'lobby'));
-  channel.on('postgres_changes',filter,()=>{if(S.view==='game'&&S.game===game&&((game==='connect'?S.cfGameId:S.rpsGameId)===gameId))viewGame()}).subscribe();
+  const channel=db.channel('connect-four-'+(gameId||'lobby'));
+  channel.on('postgres_changes',filter,()=>{if(S.view==='game'&&S.game===game&&S.cfGameId===gameId)viewGame()}).subscribe();
   S.onlineGameChannel=channel;
 }
 async function startOnlineGame(game){
@@ -1185,9 +1216,9 @@ async function viewOnlineGame(game){
     $('#games-back').onclick=()=>{stopOnlineGameChannel();setView('games')};$('#online-create').onclick=()=>startOnlineGame(game);$('#online-refresh').onclick=()=>viewOnlineGame(game);
     $$('[data-online-join]').forEach(b=>b.onclick=()=>joinOnlineGame(game,b.dataset.onlineJoin));
     $$('[data-online-open]').forEach(b=>b.onclick=async()=>{if(isConnect)S.cfGameId=b.dataset.onlineOpen;else S.rpsGameId=b.dataset.onlineOpen;await watchOnlineGameChannel(game,b.dataset.onlineOpen);await viewOnlineGame(game)});
-    if(!S.onlineGameChannel)await watchOnlineGameChannel(game,null);return;
+    if(!S.onlineGameChannel&&!S.onlineGamePollTimer)await watchOnlineGameChannel(game,null);return;
   }
-  if(!S.onlineGameChannel)await watchOnlineGameChannel(game,id);
+  if(!S.onlineGameChannel&&!S.onlineGamePollTimer)await watchOnlineGameChannel(game,id);
   const gameResult=isConnect?await db.from(table).select('*').eq('id',id).maybeSingle():await db.rpc('rps_get_game',{p_game_id:id});const g=gameResult.data,error=gameResult.error;
   if(error||!g){$('#main').innerHTML='<div class="card">Could not load this online game. Return to the game lobby and try again.</div><button type="button" class="btn btn-secondary" id="online-back">Back to lobby</button>';$('#online-back').onclick=async()=>{if(isConnect)S.cfGameId=null;else S.rpsGameId=null;await stopOnlineGameChannel();viewOnlineGame(game)};return}
   const playerIds=[g.player_one,g.player_two].filter(Boolean);let profiles=[];

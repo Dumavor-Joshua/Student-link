@@ -182,7 +182,7 @@ assert.equal((js.match(/function scrambleWord\(/g)||[]).length, 1, 'Word scrambl
 
 assert.ok(css.includes('.navitem span.nav-unread-badge{display:inline-flex}'), 'Unread conversation count must remain visible in mobile navigation');
 
-assert.ok(js.includes("from('conversation_reads').select('conversation_id,last_read_at')"), 'Unread counts must use shared Supabase read receipts');
+assert.ok(js.includes("studentlink_conversation_summaries") && js.includes('last_read_at'), 'Unread counts must use shared Supabase read receipts through the batched summary RPC');
 assert.ok(js.includes("from('conversation_reads').upsert({conversation_id:conversationId,user_id:S.session.user.id,last_read_at:timestamp}"), 'Opening a conversation must persist its read cursor to Supabase');
 assert.ok(js.includes('data-message-header-badge') && js.includes('messages-shortcut'), 'The main app header must show the unread conversation count');
 assert.ok(messageReadMigration.includes('conversation_reads') && messageReadMigration.includes('enable row level security'), 'Read receipts must have a tracked RLS-enabled migration');
