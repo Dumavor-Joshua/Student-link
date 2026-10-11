@@ -1,13 +1,23 @@
-const CACHE_NAME='studentlink-shell-v56';
+const CACHE_NAME='studentlink-shell-v57';
 const BASE=new URL('./',self.location.href);
-const APP_SHELL=[new URL('./',BASE).href,new URL('./manifest.json',BASE).href,new URL('./data/ghana-shs-master.json',BASE).href,new URL('./assets/app.css?v=studentlink-school-directory-56',BASE).href,new URL('./assets/app.js?v=studentlink-school-directory-56',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.svg',BASE).href,new URL('./assets/icon-512.svg',BASE).href];
+const APP_SHELL=[new URL('./',BASE).href,new URL('./manifest.json',BASE).href,new URL('./data/ghana-shs-master.json',BASE).href,new URL('./assets/app.css?v=studentlink-school-directory-57',BASE).href,new URL('./assets/app.js?v=studentlink-school-directory-57',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.svg',BASE).href,new URL('./assets/icon-512.svg',BASE).href];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('studentlink-')&&key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
  const request=event.request;if(request.method!=='GET')return;
  const url=new URL(request.url);if(url.origin!==self.location.origin)return;
- if(request.mode==='navigate'){event.respondWith(fetch(request).then(response=>{if(response.ok)caches.open(CACHE_NAME).then(cache=>cache.put(new URL('./',BASE).href,response.clone()));return response}).catch(async()=>await caches.match(request)||await caches.match(new URL('./',BASE).href)));return}
- if(APP_SHELL.includes(request.url)){event.respondWith(fetch(request).then(response=>{if(response.ok)caches.open(CACHE_NAME).then(cache=>cache.put(request,response.clone()));return response}).catch(()=>caches.match(request)))}
+ if(request.mode==='navigate'){
+  const rootURL=new URL('./',BASE).href;
+  const refresh=fetch(request).then(response=>response.ok?caches.open(CACHE_NAME).then(cache=>cache.put(rootURL,response.clone()).then(()=>response)):response).catch(()=>null);
+  event.waitUntil(refresh.then(()=>{}));
+  event.respondWith((async()=>await caches.match(rootURL)||await caches.match(request)||await refresh||Response.error())());
+  return;
+ }
+ if(APP_SHELL.includes(request.url)){
+  const refresh=fetch(request).then(response=>response.ok?caches.open(CACHE_NAME).then(cache=>cache.put(request,response.clone()).then(()=>response)):response).catch(()=>null);
+  event.waitUntil(refresh.then(()=>{}));
+  event.respondWith((async()=>await caches.match(request)||await refresh||Response.error())());
+ }
 });
 
 
@@ -24,7 +34,10 @@ self.addEventListener('push',event=>{
     silent:false,
     vibrate:[120,60,120],
     data:{
-      url:typeof payload.url==='string'?payload.url:'?openMessages=1',
+      url:typeof payload.url==='string'?payload.url:(typeof payload.target_url==='string'?payload.target_url:'?openMessages=1'),
+      type:typeof payload.type==='string'?payload.type:(typeof payload.notification_type==='string'?payload.notification_type:(String(payload.url||payload.target_url||'').includes('openFriends=1')?'friend_request':String(payload.url||payload.target_url||'').includes('openProfile=')?'album':'message')),
+      conversationId:typeof payload.conversationId==='string'?payload.conversationId:(typeof payload.conversation_id==='string'?payload.conversation_id:''),
+      profileId:typeof payload.profileId==='string'?payload.profileId:(typeof payload.actorId==='string'?payload.actorId:(typeof payload.actor_id==='string'?payload.actor_id:'')),
       notificationId:typeof payload.notificationId==='string'?payload.notificationId:''
     },
     actions:typeof payload.notificationId==='string'&&payload.notificationId?[
@@ -55,6 +68,10 @@ async function openStudentLinkDestination(destination){
   try{clientsList=await self.clients.matchAll({type:'window',includeUncontrolled:true});}catch(error){console.warn('StudentLink could not inspect open windows:',error);}
   for(const client of clientsList){
     if(!('focus' in client))continue;
+    // Only reuse StudentLink windows; do not navigate another page on the same origin.
+    let clientURL;
+    try{clientURL=new URL(client.url)}catch(_){continue}
+    if(clientURL.origin!==scopeURL.origin||!clientURL.pathname.startsWith(scopeURL.pathname))continue;
     try{
       if(typeof client.navigate!=='function')continue;
       await client.navigate(targetURL);
@@ -73,6 +90,16 @@ self.addEventListener('notificationclick',event=>{
   event.notification.close();
   const data=event.notification.data||{};
   let destination=data.url||'?openMessages=1';
+  if(data.type==='message'){
+    const messageDestination=new URL(destination,self.registration.scope);
+    messageDestination.searchParams.set('openMessages','1');
+    if(data.conversationId&&!messageDestination.searchParams.has('conversation'))messageDestination.searchParams.set('conversation',data.conversationId);
+    destination=messageDestination.href;
+  }else if(['album','photo','profile_photo','profile_picture','profile'].includes(data.type)&&data.profileId){
+    const profileDestination=new URL(destination,self.registration.scope);
+    profileDestination.searchParams.set('openProfile',data.profileId);
+    destination=profileDestination.href;
+  }
   if(event.action==='reply'){
     // The action opens StudentLink's chat composer; web push actions cannot
     // reliably provide a native text field across supported browsers.
