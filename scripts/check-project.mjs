@@ -17,6 +17,8 @@ const rlsOptimizationMigration = read('supabase/migrations/20261010_optimize_rls
 const tablePrivilegeMigration = read('supabase/migrations/20261010_revoke_unused_table_privileges.sql');
 const messageReadMigration = read('supabase/migrations/20261010_add_conversation_read_receipts.sql');
 const notificationHardeningMigration = read('supabase/migrations/20261010_harden_notification_rpc_and_indexes.sql');
+const blockContactMigration = read('supabase/migrations/20261011_enforce_blocks_on_contact.sql');
+const notificationRlsMigration = read('supabase/migrations/20261011_optimize_notification_rls.sql');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(html.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
@@ -39,14 +41,14 @@ assert.ok(js.includes('db.auth.signInWithPassword({ email, password })'), 'Login
 assert.ok(js.includes('const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);'), 'Email validation must use a correctly escaped regular expression');
 assert.ok(js.includes('Trending schools are temporarily unavailable.'), 'Trending-schools errors must not replace the current page');
 assert.ok(!js.includes('My school isn’t listed'), 'School selector must not show the unlisted-school checkbox');
-assert.ok(js.includes('function canonicalVerifiedSchoolName') && js.includes('String(name).trim().replace'), 'School selector must still accept manually typed school names');
+assert.ok(js.includes('function canonicalVerifiedSchoolName') && js.includes("String(name??'').trim().replace"), 'School selector must still accept manually typed school names');
 
 
 assert.ok(js.includes("from('student_feedback').select"), 'Feedback history must load from Supabase');
 assert.ok(js.includes("from('student_feedback').insert"), 'Feedback submissions must be stored in Supabase');
 assert.ok(js.includes("table:'friendships'"), 'Friendship changes must refresh through Realtime');
 assert.ok(js.includes("table:'post_likes'"), 'Like changes must refresh through Realtime');
-assert.ok(js.includes(".ilike('school',chosen)"), 'School pages must filter profiles in the database');
+assert.ok(js.includes('async function viewSchoolStudents(school)') && js.includes("schoolKey(canonicalSchoolName(p.school||''))===schoolKey(chosen)"), 'School pages must group spelling variants by canonical school name');
 assert.ok(!js.includes("studentlink-suggestion-reports"), 'Feedback must not rely on browser-only storage');
 
 
@@ -122,6 +124,15 @@ for (const gameId of ['ttt','connect','rps','quiz','guess','scramble']) assert.o
 assert.ok(css.includes('.game-tile:focus-visible') && css.includes('@media(max-width:680px){.games-intro'), 'Game library must have keyboard focus and responsive mobile styles');
 assert.ok(notificationHardeningMigration.includes('revoke execute on function public.studentlink_record_message_notification() from public, anon, authenticated'), 'Notification trigger RPCs must not be callable directly by browser roles');
 assert.ok(notificationHardeningMigration.includes('create index if not exists notifications_actor_id_idx'), 'Notification foreign keys must have performance indexes');
+assert.ok(js.includes('async function sendBrowserNotification') && js.includes('registration.showNotification(title,options)'), 'Foreground alerts must use persistent service-worker notifications where available');
+assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
+assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
+assert.ok(html.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-shell-v49'), 'Notification fix must ship with matching fresh app-shell cache versions');
+assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
+assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
+assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
+assert.ok(notificationRlsMigration.includes('(select auth.uid()) = user_id') && notificationRlsMigration.includes('Users manage their own push subscriptions'), 'Notification RLS policies must use optimized caller identity checks');
+
 
 console.log('StudentLink static checks passed.');
 
@@ -146,7 +157,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-mobile-fix-44') && sw.includes('studentlink-mobile-fix-44') && sw.includes('studentlink-shell-v44'), 'Updated app and service-worker assets must use matching fresh cache versions');
+assert.ok(html.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-shell-v49'), 'Updated app and service-worker assets must use matching fresh cache versions');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -158,7 +169,7 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-mobile-fix-44') && sw.includes('studentlink-mobile-fix-44'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-mobile-fix-49'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('data-message-nav-badge') && js.includes('messenger-unread-badge'), 'Messages navigation and chat rows must render unread badges');
 assert.ok(js.includes("count:'exact',head:true") && js.includes('updateMessageReadCursor'), 'Unread message counts must be computed and cleared when a visible chat is opened');
 assert.ok(js.includes("S.publicProfileId=null;S.view='messages';syncNavigationState();await renderView()}"), 'Profile and friends Message actions must use the shared view renderer');

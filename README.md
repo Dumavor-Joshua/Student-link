@@ -10,6 +10,7 @@ StudentLink is a student-focused social platform for school communities, posts, 
 - `sw.js` and `manifest.json` — offline app shell, install metadata, and push-notification click handling.
 - `supabase_schema.sql` — base database schema, triggers, and row-level security.
 - `supabase/migrations/` — incremental database changes. Apply each migration to an existing database in chronological order.
+- `TESTING.md` — release acceptance checks for security, notifications, messaging, games, PWA installation, and deployment.
 - `scripts/check-project.mjs` — static regression checks for routes, authentication, messaging, game navigation, accessibility hooks, cache versions, and migration safeguards.
 
 ## UI design direction
@@ -49,6 +50,14 @@ Online multiplayer requires a signed-in account, Supabase RPCs/tables from the g
 5. Run the static regression suite with Node.js: `node scripts/check-project.mjs`.
 
 Do not re-run the base schema over an existing production database without reviewing its statements first. Prefer tracked, incremental migrations for changes.
+
+## Blocking and contact safety
+
+The migration `supabase/migrations/20261011_enforce_blocks_on_contact.sql` makes blocking a server-enforced contact boundary by reusing the existing caller-scoped `is_blocked_between` helper: new friend requests, acceptance of pending requests, new conversations, and new messages are rejected when either participant has blocked the other. Existing conversation history is not automatically deleted. Apply the migration to an existing database after reviewing its diff, and verify it with two test accounts before release.
+
+## Notification compatibility
+
+Foreground notification delivery now prefers the service worker's persistent `showNotification()` API, which is the compatible path for mobile web apps. Notification clicks route friend-request alerts to Friends and message alerts to the relevant conversation. This frontend change does not replace the required server-side Web Push sender, VAPID configuration, browser permission, or real-device background tests.
 
 ## Security and student privacy
 
