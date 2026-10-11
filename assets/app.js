@@ -268,17 +268,9 @@ function canonicalSchoolName(s=''){
   const original=String(s??'').trim().replace(/\s+/g,' ');
   if(!original)return '';
   const key=schoolKey(original);
-  // Exact canonical names and explicit nicknames take priority over fuzzy matching.
-  const exact=VERIFIED_GHANA_SHS_TVET.find(name=>schoolKey(name)===key);
-  if(exact)return exact;
-  const explicitAlias=SCHOOL_ALIAS_KEYS.get(key);
-  if(explicitAlias){
-    const target=VERIFIED_GHANA_SHS_TVET.find(name=>schoolKey(name)===schoolKey(explicitAlias));
-    if(target)return target;
-  }
   const typeOf=value=>{const k=schoolKey(value);return /\bshts\b/.test(k)?'shts':/\bshs\b/.test(k)?'shs':/\btechinst\b/.test(k)?'techinst':''};
   const locationWords=['accra','kumasi','tamale','koforidua','cape coast','sekondi','takoradi','navrongo','mankessim','bekwai','suhum','aburi','legon','obuasi','ejisu','fiapre','sunyani','dunkwa','nkwatia','mampong','asokwa','hohoe'];
-  const hasLocation=(value)=>locationWords.filter(word=>(' '+schoolKey(value)+' ').includes(' '+word+' '));
+  const hasLocation=value=>locationWords.filter(word=>(' '+schoolKey(value)+' ').includes(' '+word+' '));
   const inputType=typeOf(original),inputLocations=hasLocation(original);
   const observed=Array.from(new Set([original,...(S.schoolVariants||[]).map(value=>String(value||'').trim()).filter(Boolean)]));
   const candidates=observed.map(value=>{
@@ -291,17 +283,23 @@ function canonicalSchoolName(s=''){
     const otherMatches=candidates.filter(item=>schoolKey(item.value)!==key).sort((a,b)=>b.score-a.score);
     const ambiguous=otherMatches.length>1&&otherMatches[1].score>=otherMatches[0].score-0.035;
     if(otherMatches.length&&!ambiguous){
-      // Canonicalize the observed spelling cluster before fuzzy directory matching.
-      // This prevents two near-identical profiles from resolving to different directory entries.
       const cluster=[original,...otherMatches.map(item=>item.value)];
+      const canonicalDirectoryName=cluster.map(value=>VERIFIED_GHANA_SHS_TVET.find(name=>schoolKey(name)===schoolKey(value))).find(Boolean);
+      if(canonicalDirectoryName)return canonicalDirectoryName;
       const representative=cluster.sort((a,b)=>schoolKey(a).localeCompare(schoolKey(b),'en')||a.localeCompare(b,'en'))[0];
       const representativeKey=schoolKey(representative);
-      return VERIFIED_GHANA_SHS_TVET.find(name=>schoolKey(name)===representativeKey)
-        ||SCHOOL_ALIAS_KEYS.get(representativeKey)
-        ||representative;
+      return SCHOOL_ALIAS_KEYS.get(representativeKey)||representative;
     }
   }
-  // Fuzzy directory matching is the final fallback, after observed profile variants.
+  // Exact directory names and explicit aliases are resolved after observed-profile clustering.
+  // This lets an exact directory spelling group with a student's older near-identical profile value.
+  const exact=VERIFIED_GHANA_SHS_TVET.find(name=>schoolKey(name)===key);
+  if(exact)return exact;
+  const explicitAlias=SCHOOL_ALIAS_KEYS.get(key);
+  if(explicitAlias){
+    const target=VERIFIED_GHANA_SHS_TVET.find(name=>schoolKey(name)===schoolKey(explicitAlias));
+    if(target)return target;
+  }
   return verifiedSchoolMatch(original)||original;
 }
 function authHTML(tab='signup',message=''){return `<div class="auth"><div class="auth-layout"><section class="auth-intro"><div class="brand"><span class="brandicon" aria-hidden="true">🔗</span><span>StudentLink</span></div><h1>Connect with classmates and your school community.</h1><p>One place to share updates, meet classmates, find school communities, and learn together.</p><div class="auth-intro-note"><span aria-hidden="true">✓</span> Made for students. Built for connection.</div></section><section class="auth-panel"><div class="hero"><div class="auth-card-heading"><h2>${tab==='signup'?'Create an account':'Welcome back'}</h2><p>${tab==='signup'?'It’s quick and easy.':'Log in to continue to StudentLink.'}</p></div><div class="tab-buttons" role="group" aria-label="Account access"><button type="button" data-tab="signup" class="${tab==='signup'?'active':''}" aria-pressed="${tab==='signup'}">Sign up</button><button type="button" data-tab="login" class="${tab==='login'?'active':''}" aria-pressed="${tab==='login'}">Log in</button></div><form id="authform" novalidate>${tab==='signup'? `<div class="field"><label for="nick">Nickname</label><input id="nick" name="nickname" autocomplete="nickname" placeholder="What should classmates call you?" minlength="3" required></div><div class="field"><label for="school">School</label>${schoolPickerHTML('school')}</div>`:''}<div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div><div class="field"><label for="password">Password</label><div class="password-control"><input id="password" name="password" type="password" autocomplete="${tab==='signup'?'new-password':'current-password'}" minlength="6" required><button type="button" class="password-toggle" id="password-toggle" aria-controls="password" aria-pressed="false">Show</button></div>${tab==='signup'?'<p class="auth-help">Use at least 6 characters.</p>':''}</div>${tab==='login'?'<button type="button" class="auth-text-link" id="forgot-password">Forgot password?</button>':''}<button type="submit" class="btn auth-submit">${tab==='signup'?'Create account':'Log in'}</button><div class="auth-divider" aria-hidden="true"><span>or</span></div><button type="button" class="btn btn-secondary auth-google" id="google-signin"><svg aria-hidden="true" viewBox="0 0 48 48" width="18" height="18" focusable="false"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.4H5.8v5.3A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.3H5.8a20 20 0 0 0 0 17.8z"/><path fill="#EA4335" d="M24 12c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 6 29.5 4 24 4A20 20 0 0 0 5.8 15.1l6.8 5.3C14.2 15.6 18.7 12 24 12z"/></svg><span>Continue with Google</span></button></form><p id="auth-message" class="auth-message" role="status" aria-live="polite" ${message?'':'hidden'}>${esc(message)}</p></div><p class="auth-footer">StudentLink helps students connect with their school community.</p></section></div></div>`}function renderAuth(tab='signup', msg='') {
