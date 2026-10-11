@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1224">
+  <meta name="description" content="Install StudentLink on your phone for quick access to classmates, chats and games.">
+  <title>Install StudentLink</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon-192.svg">
+  <style>
+    :root{color-scheme:dark;--bg:#071226;--panel:#101f3b;--line:#263b60;--text:#f5f8ff;--muted:#bdc9df;--blue:#1677ff}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at top,#18345d 0,var(--bg) 65%);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
+    main{width:min(100%,440px);padding:28px;border:1px solid var(--line);border-radius:24px;background:rgba(16,31,59,.94);box-shadow:0 24px 80px #0005;text-align:center}
+    img{width:96px;height:96px;border-radius:24px}
+    h1{margin:18px 0 8px;font-size:30px;letter-spacing:-.6px}
+    p{color:var(--muted);line-height:1.6}
+    button,a.action{display:flex;justify-content:center;align-items:center;width:100%;min-height:50px;margin-top:16px;padding:13px 18px;border:0;border-radius:13px;background:var(--blue);color:white;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+    a.secondary{background:transparent;border:1px solid var(--line);color:var(--text)}
+    #status{margin-top:18px;padding:14px;border-radius:12px;background:#09172e;text-align:left;font-size:14px}
+    ol{padding-left:22px;text-align:left;color:var(--muted);line-height:1.7}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body>
+  <main>
+    <img src="./assets/icon-192.svg" alt="StudentLink app icon">
+    <h1>Install StudentLink</h1>
+    <p>Add StudentLink to your phone for an app-like experience and quicker access. Installation is free.</p>
+    <button id="install" hidden>Install StudentLink</button>
+    <a class="action" id="open" href="./">Open StudentLink</a>
+    <div id="status" role="status" aria-live="polite">Checking whether your browser supports direct installation…</div>
+    <section id="manual" hidden>
+      <p><strong>Install from your browser</strong></p>
+      <ol id="steps">
+        <li>Open this page in Chrome on Android.</li>
+        <li>Tap the browser menu (⋮).</li>
+        <li>Choose <strong>Install app</strong> or <strong>Add to Home screen</strong>, then confirm.</li>
+      </ol>
+    </section>
+  </main>
+  <script>
+    (function(){
+      var deferredPrompt=null;
+      var installButton=document.getElementById('install');
+      var status=document.getElementById('status');
+      var manual=document.getElementById('manual');
+      var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+      var isAndroid=/android/i.test(navigator.userAgent);
+      function showManual(){
+        manual.hidden=false;
+        if(isIOS){
+          status.textContent='On iPhone or iPad, open this page in Safari, tap Share, then choose Add to Home Screen.';
+          document.getElementById('steps').innerHTML='<li>Open this page in Safari.</li><li>Tap the Share button.</li><li>Choose <strong>Add to Home Screen</strong>, then tap Add.</li>';
+        }else if(isAndroid){
+          status.textContent='If the install button does not appear, use Chrome’s menu to add the app to your home screen.';
+        }else{
+          status.textContent='If direct installation is unavailable, open StudentLink in a supported browser and use its Install or Add to Home Screen option.';
+        }
+      }
+      window.addEventListener('beforeinstallprompt',function(event){
+        event.preventDefault();
+        deferredPrompt=event;
+        installButton.hidden=false;
+        status.textContent='Your browser can install StudentLink directly. Tap the button below.';
+        manual.hidden=true;
+      });
+      installButton.addEventListener('click',async function(){
+        if(!deferredPrompt){showManual();return;}
+        deferredPrompt.prompt();
+        try{
+          var choice=await deferredPrompt.userChoice;
+          status.textContent=choice&&choice.outcome==='accepted'?'StudentLink installation accepted. Follow any browser confirmation to finish.':'Installation was not completed. You can still use Open StudentLink or follow the browser steps below.';
+          if(!choice||choice.outcome!=='accepted')showManual();
+        }catch(_){showManual();}
+        deferredPrompt=null;
+        installButton.hidden=true;
+      });
+      window.addEventListener('appinstalled',function(){
+        status.textContent='StudentLink is installed on this device.';
+        installButton.hidden=true;
+        manual.hidden=true;
+      });
+      if(!('serviceWorker' in navigator))showManual();
+      else navigator.serviceWorker.register('./sw.js').catch(function(){});
+      window.setTimeout(function(){if(!deferredPrompt)showManual();},1800);
+    })();
+  </script>
+</body>
+</html>
