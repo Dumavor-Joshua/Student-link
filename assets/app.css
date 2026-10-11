@@ -1389,3 +1389,11 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
   body:not(:has(.auth)) .header>div:first-child{margin-top:4px}
   body:not(:has(.auth)) .header>div:last-child{margin-top:-6px}
 }
+
+
+/* Final small-screen adjustment: nudge the three header action buttons left. */
+@media(max-width:760px){
+  body:not(:has(.auth)) .header>div:last-child{
+    transform:translateX(-8px);
+  }
+}
