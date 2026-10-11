@@ -87,6 +87,10 @@ const profileMarkup = js.slice(profileStart, profileEnd);
 assert.ok(shellStart >= 0 && shellEnd > shellStart, 'App shell must remain present');
 assert.doesNotMatch(shellMarkup, /profile-danger-zone|id="delete-profile"/, 'Profile deactivation controls must not appear under the main menu');
 assert.match(profileMarkup, /profile-danger-zone[\s\S]*id="delete-profile"/, 'Profile deactivation controls must exist on the Profile page');
+assert.ok((shellMarkup.match(/<button\\b/g)||[]).length===2 && shellMarkup.includes('id="install-app"') && shellMarkup.includes('id="theme-toggle"'), 'The global header must contain only Install app and theme controls');
+assert.ok(!shellMarkup.includes('id="notifications-toggle"') && !shellMarkup.includes('id="notifications-history-toggle"'), 'Push and notification history controls must not remain in the header');
+assert.ok(profileMarkup.includes('id="notifications-toggle"') && profileMarkup.includes('id="notifications-history-toggle"') && profileMarkup.includes('setupNotificationControl();setupNotificationHistoryControl();'), 'Push and notification history controls must be available and wired on the Profile page');
+assert.ok(css.includes('.profile-notification-actions') && css.includes('@media(max-width:420px){.profile-notification-actions'), 'Profile notification controls must fit small screens');
 assert.ok(css.includes('@media(max-width:760px){') && css.includes('.leftside{order:3'), 'Mobile layout must use a touch-friendly bottom navigation');
 assert.ok(css.includes('@media(max-width:420px){') && css.includes('overflow-x:hidden'), 'Very narrow phone layouts must guard against horizontal overflow');
 
