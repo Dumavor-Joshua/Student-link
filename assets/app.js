@@ -146,6 +146,8 @@ const SCHOOL_ALIASES={
   'prempeh college kumasi':'Prempeh College'
 };
 const SCHOOL_ALIAS_KEYS=new Map(Object.entries(SCHOOL_ALIASES).map(([alias,canonical])=>[schoolKey(alias),canonical]));
+// Correct an obvious mistaken profile label to the canonical Abor Senior High entry.
+SCHOOL_ALIAS_KEYS.set(schoolKey('A or senior high school'),'Abor Senior High');
 function editDistance(a,b){
   if(a===b)return 0;if(!a)return b.length;if(!b)return a.length;
   let prev=Array.from({length:b.length+1},(_,i)=>i);
