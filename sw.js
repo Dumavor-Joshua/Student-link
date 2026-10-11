@@ -1,4 +1,4 @@
-const CACHE_NAME='studentlink-shell-v44';
+const CACHE_NAME='studentlink-shell-v45';
 const BASE=new URL('./',self.location.href);
 const APP_SHELL=[new URL('./',BASE).href,new URL('./manifest.json',BASE).href,new URL('./assets/app.css?v=studentlink-mobile-fix-44',BASE).href,new URL('./assets/app.js?v=studentlink-mobile-fix-44',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.svg',BASE).href,new URL('./assets/icon-512.svg',BASE).href];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});
