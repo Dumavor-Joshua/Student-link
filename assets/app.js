@@ -490,7 +490,7 @@ async function syncStudentLinkDeviceBadge(count){
 }
 async function refreshNotificationHistoryBadge(){
   if(!db||!S.session?.user?.id)return;
-  const {count,error}=await db.from('notifications').select('id',{count:'exact',head:true}).is('read_at',null);
+  const {count,error}=await db.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',S.session.user.id).is('read_at',null);
   if(error){console.warn('Notification history count could not load:',error);return}
   const badge=document.getElementById('notifications-history-count');
   if(!badge)return;
@@ -511,10 +511,10 @@ async function openNotificationHistory(){
   panel.innerHTML='<div style="position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 -14px 10px;padding:12px 14px;background:var(--p);border-bottom:1px solid var(--line);border-radius:14px 14px 0 0"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close" aria-label="Close notifications" style="position:relative;z-index:21;display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;flex:0 0 auto;min-height:38px;padding:8px 14px;background:var(--p2);color:var(--txt);border:1px solid var(--line);border-radius:9px">Close</button></div><div class="tiny">Loading notification history…</div>';
   document.body.appendChild(panel);
   
-  const {data,error}=await db.from('notifications').select('id,type,title,body,target_url,related_id,actor_id,created_at,read_at').eq('type','message').order('created_at',{ascending:false}).limit(5);
+  const {data,error}=await db.from('notifications').select('id,type,title,body,target_url,related_id,actor_id,created_at,read_at').eq('user_id',S.session.user.id).is('read_at',null).order('created_at',{ascending:false}).limit(5);
   if(!panel.isConnected)return;
   if(error){panel.innerHTML='<div class="notification-panel-heading"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close" aria-label="Close notifications">Close ✕</button></div><p class="tiny">Notification history could not load. Please try again.</p>';console.warn('Notification history could not load:',error);return}
-  if(!data?.length){panel.innerHTML='<div class="notification-panel-heading"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close" aria-label="Close notifications">Close ✕</button></div><p class="tiny">No recent messages yet. New messages will appear here.</p>';panel.querySelector('button').onclick=()=>panel.remove();return}
+  if(!data?.length){panel.innerHTML='<div class="notification-panel-heading"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close" aria-label="Close notifications">Close ✕</button></div><p class="tiny notification-empty-state">No new notifications.</p>';return}
   panel.innerHTML='<div class="notification-panel-heading"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close" aria-label="Close notifications">Close ✕</button></div>'+data.map(item=>'<article data-notification-card="'+esc(item.id)+'" style="padding:10px 8px;border-bottom:1px solid var(--line);border-radius:8px;background:'+(item.read_at?'var(--p)':'var(--p2)')+'"><div class="notification-card-actions"><button type="button" data-notification-id="'+esc(item.id)+'" data-notification-type="'+esc(item.type)+'" class="notification-open" style="display:block;flex:1;min-width:0;text-align:left;padding:0;border:0;background:transparent;color:var(--txt);cursor:pointer"><strong>'+esc(item.title)+'</strong><div style="font-size:13px;margin-top:3px">'+esc(item.body||'')+'</div><div class="tiny" style="margin-top:5px">'+esc(new Date(item.created_at).toLocaleString())+(item.read_at?'':' · New')+'</div></button><button type="button" class="notification-dismiss" data-dismiss-notification="'+esc(item.id)+'" aria-label="Dismiss '+esc(item.title)+'" title="Dismiss notification">✕</button></div>'+(item.type==='message'?'<form data-quick-reply="'+esc(item.id)+'" style="display:flex;gap:6px;margin-top:9px"><input name="reply" maxlength="1500" aria-label="Reply to '+esc(item.title)+'" placeholder="Reply…" style="min-width:0;flex:1;width:0;padding:9px 11px;border:1px solid var(--line);border-radius:18px;background:var(--p);color:var(--txt);font:inherit;font-size:14px" required><button type="submit" class="btn" style="padding:8px 12px;border-radius:18px;white-space:nowrap">Send</button></form>':'')+'</article>').join('');
   
   /* Delegate dismiss clicks from the panel itself and remove the card immediately.
@@ -586,7 +586,7 @@ async function openNotificationHistory(){
     finally{if(send.isConnected){send.disabled=false;send.textContent='Send'}}
   });
   const unread=data.filter(item=>!item.read_at).map(item=>item.id);
-  if(unread.length)await db.from('notifications').update({read_at:new Date().toISOString()}).in('id',unread);
+  if(unread.length){const {error:markReadError}=await db.from('notifications').update({read_at:new Date().toISOString()}).eq('user_id',S.session.user.id).in('id',unread);if(markReadError)console.warn('Could not mark notifications as seen:',markReadError)}
   await refreshNotificationHistoryBadge();
   panel.querySelectorAll('[data-notification-id]').forEach(b=>{b.style.background='transparent';const meta=b.querySelector('.tiny');if(meta)meta.textContent=meta.textContent.replace(' · New','')});
 }
