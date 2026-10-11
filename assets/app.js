@@ -203,7 +203,9 @@ function installCanonicalSchoolDirectory(names){
     const scored=searchNames.map(name=>{
       const candidateType=schoolType(name),b=schoolKey(name);
       if(inputType&&candidateType&&inputType!==candidateType)return {name,score:0};
-      const locationMismatch=locationWords.some(w=>hasWord(a,w)!==hasWord(b,w));
+      const inputLocations=locationWords.filter(w=>hasWord(a,w));
+      const candidateLocations=locationWords.filter(w=>hasWord(b,w));
+      const locationMismatch=inputLocations.length>0&&candidateLocations.length>0&&!inputLocations.some(w=>candidateLocations.includes(w));
       if(locationMismatch)return {name,score:0};
       const candidateCore=core(name);
       const coreScore=inputCore&&candidateCore?schoolSimilarity(inputCore,candidateCore):0;
