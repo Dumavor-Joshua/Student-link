@@ -79,7 +79,7 @@ assert.ok(css.includes('.auth-panel .hero'), 'Authentication forms must use the 
 
 
 const shellStart = js.indexOf('function shell(){');
-const shellEnd = js.indexOf('async function boot()', shellStart);
+const shellEnd = js.indexOf('async function boot(', shellStart);
 const shellMarkup = js.slice(shellStart, shellEnd);
 const profileStart = js.indexOf('function viewProfile()');
 const profileEnd = js.indexOf('function profileAvatarMarkup', profileStart);
@@ -233,7 +233,7 @@ assert.equal(schoolTest.canonicalVerifiedSchoolName('PRESEC Legon'), "Presbyteri
 assert.equal(schoolTest.canonicalVerifiedSchoolName('Presby Senior High School, Legon'), "Presbyterian Boys' Secondary School (PRESEC Legon)", 'Older PRESEC spellings must resolve to the same canonical school');
 assert.equal(schoolTest.canonicalSchoolName('Riverside Community Senior High School'), schoolTest.canonicalSchoolName('Riverside Comunity Senior High School'), 'Unlisted but observed school spelling variants must converge on one stable name');
 assert.equal(schoolTest.schoolKey('Anlo Technical Institute (ANTECH)'), schoolTest.schoolKey('Anlo Technical lnstitute (ANTECH)'), 'A common lowercase-l-for-uppercase-I typo in Institute must not split the same school');
-assert.equal(schoolTest.canonicalSchoolName('A or senior high school'), 'Abor Senior High', 'The mistaken A or senior high school label must map to Abor Senior High');
+assert.equal(schoolTest.canonicalSchoolName('A or senior high school'), 'Abor Senior High School', 'The mistaken A or senior high school label must map to the canonical master-directory entry');
 schoolRuntime.S.schoolVariants=['Yaa Asantewaa Girls Senior High School','Yaa Asantewaa Girl Senior High School'];
 assert.equal(schoolTest.schoolKey(schoolTest.canonicalSchoolName('Yaa Asantewaa Girls Senior High School')), schoolTest.schoolKey(schoolTest.canonicalSchoolName('Yaa Asantewaa Girl Senior High School')), 'An exact directory spelling and a near-identical existing profile spelling must share one trending group');
 schoolRuntime.S.schoolVariants=['North Hill Senior High School','North Hill Senior High/Tech School'];
