@@ -265,7 +265,7 @@ function wireSchoolPicker(id){
 }
 
 function canonicalSchoolName(s=''){
-  const original=String(s??'').trim().replace(/\\s+/g,' ');
+  const original=String(s??'').trim().replace(/\s+/g,' ');
   if(!original)return '';
   const key=schoolKey(original);
   // Exact canonical names and explicit nicknames take priority over fuzzy matching.
@@ -276,7 +276,7 @@ function canonicalSchoolName(s=''){
     const target=VERIFIED_GHANA_SHS_TVET.find(name=>schoolKey(name)===schoolKey(explicitAlias));
     if(target)return target;
   }
-  const typeOf=value=>{const k=schoolKey(value);return /\\bshts\\b/.test(k)?'shts':/\\bshs\\b/.test(k)?'shs':/\\btechinst\\b/.test(k)?'techinst':''};
+  const typeOf=value=>{const k=schoolKey(value);return /\bshts\b/.test(k)?'shts':/\bshs\b/.test(k)?'shs':/\btechinst\b/.test(k)?'techinst':''};
   const locationWords=['accra','kumasi','tamale','koforidua','cape coast','sekondi','takoradi','navrongo','mankessim','bekwai','suhum','aburi','legon','obuasi','ejisu','fiapre','sunyani','dunkwa','nkwatia','mampong','asokwa','hohoe'];
   const hasLocation=(value)=>locationWords.filter(word=>(' '+schoolKey(value)+' ').includes(' '+word+' '));
   const inputType=typeOf(original),inputLocations=hasLocation(original);
