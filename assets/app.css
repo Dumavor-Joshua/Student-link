@@ -1510,3 +1510,21 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
     box-sizing:border-box!important;
   }
 }
+
+
+/* Requested header, feed title and profile account-action layout. */
+.header-brand-home{
+  appearance:none;border:0;background:transparent;color:inherit;
+  font:inherit;font-weight:750;font-size:16px;letter-spacing:-.02em;
+  padding:6px 0;cursor:pointer;white-space:nowrap
+}
+.header-brand-home:hover{opacity:.82}
+.feed-heading{flex:1;min-width:0;text-align:center}
+.feed-heading .title{margin-left:auto;margin-right:auto}
+.profile-account-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+@media(max-width:620px){
+  .profile-account-actions{display:flex;flex-direction:row;align-items:center;gap:8px}
+  .profile-account-actions .btn{width:auto;flex:1}
+  .feed-head{align-items:center}
+  .feed-heading{width:100%;text-align:center}
+}
