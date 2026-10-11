@@ -39,16 +39,16 @@ Added `supabase/migrations/20261011_enforce_blocks_on_contact.sql`:
 
 ## Verification status
 
-The source changes and regression assertions are committed on the `launch-readiness-hardening` branch. GitHub Actions run 512 passed both `node --check assets/app.js` and `node scripts/check-project.mjs`. The Netlify deploy preview also reports success. This does not claim live-device or production database verification.
+The source changes and regression assertions are committed on the `launch-readiness-hardening` branch. GitHub Actions run 512 passed both `node --check assets/app.js` and `node scripts/check-project.mjs`. The Netlify deploy preview also reports success. The two database migrations were applied to the connected StudentLink Supabase project as `20261011144448 studentlink_enforce_blocks_on_contact` and `20261011144453 studentlink_optimize_notification_rls`; I queried `pg_policies` afterward and confirmed the block conditions and optimized ownership predicates are present. This verifies schema state, not a real two-account behavioural test or live-device push delivery.
 
 Still requires live verification:
 1. Run `node scripts/check-project.mjs` in a clean checkout and resolve any assertion failures.
-2. Apply the block migration to a dedicated test Supabase project, then verify blocked contact using two test accounts.
+2. Verify blocked contact using two test accounts; the policy migration is already applied to the connected Supabase project.
 3. Confirm the migration's helper and policy behaviour with the actual deployed database schema and existing policies.
 4. Test push delivery with a real server-side Web Push sender, including app-open, background, and fully closed states on target Android/iOS devices.
 5. Confirm the production URL, deployed commit, Supabase redirect URLs, VAPID public configuration, server-side private-key configuration, and any edge/function sender deployment.
-6. Complete privacy/community rules, moderator response workflow, and a documented deletion/retention process before broad student access.
+6. Enable leaked-password protection in Supabase Auth (the advisor still reports it disabled). Complete privacy/community rules, moderator response workflow, and a documented deletion/retention process before broad student access.
 
 ## Deployment safety
 
-This branch intentionally does not apply SQL to the live database and does not publish a new production deploy. Review and merge only after the static checks and migration review pass. Apply the migration to production only after a tested backup/recovery plan and test-environment verification.
+The two policy migrations have been applied to the connected Supabase project and verified by inspecting the resulting policies. The frontend changes are still on the pull request branch; merge and production deployment remain separate from the database migration. Real-device notification delivery and two-account contact tests are still outstanding.
