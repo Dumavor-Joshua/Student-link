@@ -1251,7 +1251,7 @@ function setupInstallControl(){
   toast('Open your browser menu and choose Install app or Add to Home Screen.');
  };
 }
-function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));});const layout=document.querySelector('.layout');if(layout){layout.classList.toggle('messages-mode',S.view==='messages');if(S.view!=='messages')layout.classList.remove('messages-chat-open')}document.querySelector('.trending-mobile-wrap')?.classList.toggle('messages-view',S.view==='messages');
+function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));});const layout=document.querySelector('.layout');if(layout){layout.classList.toggle('messages-mode',S.view==='messages');if(S.view!=='messages')layout.classList.remove('messages-chat-open')}document.querySelector('.trending-mobile-wrap')?.classList.toggle('messages-view',S.view==='messages');}
 /* Mobile: collapse Trending Schools on downward scroll, regardless of which container scrolls. */
 if(!window.__studentLinkTrendingScrollBound){
  window.__studentLinkTrendingScrollBound=true;
