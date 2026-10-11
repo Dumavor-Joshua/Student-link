@@ -617,12 +617,26 @@ function setupNotificationControl(){
     }finally{button.disabled=Notification.permission==='denied';updateNotificationButton();}
   });
 }
-function sendBrowserNotification(title,body,tag){
+async function sendBrowserNotification(title,body,tag){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const options={body:String(body||''),tag:String(tag||'studentlink-alert'),icon:new URL('./assets/icon-192.svg',document.baseURI).href,badge:new URL('./assets/icon-192.svg',document.baseURI).href,renotify:false,silent:false,data:{url:'?openMessages=1'}};
   try{
-    if(!('Notification' in window)||Notification.permission!=='granted')return;
-    const notification=new Notification(title,{body,tag,icon:'favicon.ico',renotify:false});
+    // Persistent notifications are the compatible path for mobile browsers and installed PWAs.
+    // The Notification constructor is intentionally only a desktop fallback.
+    if('serviceWorker' in navigator){
+      const registration=await navigator.serviceWorker.ready;
+      if(registration&&typeof registration.showNotification==='function'){
+        await registration.showNotification(title,options);
+        return;
+      }
+    }
+    const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||window.matchMedia?.('(display-mode: standalone)').matches;
+    if(mobile)return;
+    const notification=new Notification(title,options);
     notification.onclick=()=>{try{window.focus()}catch(_){};notification.close()};
-  }catch(error){console.warn('StudentLink browser notification failed:',error);}
+  }catch(error){
+    console.warn('StudentLink persistent browser notification failed:',error);
+  }
 }
 async function notifyFriendRequest(payload){
   try{
