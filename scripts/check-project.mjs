@@ -197,8 +197,8 @@ for (const title of quizSetTitles) assert.ok(js.includes(title), 'Student Quiz m
 
 // Ghana SHS master directory and safe canonical school grouping.
 const schoolMaster = JSON.parse(read('data/ghana-shs-master.json'));
-assert.ok(schoolMaster.schools.length >= 350, 'School master checklist must contain the expanded national directory');
-assert.ok(schoolMaster.sources.some(source => source.url.includes('SHSTVET_SCHOOLS.pdf')), 'School master must document the official GES/TVET source');
+assert.ok(schoolMaster.schools.length >= 550, 'School master must use the complete supplied directory');
+assert.ok(schoolMaster.sources.some(source => source.title.includes('user-supplied') || source.title.includes('User-supplied')), 'School master must document the supplied directory as its primary source');
 assert.ok(js.includes('function schoolSimilarity') && js.includes('function verifiedSchoolMatch'), 'School normalization must include conservative fuzzy matching');
 assert.ok(js.includes('const SCHOOL_ALIASES=') && js.includes('SCHOOL_ALIAS_KEYS'), 'Common school nicknames and abbreviations must map to canonical names');
 assert.ok(js.includes('function viewSchools()') && js.includes('canonicalSchoolName((p.school||\'\').trim())'), 'Trending schools must group profiles by canonical school');
@@ -216,8 +216,9 @@ runInNewContext(`${schoolHelpers};${schoolNameHelper};globalThis.schoolTest={sch
 const schoolTest = schoolRuntime.schoolTest;
 assert.ok(schoolTest.VERIFIED_GHANA_SHS_TVET.length >= 350, 'Runtime school checklist must remain expanded');
 const appSchoolKeys = new Set(schoolTest.VERIFIED_GHANA_SHS_TVET.map(schoolTest.schoolKey));
-assert.equal(schoolMaster.schools.length, appSchoolKeys.size, 'Master JSON and offline application list must stay synchronized');
-for (const school of schoolMaster.schools) assert.ok(appSchoolKeys.has(schoolTest.schoolKey(school.name)), 'School master entry must exist in the app checklist: '+school.name);
+assert.ok(js.includes('async function loadCanonicalSchoolDirectory') && js.includes("data/ghana-shs-master.json"), 'Runtime school selector must load the supplied master directory as its source of truth');
+assert.equal(new Set(schoolMaster.schools.map(s=>schoolTest.schoolKey(s.name))).size, schoolMaster.schools.length, 'Master directory must not contain duplicate canonical school names');
+assert.deepEqual(schoolMaster.schools.map(s=>s.name), [...schoolMaster.schools.map(s=>s.name)].sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'})), 'Master directory must be alphabetically sorted');
 assert.equal(schoolTest.canonicalVerifiedSchoolName('PRESEC Legon'), "Presbyterian Boys' Senior High School, Legon", 'PRESEC aliases must resolve to one canonical school');
 assert.equal(schoolTest.canonicalVerifiedSchoolName('Presby Senior High School, Legon'), "Presbyterian Boys' Senior High School, Legon", 'Older PRESEC spellings must resolve to the same canonical school');
 assert.equal(schoolTest.canonicalSchoolName('Riverside Community Senior High School'), schoolTest.canonicalSchoolName('Riverside Comunity Senior High School'), 'Unlisted but observed school spelling variants must converge on one stable name');
