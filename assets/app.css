@@ -1394,6 +1394,17 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
 /* Final small-screen adjustment: nudge the three header action buttons left. */
 @media(max-width:760px){
   body:not(:has(.auth)) .header>div:last-child{
-    transform:translateX(-8px);
+    transform:translateX(-20px)!important;margin-right:12px!important;
+  }
+}
+
+
+/* Mobile action row: stronger left offset for the three visible icon buttons. */
+@media(max-width:760px){
+  body:not(:has(.auth)) .header>div:last-child{
+    position:relative!important;
+    left:-12px!important;
+    transform:translateX(-8px)!important;
+    margin-right:12px!important;
   }
 }
