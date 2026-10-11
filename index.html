@@ -1,19 +1,35 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1224"><title>StudentLink — Connect with classmates</title><link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=studentlink-blue-cap-favicon-2"><link rel="manifest" href="./manifest.json"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="StudentLink"><link rel="apple-touch-icon" href="assets/icon-192.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/app.css?v=studentlink-mobile-fix-48"></head><body><div id="app" class="startup-skeleton" role="status" aria-live="polite" aria-label="Loading StudentLink">
   <style>
-    .startup-skeleton{min-height:100vh;padding:16px;box-sizing:border-box;background:#f4f6fb;color:#172033;font-family:system-ui,-apple-system,sans-serif}
-    .startup-skeleton .sk-top,.startup-skeleton .sk-line,.startup-skeleton .sk-card,.startup-skeleton .sk-circle{background:linear-gradient(100deg,#e2e7f0 20%,#f5f7fb 38%,#e2e7f0 56%);background-size:220% 100%;animation:studentlink-sk-shimmer 1.35s ease-in-out infinite}
-    .startup-skeleton .sk-top{height:54px;border-radius:14px;margin:0 auto 18px;max-width:1100px}
-    .startup-skeleton .sk-wrap{max-width:1100px;margin:auto;display:grid;grid-template-columns:190px minmax(0,1fr) 220px;gap:16px}
-    .startup-skeleton .sk-card{height:160px;border-radius:16px;margin-bottom:14px}
-    .startup-skeleton .sk-main .sk-card:first-child{height:95px}
-    .startup-skeleton .sk-circle{width:38px;height:38px;border-radius:50%;display:inline-block;margin:8px}
-    .startup-skeleton .sk-label{font-size:14px;text-align:center;color:#657087;padding:6px 0 14px}
+    .startup-skeleton{min-height:100vh;padding:0;background:#101b35;color:#f5f7ff;font-family:system-ui,-apple-system,sans-serif}
+    .startup-skeleton .sk-top{height:68px;padding:0 20px;display:flex;align-items:center;gap:16px;background:#172746;border-bottom:1px solid #354a6d}
+    .startup-skeleton .sk-brand{width:142px;height:24px;border-radius:6px;flex:none}
+    .startup-skeleton .sk-search{height:34px;max-width:460px;flex:1;border:1px solid #354a6d;border-radius:8px}
+    .startup-skeleton .sk-top-action{width:36px;height:36px;border-radius:50%;border:1px solid #354a6d;flex:none}
+    .startup-skeleton .sk-shimmer{background:linear-gradient(100deg,#203454 20%,#2a4064 38%,#203454 56%);background-size:220% 100%;animation:studentlink-sk-shimmer 1.5s ease-in-out infinite}
+    .startup-skeleton .sk-wrap{max-width:1500px;margin:auto;display:grid;grid-template-columns:220px minmax(0,1fr) 280px;min-height:calc(100vh - 68px)}
+    .startup-skeleton .sk-side{padding:16px;background:#172746;border-right:1px solid #354a6d}
+    .startup-skeleton .sk-main{padding:16px;min-width:0}
+    .startup-skeleton .sk-outline{border:1px solid #354a6d;border-radius:8px;background:#172746;padding:16px;margin-bottom:16px}
+    .startup-skeleton .sk-line{height:10px;border-radius:5px;margin:9px 0}
+    .startup-skeleton .sk-line.short{width:38%}.startup-skeleton .sk-line.medium{width:65%}.startup-skeleton .sk-line.long{width:88%}
+    .startup-skeleton .sk-nav{height:38px;border-radius:6px;margin:10px 0}
+    .startup-skeleton .sk-post-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .startup-skeleton .sk-circle{width:40px;height:40px;border-radius:50%;flex:none}
+    .startup-skeleton .sk-compose{height:42px;border:1px solid #354a6d;border-radius:6px;margin-top:14px}
+    .startup-skeleton .sk-post-image{height:120px;border:1px solid #354a6d;border-radius:6px;margin-top:14px;background:#14213b}
+    .startup-skeleton .sk-label{font-size:13px;text-align:center;color:#b7c5df;padding:0 12px 16px}
     @keyframes studentlink-sk-shimmer{to{background-position-x:-220%}}
-    @media(max-width:720px){.startup-skeleton{padding:12px}.startup-skeleton .sk-wrap{grid-template-columns:minmax(0,1fr)}.startup-skeleton .sk-side{display:none}.startup-skeleton .sk-card{height:135px}.startup-skeleton .sk-main .sk-card:first-child{height:80px}}
-    @media(prefers-reduced-motion:reduce){.startup-skeleton .sk-top,.startup-skeleton .sk-line,.startup-skeleton .sk-card,.startup-skeleton .sk-circle{animation:none}}
+    @media(max-width:900px){.startup-skeleton .sk-wrap{grid-template-columns:190px minmax(0,1fr)}.startup-skeleton .sk-right{display:none}}
+    @media(max-width:620px){.startup-skeleton .sk-top{height:60px;padding:0 12px;gap:10px}.startup-skeleton .sk-brand{width:96px}.startup-skeleton .sk-search{min-width:0}.startup-skeleton .sk-top-action{width:30px;height:30px}.startup-skeleton .sk-wrap{grid-template-columns:minmax(0,1fr);min-height:calc(100vh - 60px)}.startup-skeleton .sk-side{display:none}.startup-skeleton .sk-main{padding:12px}.startup-skeleton .sk-outline{padding:13px}.startup-skeleton .sk-post-image{height:95px}}
+    @media(prefers-reduced-motion:reduce){.startup-skeleton .sk-shimmer{animation:none}}
   </style>
-  <div class="sk-top"></div><div class="sk-label">Getting StudentLink ready…</div>
-  <div class="sk-wrap"><div class="sk-side"><div class="sk-card"></div><div class="sk-card"></div></div><div class="sk-main"><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div></div><div class="sk-side"><div class="sk-card"></div><div class="sk-card"></div></div></div>
+  <div class="sk-top"><div class="sk-brand sk-shimmer"></div><div class="sk-search"></div><div class="sk-top-action sk-shimmer"></div><div class="sk-top-action sk-shimmer"></div></div>
+  <div class="sk-label" style="padding-top:12px">Getting StudentLink ready…</div>
+  <div class="sk-wrap">
+    <aside class="sk-side"><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div></div><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-line long sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></aside>
+    <main class="sk-main"><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-compose"></div></div><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div><div class="sk-post-image"></div><div class="sk-line short sk-shimmer"></div></div><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div></div></main>
+    <aside class="sk-side sk-right"><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div></div></aside>
+  </div>
 </div><div class="modalbg" id="modalbg" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modal"><button type="button" id="modalclose" aria-label="Close window" onclick="document.getElementById('modalbg').classList.remove('show')" style="position:absolute;top:10px;right:10px">✕</button><div id="modaltitle" style="font-size:18px;font-weight:600;margin-bottom:16px"></div><div id="modalcontent"></div></div></div><script>
 (function(){
   window.studentLinkInstallPrompt=null;
