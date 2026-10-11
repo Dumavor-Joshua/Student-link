@@ -35,9 +35,9 @@ self.addEventListener('push',event=>{
     vibrate:[120,60,120],
     data:{
       url:typeof payload.url==='string'?payload.url:(typeof payload.target_url==='string'?payload.target_url:'?openMessages=1'),
-      type:typeof payload.type==='string'?payload.type:(String(payload.url||payload.target_url||'').includes('openFriends=1')?'friend_request':String(payload.url||payload.target_url||'').includes('openProfile=')?'album':'message'),
-      conversationId:typeof payload.conversationId==='string'?payload.conversationId:'',
-      profileId:typeof payload.profileId==='string'?payload.profileId:(typeof payload.actorId==='string'?payload.actorId:''),
+      type:typeof payload.type==='string'?payload.type:(typeof payload.notification_type==='string'?payload.notification_type:(String(payload.url||payload.target_url||'').includes('openFriends=1')?'friend_request':String(payload.url||payload.target_url||'').includes('openProfile=')?'album':'message')),
+      conversationId:typeof payload.conversationId==='string'?payload.conversationId:(typeof payload.conversation_id==='string'?payload.conversation_id:''),
+      profileId:typeof payload.profileId==='string'?payload.profileId:(typeof payload.actorId==='string'?payload.actorId:(typeof payload.actor_id==='string'?payload.actor_id:'')),
       notificationId:typeof payload.notificationId==='string'?payload.notificationId:''
     },
     actions:typeof payload.notificationId==='string'&&payload.notificationId?[
