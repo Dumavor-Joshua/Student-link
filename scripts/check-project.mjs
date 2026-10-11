@@ -79,7 +79,7 @@ assert.ok(css.includes('.auth-panel .hero'), 'Authentication forms must use the 
 
 
 const shellStart = js.indexOf('function shell(){');
-const shellEnd = js.indexOf('async function boot()', shellStart);
+const shellEnd = js.indexOf('async function boot(', shellStart);
 const shellMarkup = js.slice(shellStart, shellEnd);
 const profileStart = js.indexOf('function viewProfile()');
 const profileEnd = js.indexOf('function profileAvatarMarkup', profileStart);
