@@ -95,7 +95,7 @@ self.addEventListener('notificationclick',event=>{
     messageDestination.searchParams.set('openMessages','1');
     if(data.conversationId&&!messageDestination.searchParams.has('conversation'))messageDestination.searchParams.set('conversation',data.conversationId);
     destination=messageDestination.href;
-  }else if(data.type==='album'&&data.profileId){
+  }else if(['album','photo','profile_photo','profile_picture','profile'].includes(data.type)&&data.profileId){
     const profileDestination=new URL(destination,self.registration.scope);
     profileDestination.searchParams.set('openProfile',data.profileId);
     destination=profileDestination.href;
