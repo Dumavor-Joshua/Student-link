@@ -1494,3 +1494,19 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
     box-sizing:border-box!important;
   }
 }
+
+
+/* Latest mobile spacing request: 5px body gutter and 10px right padding for header actions. */
+@media(max-width:760px){
+  html,body{
+    padding:5px!important;
+    box-sizing:border-box!important;
+  }
+  body:not(:has(.auth)){
+    padding:5px!important;
+  }
+  body:not(:has(.auth)) .header>div:last-child{
+    padding-right:10px!important;
+    box-sizing:border-box!important;
+  }
+}
