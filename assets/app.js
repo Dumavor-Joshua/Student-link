@@ -1252,25 +1252,43 @@ function setupInstallControl(){
  };
 }
 function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));});const layout=document.querySelector('.layout');if(layout){layout.classList.toggle('messages-mode',S.view==='messages');if(S.view!=='messages')layout.classList.remove('messages-chat-open')}document.querySelector('.trending-mobile-wrap')?.classList.toggle('messages-view',S.view==='messages');
-/* On phones, collapse Trending schools while scrolling down and reveal it when scrolling up. */
+/* On phones, collapse Trending Schools while either the page or the feed's own scroll area moves. */
 if(!window.__studentLinkTrendingScrollBound){
  window.__studentLinkTrendingScrollBound=true;
- let previousY=window.scrollY||0;
- let pending=false;
- window.addEventListener('scroll',()=>{
-  if(pending)return;
-  pending=true;
+ const lastPositions=new WeakMap();
+ const updateTrendingForScroll=(source)=>{
+  if(!window.matchMedia('(max-width:760px)').matches)return;
+  const strip=document.querySelector('.trending-mobile-wrap');
+  if(!strip||strip.classList.contains('messages-view'))return;
+  const current=source===window?(window.scrollY||0):(source.scrollTop||0);
+  const previous=lastPositions.has(source)?lastPositions.get(source):current;
+  if(current>40&&current>previous+2)strip.classList.add('scroll-collapsed');
+  else if(current<previous-2||current<=12)strip.classList.remove('scroll-collapsed');
+  lastPositions.set(source,current);
+ };
+ let scrollFrame=false;
+ const queueScrollUpdate=source=>{
+  if(scrollFrame)return;
+  scrollFrame=true;
   window.requestAnimationFrame(()=>{
-   const currentY=window.scrollY||0;
-   const strip=document.querySelector('.trending-mobile-wrap');
-   if(strip&&window.matchMedia('(max-width:760px)').matches&&!strip.classList.contains('messages-view')){
-    if(currentY>100&&currentY>previousY+3)strip.classList.add('scroll-collapsed');
-    else if(currentY<previousY-3||currentY<=40)strip.classList.remove('scroll-collapsed');
-   }
-   previousY=currentY;
-   pending=false;
+   scrollFrame=false;
+   updateTrendingForScroll(source);
   });
- },{passive:true});
+ };
+ window.addEventListener('scroll',()=>queueScrollUpdate(window),{passive:true});
+ document.addEventListener('scroll',event=>{
+  if(event.target instanceof HTMLElement&&event.target.matches('.main'))queueScrollUpdate(event.target);
+ },{passive:true,capture:true});
+ document.addEventListener('click',event=>{
+  if(event.target.closest('#header-brand-home')){
+   event.preventDefault();
+   document.querySelector('.trending-mobile-wrap')?.classList.remove('scroll-collapsed');
+   setView('feed');
+   window.scrollTo({top:0,behavior:'smooth'});
+   const main=document.querySelector('.main');
+   if(main)main.scrollTo({top:0,behavior:'smooth'});
+  }
+ });
 }
  }
 function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
