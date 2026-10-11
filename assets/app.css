@@ -1408,3 +1408,22 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
     margin-right:12px!important;
   }
 }
+
+
+/* Mobile header refinement: move actions further left and tighten outer gutters. */
+@media(max-width:760px){
+  body:not(:has(.auth)) .header{
+    padding:5px!important;
+    box-sizing:border-box!important;
+  }
+  body:not(:has(.auth)) .header>div:last-child{
+    left:-20px!important;
+    transform:translateX(-12px)!important;
+    margin-right:20px!important;
+  }
+}
+@media(max-width:380px){
+  body:not(:has(.auth)) .header{
+    padding:5px!important;
+  }
+}
