@@ -288,14 +288,13 @@ function canonicalSchoolName(s=''){
     return {value,score:schoolSimilarity(original,value)};
   }).filter(item=>item.score>=0.88).sort((a,b)=>b.score-a.score||schoolKey(a.value).localeCompare(schoolKey(b.value),'en')||a.value.localeCompare(b.value,'en'));
   if(candidates.length){
-    const best=candidates[0];
-    const competing=candidates.find((item,index)=>index>0&&item.score>=best.score-0.035&&schoolKey(item.value)!==schoolKey(best.value));
-    if(!competing){
-      // Canonicalize the best observed spelling only after the variant cluster is known.
-      // Avoid re-running fuzzy directory matching here: that can send near-identical profile
-      // values to different directory entries and split a trending-school group again.
-      const representative=[original,...candidates.map(item=>item.value)]
-        .sort((a,b)=>schoolKey(a).localeCompare(schoolKey(b),'en')||a.localeCompare(b,'en'))[0];
+    const otherMatches=candidates.filter(item=>schoolKey(item.value)!==key).sort((a,b)=>b.score-a.score);
+    const ambiguous=otherMatches.length>1&&otherMatches[1].score>=otherMatches[0].score-0.035;
+    if(otherMatches.length&&!ambiguous){
+      // Canonicalize the observed spelling cluster before fuzzy directory matching.
+      // This prevents two near-identical profiles from resolving to different directory entries.
+      const cluster=[original,...otherMatches.map(item=>item.value)];
+      const representative=cluster.sort((a,b)=>schoolKey(a).localeCompare(schoolKey(b),'en')||a.localeCompare(b,'en'))[0];
       const representativeKey=schoolKey(representative);
       return VERIFIED_GHANA_SHS_TVET.find(name=>schoolKey(name)===representativeKey)
         ||SCHOOL_ALIAS_KEYS.get(representativeKey)
