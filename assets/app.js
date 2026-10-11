@@ -507,16 +507,16 @@ async function openNotificationHistory(){
   panel=document.createElement('section');
   panel.id='studentlink-notification-history';
   panel.setAttribute('aria-label','Notification history');
-  panel.style.cssText='position:fixed;z-index:3000;top:72px;right:12px;width:min(390px,calc(100vw - 24px));max-height:min(70vh,560px);overflow:auto;overscroll-behavior:contain;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--p);color:var(--txt);box-shadow:0 12px 36px rgba(0,0,0,.32);isolation:isolate';
-  panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button></div><div class="tiny">Loading notification history…</div>';
+  panel.style.cssText='position:fixed;z-index:3000;top:72px;right:12px;width:min(390px,calc(100vw - 24px));max-height:min(70vh,560px);overflow:auto;overscroll-behavior:contain;padding:0 14px 14px;border:1px solid var(--line);border-radius:14px;background:var(--p);color:var(--txt);box-shadow:0 12px 36px rgba(0,0,0,.32);isolation:isolate';
+  panel.innerHTML='<div style="position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 -14px 10px;padding:12px 14px;background:var(--p);border-bottom:1px solid var(--line);border-radius:14px 14px 0 0"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close" aria-label="Close notifications" style="position:relative;z-index:21;display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;flex:0 0 auto;min-height:38px;padding:8px 14px;background:var(--p2);color:var(--txt);border:1px solid var(--line);border-radius:9px">Close</button></div><div class="tiny">Loading notification history…</div>';
   document.body.appendChild(panel);
-  panel.querySelector('#studentlink-notification-close').onclick=()=>panel.remove();
+  panel.querySelector('#studentlink-notification-close').onclick=event=>{event.preventDefault();event.stopPropagation();panel.remove()};
   const {data,error}=await db.from('notifications').select('id,type,title,body,target_url,related_id,actor_id,created_at,read_at').eq('type','message').order('created_at',{ascending:false}).limit(5);
   if(!panel.isConnected)return;
-  if(error){panel.innerHTML='<strong>Notifications</strong><p class="tiny">Notification history could not load. Please try again.</p><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button>';panel.querySelector('button').onclick=()=>panel.remove();console.warn('Notification history could not load:',error);return}
+  if(error){panel.innerHTML='<strong>Notifications</strong><p class="tiny">Notification history could not load. Please try again.</p><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button>';panel.querySelector('#studentlink-notification-close').onclick=event=>{event.preventDefault();event.stopPropagation();panel.remove()};console.warn('Notification history could not load:',error);return}
   if(!data?.length){panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button></div><p class="tiny">No recent messages yet. New messages will appear here.</p>';panel.querySelector('button').onclick=()=>panel.remove();return}
   panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px"><strong>Notifications</strong><button type="button" class="btn btn-secondary" id="studentlink-notification-close">Close</button></div>'+data.map(item=>'<article style="padding:10px 8px;border-bottom:1px solid var(--line);border-radius:8px;background:'+(item.read_at?'var(--p)':'var(--p2)')+'"><button type="button" data-notification-id="'+esc(item.id)+'" data-notification-type="'+esc(item.type)+'" style="display:block;width:100%;text-align:left;padding:0;border:0;background:transparent;color:var(--txt);cursor:pointer"><strong>'+esc(item.title)+'</strong><div style="font-size:13px;margin-top:3px">'+esc(item.body||'')+'</div><div class="tiny" style="margin-top:5px">'+esc(new Date(item.created_at).toLocaleString())+(item.read_at?'':' · New')+'</div></button>'+(item.type==='message'?'<form data-quick-reply="'+esc(item.id)+'" style="display:flex;gap:6px;margin-top:9px"><input name="reply" maxlength="1500" aria-label="Reply to '+esc(item.title)+'" placeholder="Reply…" style="min-width:0;flex:1;width:0;padding:9px 11px;border:1px solid var(--line);border-radius:18px;background:var(--p);color:var(--txt);font:inherit;font-size:14px" required><button type="submit" class="btn" style="padding:8px 12px;border-radius:18px;white-space:nowrap">Send</button></form>':'')+'</article>').join('');
-  panel.querySelector('#studentlink-notification-close').onclick=()=>panel.remove();
+  panel.querySelector('#studentlink-notification-close').onclick=event=>{event.preventDefault();event.stopPropagation();panel.remove()};
   panel.querySelectorAll('[data-notification-id]').forEach(itemButton=>itemButton.onclick=async()=>{
     const item=data.find(row=>row.id===itemButton.dataset.notificationId);
     if(item&&!item.read_at){const {error:readError}=await db.from('notifications').update({read_at:new Date().toISOString()}).eq('id',item.id);if(readError){console.warn('Could not mark notification read:',readError);return}item.read_at=new Date().toISOString()}
@@ -1290,7 +1290,24 @@ if(!window.__studentLinkTrendingScrollBound){
    window.requestAnimationFrame(syncTrendingVisibility);
   }
  });
-}function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
+}
+/* Header brand is a reliable, direct shortcut back to the Feed. */
+if(!window.__studentLinkBrandShortcutBound){
+ window.__studentLinkBrandShortcutBound=true;
+ document.addEventListener('click',event=>{
+  const brand=event.target instanceof Element?event.target.closest('#header-brand-home'):null;
+  if(!brand)return;
+  event.preventDefault();
+  event.stopPropagation();
+  if(typeof setView==='function')setView('feed');
+  const strip=document.querySelector('.trending-mobile-wrap');
+  strip?.classList.remove('scroll-collapsed');
+  window.scrollTo({top:0,behavior:'auto'});
+  const main=document.querySelector('.main');
+  if(main)main.scrollTo({top:0,behavior:'auto'});
+ },true);
+}
+function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
 function modal(title,content){$('#modaltitle').textContent=title;$('#modalcontent').innerHTML=content;$('#modalbg').classList.add('show')}
 function closeModal(){$('#modalbg').classList.remove('show')}
 document.addEventListener('click',e=>{if(e.target.closest('#modalclose')){e.preventDefault();closeModal()}});
