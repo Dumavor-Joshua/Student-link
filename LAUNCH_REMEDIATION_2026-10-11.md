@@ -15,8 +15,8 @@
 
 ### 3. Server-enforced blocking
 Added `supabase/migrations/20261011_enforce_blocks_on_contact.sql`:
-- Introduces a narrowly scoped security-definer helper that only permits a signed-in caller to check a block relationship involving their own account.
-- Revokes execution from PUBLIC and anon; grants execution to authenticated users.
+- Reuses the existing `is_blocked_between` security-definer helper, which already limits checks to relationships involving the signed-in caller.
+- Does not add another callable helper or change existing helper grants.
 - Rejects friend requests involving a block in either direction.
 - Rejects accepting a pending request when a block exists.
 - Rejects creation of new conversations when either participant has blocked the other.
