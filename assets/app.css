@@ -1570,3 +1570,23 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
    border-width:0!important;visibility:hidden;
  }
 }
+
+
+/* Definitive mobile behavior: hide only the Trending Schools strip, not the header actions. */
+@media(max-width:760px){
+ body:not(:has(.auth)) .trending-mobile-wrap{
+  display:block!important;
+  overflow:hidden!important;
+  max-height:180px;
+  height:auto;
+  opacity:1;
+  visibility:visible;
+  transition:max-height .18s ease,opacity .15s ease,margin .18s ease,padding .18s ease;
+ }
+ body:not(:has(.auth)) .trending-mobile-wrap.scroll-collapsed{
+  display:block!important;
+  max-height:0!important;height:0!important;min-height:0!important;
+  padding:0!important;margin:0!important;border:0!important;
+  opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+ }
+}
