@@ -1251,7 +1251,28 @@ function setupInstallControl(){
   toast('Open your browser menu and choose Install app or Add to Home Screen.');
  };
 }
-function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));});const layout=document.querySelector('.layout');if(layout){layout.classList.toggle('messages-mode',S.view==='messages');if(S.view!=='messages')layout.classList.remove('messages-chat-open')}document.querySelector('.trending-mobile-wrap')?.classList.toggle('messages-view',S.view==='messages'); }
+function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));});const layout=document.querySelector('.layout');if(layout){layout.classList.toggle('messages-mode',S.view==='messages');if(S.view!=='messages')layout.classList.remove('messages-chat-open')}document.querySelector('.trending-mobile-wrap')?.classList.toggle('messages-view',S.view==='messages');
+/* On phones, collapse Trending schools while scrolling down and reveal it when scrolling up. */
+if(!window.__studentLinkTrendingScrollBound){
+ window.__studentLinkTrendingScrollBound=true;
+ let previousY=window.scrollY||0;
+ let pending=false;
+ window.addEventListener('scroll',()=>{
+  if(pending)return;
+  pending=true;
+  window.requestAnimationFrame(()=>{
+   const currentY=window.scrollY||0;
+   const strip=document.querySelector('.trending-mobile-wrap');
+   if(strip&&window.matchMedia('(max-width:760px)').matches&&!strip.classList.contains('messages-view')){
+    if(currentY>100&&currentY>previousY+3)strip.classList.add('scroll-collapsed');
+    else if(currentY<previousY-3||currentY<=40)strip.classList.remove('scroll-collapsed');
+   }
+   previousY=currentY;
+   pending=false;
+  });
+ },{passive:true});
+}
+ }
 function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
 function modal(title,content){$('#modaltitle').textContent=title;$('#modalcontent').innerHTML=content;$('#modalbg').classList.add('show')}
 function closeModal(){$('#modalbg').classList.remove('show')}
