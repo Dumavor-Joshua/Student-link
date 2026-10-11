@@ -1654,3 +1654,11 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
  border-radius:9px!important;background:var(--p2)!important;color:var(--txt)!important;
  flex:0 0 auto!important;
 }
+
+
+/* Notification settings live on the Profile page; keep the global header to two actions. */
+.profile-notification-settings{min-width:0}
+.profile-notification-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.profile-notification-actions .btn{min-height:42px;max-width:100%}
+#notifications-history-count:not([hidden]){display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;margin-left:5px;padding:0 5px;border-radius:999px;background:#e34855;color:#fff;font-size:11px;font-weight:800}
+@media(max-width:420px){.profile-notification-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}.profile-notification-actions .btn{width:100%;justify-content:center}}
