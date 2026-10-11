@@ -167,7 +167,12 @@ function verifiedSchoolMatch(name=''){
   // Auto-correct only very clear, unique near-matches; ambiguous school names stay separate.
   if(key.length<6)return '';
   const ranked=VERIFIED_GHANA_SHS_TVET.map(name=>({name,score:schoolSimilarity(key,name)}).sort?null:null);
-  const scores=VERIFIED_GHANA_SHS_TVET.map(candidate=>({name:candidate,score:schoolSimilarity(key,candidate)})).sort((a,b)=>b.score-a.score);
+  const schoolType=value=>{const candidateKey=schoolKey(value);return /\bshts\b/.test(candidateKey)?'shts':/\bshs\b/.test(candidateKey)?'shs':/\btechinst\b/.test(candidateKey)?'techinst':''};
+  const inputType=schoolType(name);
+  const scores=VERIFIED_GHANA_SHS_TVET.map(candidate=>{
+    const candidateType=schoolType(candidate);
+    return {name:candidate,score:inputType&&candidateType&&inputType!==candidateType?0:schoolSimilarity(key,candidate)};
+  }).sort((a,b)=>b.score-a.score);
   if(!scores.length||scores[0].score<0.91)return '';
   if(scores[1]&&scores[0].score-scores[1].score<0.045)return '';
   return scores[0].name;
