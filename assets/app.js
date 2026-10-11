@@ -187,8 +187,8 @@ function installCanonicalSchoolDirectory(names){
     const key=schoolKey(value);
     return /\bshts\b/.test(key)?'shts':/\bshs\b/.test(key)?'shs':/\btechinst\b/.test(key)?'techinst':'';
   };
-  const core=value=>schoolKey(value)
-    .replace(/\b(shts|shs|techinst|senior|high|technical|institute|school|college|academy|secondary|presec|of|the|and|for|girls|boys|community|presbyterian|presby|catholic|methodist|anglican|islamic|sda|stem|vocational|training|centre|center)\b/g,' ')
+  const core=value=>schoolKey(String(value||'').replace(/\([^)]*\)/g,' '))
+    .replace(/\b(shts|shs|techinst|senior|high|technical|institute|school|college|academy|secondary|presec|of|the|and|for|girls|boys|community|presbyterian|presby|catholic|methodist|anglican|islamic|sda|stem|vocational|training|centre|center|accra|kumasi|tamale|koforidua|cape|coast|sekondi|takoradi|navrongo|mankessim|bekwai|suhum|aburi|legon|obuasi|ejisu|fiapre|sunyani|dunkwa|nkwatia|mampong|asokwa|hohoe|abusco|an seco|ghanass|ghanasco|ketasco|kp ansec|k stys|big boss|owass)\b/g,' ')
     .replace(/\s+/g,' ').trim();
   const candidatesFor=value=>{
     const inputType=schoolType(value),inputCore=core(value),a=schoolKey(value);
