@@ -177,6 +177,56 @@ function canonicalVerifiedSchoolName(name=''){
   if(!original)return '';
   return verifiedSchoolMatch(original)||original;
 }
+
+function installCanonicalSchoolDirectory(names){
+  const canonicalNames=[...new Set((names||[]).map(n=>String(n||'').trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,'en',{sensitivity:'base'}));
+  if(canonicalNames.length<500)return false;
+  const legacyNames=[...VERIFIED_GHANA_SHS_TVET];
+  const candidatesFor=value=>{
+    const inputType=/\\bshts\\b/.test(schoolKey(value))?'shts':/\\bshs\\b/.test(schoolKey(value))?'shs':/\\btechinst\\b/.test(schoolKey(value))?'techinst':'';
+    const scored=canonicalNames.map(name=>{
+      const candidateType=/\\bshts\\b/.test(schoolKey(name))?'shts':/\\bshs\\b/.test(schoolKey(name))?'shs':/\\btechinst\\b/.test(schoolKey(name))?'techinst':'';
+      const a=schoolKey(value),b=schoolKey(name);
+      const locationWords=['accra','kumasi','tamale','koforidua','cape coast','sekondi','takoradi','ho','wa','sun y ani','navrongo','mankessim','bekwai','suhum','aburi','legon','obuasi','ejisu','fiapre'];
+      const locationMismatch=locationWords.some(w=>a.includes(w)!==b.includes(w));
+      if(inputType&&candidateType&&inputType!==candidateType)return {name,score:0};
+      if(locationMismatch)return {name,score:0};
+      return {name,score:schoolSimilarity(value,name)};
+    }).sort((a,b)=>b.score-a.score);
+    if(!scored.length||scored[0].score<0.82||(scored[1]&&scored[0].score-scored[1].score<0.06))return '';
+    return scored[0].name;
+  };
+  VERIFIED_GHANA_SHS_TVET.splice(0,VERIFIED_GHANA_SHS_TVET.length,...canonicalNames);
+  const aliases=[];
+  for(const [alias,target] of Object.entries(SCHOOL_ALIASES)){
+    const exact=canonicalNames.find(n=>schoolKey(n)===schoolKey(target));
+    aliases.push([alias,exact||candidatesFor(target)||target]);
+  }
+  for(const oldName of legacyNames){
+    const exact=canonicalNames.find(n=>schoolKey(n)===schoolKey(oldName));
+    const match=exact||candidatesFor(oldName);
+    if(match)aliases.push([oldName,match]);
+  }
+  SCHOOL_ALIAS_KEYS.clear();
+  for(const [alias,target] of aliases){
+    if(canonicalNames.some(n=>schoolKey(n)===schoolKey(target)))SCHOOL_ALIAS_KEYS.set(schoolKey(alias),target);
+  }
+  return true;
+}
+async function loadCanonicalSchoolDirectory(){
+  try{
+    const response=await fetch(new URL('data/ghana-shs-master.json',document.baseURI),{cache:'no-store'});
+    if(!response.ok)throw new Error('Directory request returned '+response.status);
+    const payload=await response.json();
+    if(!Array.isArray(payload.schools))throw new Error('Directory file has no school list');
+    const loaded=installCanonicalSchoolDirectory(payload.schools.map(s=>typeof s==='string'?s:s?.name));
+    if(!loaded)throw new Error('Directory did not contain enough school names');
+  }catch(error){
+    console.warn('StudentLink school directory could not be refreshed; using the built-in fallback list.',error);
+  }
+}
+
 function schoolPickerHTML(id,value=''){
   const initial=String(value||'').trim();
   return '<input id="'+esc(id)+'" name="'+esc(id)+'" list="verified-gh-school-options" autocomplete="organization" placeholder="Start typing your school name…" maxlength="120" value="'+esc(initial)+'" required>'+
@@ -1382,6 +1432,7 @@ document.addEventListener('click',e=>{if(e.target.closest('#header-brand-home'))
 async function startStudentLink(){
   const app=document.getElementById('app');
   try{
+    await loadCanonicalSchoolDirectory();
     if(!configured){
       renderAuth('signup','Setup needed: create Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.');
       return;
