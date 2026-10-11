@@ -1252,25 +1252,28 @@ function setupInstallControl(){
  };
 }
 function syncNavigationState(){ document.querySelectorAll('[data-view]').forEach(link=>{const selected=link.dataset.view===S.view||(S.view==='game'&&link.dataset.view==='games');link.classList.toggle('active',selected);link.setAttribute('aria-current',selected?'page':'false');link.setAttribute('aria-pressed',String(selected));});const layout=document.querySelector('.layout');if(layout){layout.classList.toggle('messages-mode',S.view==='messages');if(S.view!=='messages')layout.classList.remove('messages-chat-open')}document.querySelector('.trending-mobile-wrap')?.classList.toggle('messages-view',S.view==='messages');}
-/* Mobile: collapse Trending Schools on downward scroll, regardless of which container scrolls. */
+/* Mobile Trending Schools: remain hidden on upward scroll until the header is reached. */
 if(!window.__studentLinkTrendingScrollBound){
  window.__studentLinkTrendingScrollBound=true;
  let lastY=0;
- let lastMainY=0;
  let framePending=false;
+ const headerTop=()=>{
+  const header=document.querySelector('.header')||document.querySelector('header')||document.querySelector('.topbar');
+  return header?Math.max(0,header.getBoundingClientRect().bottom):0;
+ };
  const syncTrendingVisibility=()=>{
   framePending=false;
   const strip=document.querySelector('.trending-mobile-wrap');
   if(!strip||!window.matchMedia('(max-width:760px)').matches)return;
   if(strip.classList.contains('messages-view'))return;
+  const y=window.scrollY||document.documentElement.scrollTop||0;
   const main=document.querySelector('.main');
-  const windowY=window.scrollY||document.documentElement.scrollTop||0;
   const mainY=main?.scrollTop||0;
-  const scrollingDown=windowY>lastY+1||mainY>lastMainY+1;
-  const scrollingUp=windowY<lastY-1||mainY<lastMainY-1;
-  if((scrollingDown&&Math.max(windowY,mainY)>8))strip.classList.add('scroll-collapsed');
-  else if(scrollingUp||Math.max(windowY,mainY)<=8)strip.classList.remove('scroll-collapsed');
-  lastY=windowY;lastMainY=mainY;
+  const position=Math.max(y,mainY);
+  /* Re-show only when the scroll position is back at the very top/header. */
+  if(position<=3||headerTop()>=window.innerHeight-5)strip.classList.remove('scroll-collapsed');
+  else strip.classList.add('scroll-collapsed');
+  lastY=position;
  };
  const scheduleTrendingSync=()=>{
   if(framePending)return;
@@ -1281,8 +1284,13 @@ if(!window.__studentLinkTrendingScrollBound){
  document.addEventListener('scroll',scheduleTrendingSync,{passive:true,capture:true});
  window.addEventListener('resize',scheduleTrendingSync,{passive:true});
  document.addEventListener('touchmove',scheduleTrendingSync,{passive:true});
-}
-function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
+ document.addEventListener('click',event=>{
+  if(event.target.closest('#header-brand-home')){
+   document.querySelector('.trending-mobile-wrap')?.classList.remove('scroll-collapsed');
+   window.requestAnimationFrame(syncTrendingVisibility);
+  }
+ });
+}function setView(v){if(v!=='game'&&S.view==='game'){stopTttChannel();stopOnlineGameChannel();S.tttGameId=null;S.cfGameId=null;S.rpsGameId=null}S.view=v;if(v!=='school')S.schoolFilter='';if(v!=='public-profile')S.publicProfileId=null;syncNavigationState();renderView()}
 function modal(title,content){$('#modaltitle').textContent=title;$('#modalcontent').innerHTML=content;$('#modalbg').classList.add('show')}
 function closeModal(){$('#modalbg').classList.remove('show')}
 document.addEventListener('click',e=>{if(e.target.closest('#modalclose')){e.preventDefault();closeModal()}});
