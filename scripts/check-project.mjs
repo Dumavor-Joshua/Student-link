@@ -18,6 +18,7 @@ const tablePrivilegeMigration = read('supabase/migrations/20261010_revoke_unused
 const messageReadMigration = read('supabase/migrations/20261010_add_conversation_read_receipts.sql');
 const notificationHardeningMigration = read('supabase/migrations/20261010_harden_notification_rpc_and_indexes.sql');
 const blockContactMigration = read('supabase/migrations/20261011_enforce_blocks_on_contact.sql');
+const notificationRlsMigration = read('supabase/migrations/20261011_optimize_notification_rls.sql');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(html.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
@@ -130,6 +131,7 @@ assert.ok(html.includes('studentlink-mobile-fix-49') && sw.includes('studentlink
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
 assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
+assert.ok(notificationRlsMigration.includes('(select auth.uid()) = user_id') && notificationRlsMigration.includes('Users manage their own push subscriptions'), 'Notification RLS policies must use optimized caller identity checks');
 
 
 console.log('StudentLink static checks passed.');
