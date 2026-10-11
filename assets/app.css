@@ -1623,3 +1623,22 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
 @media(max-width:760px){
  #studentlink-notification-history{top:calc(env(safe-area-inset-top,0px) + 12px)!important;right:5px!important;width:calc(100vw - 10px)!important;max-height:78dvh!important}
 }
+
+
+/* Notification panel controls: high-contrast, visible, and fixed at the panel top. */
+#studentlink-notification-history{z-index:2147483000!important;box-sizing:border-box!important}
+#studentlink-notification-history .notification-panel-heading{
+ position:sticky!important;top:0!important;z-index:2147483001!important;
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:12px!important;min-height:58px!important;margin:0 -14px 10px!important;
+ padding:10px 14px!important;background:var(--p)!important;
+ border-bottom:1px solid var(--line)!important;box-sizing:border-box!important;
+}
+#studentlink-notification-history #studentlink-notification-close{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+ position:relative!important;z-index:2147483002!important;min-width:76px!important;
+ min-height:40px!important;padding:8px 12px!important;border:1px solid var(--line)!important;
+ border-radius:9px!important;background:var(--p2)!important;color:var(--txt)!important;
+ flex:0 0 auto!important;
+}
