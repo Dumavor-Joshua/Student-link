@@ -23,19 +23,23 @@ Added `supabase/migrations/20261011_enforce_blocks_on_contact.sql`:
 - Rejects new messages in existing conversations when either participant has blocked the other.
 - Keeps existing conversation history available rather than silently deleting messages.
 
-### 4. Cache invalidation
+### 4. Database policy hardening
+- Added a migration that enforces the existing caller-scoped block-check helper across friend requests, accepting requests, new conversations, and sending messages.
+- Added a migration that rewrites notification and push-subscription RLS identity checks as scalar subqueries, addressing the four policy-performance warnings reported by Supabase's advisor without changing row ownership rules.
+
+### 5. Cache invalidation
 - Bumped the application asset version to `studentlink-mobile-fix-49`.
 - Bumped the service-worker shell cache to `studentlink-shell-v49`.
 - Keeps the HTML and service worker asset versions aligned so devices do not continue serving the old notification helper from cache.
 
-### 5. Regression coverage and documentation
+### 6. Regression coverage and documentation
 - Added static regression assertions for service-worker notifications, mobile fallback behaviour, notification deep links, cache versions, and block-enforcement SQL.
 - Replaced stale game testing instructions with an acceptance checklist covering the current six-game library, security, blocking, notification delivery, PWA install, mobile layouts, and release operations.
 - Updated README documentation for the migration and notification behaviour.
 
 ## Verification status
 
-The source changes and regression assertions are committed on the `launch-readiness-hardening` branch. A static assertion is not the same as executing the test suite, and this report does not claim live-device or production database verification.
+The source changes and regression assertions are committed on the `launch-readiness-hardening` branch. GitHub Actions run 512 passed both `node --check assets/app.js` and `node scripts/check-project.mjs`. The Netlify deploy preview also reports success. This does not claim live-device or production database verification.
 
 Still requires live verification:
 1. Run `node scripts/check-project.mjs` in a clean checkout and resolve any assertion failures.
