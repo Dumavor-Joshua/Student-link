@@ -8,6 +8,8 @@ function makeRandomId(){if(window.crypto&&typeof window.crypto.randomUUID==='fun
 function schoolKey(s=''){
   return String(s??'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('en')
     .replace(/&/g,' and ')
+    // Common keyboard/OCR typo: lowercase l entered in place of capital I in "Institute".
+    .replace(/\blnstitute\b/g,'institute')
     .replace(/\b(senior\s+high\s*\/\s*technical|senior\s+high\s*\/\s*tech|senior\s+high\s+technical|shts|shst|shst\.?|senior high tech)\b/g,' shts ')
     .replace(/\b(technical\s+institute|tech\.?\s+inst\.?|tech\.?\s+institute)\b/g,' techinst ')
     .replace(/\b(snr\.?\s*high|senior\s+high(?:\s+school)?|s\.?h\.?s\.?)\b/g,' shs ')
