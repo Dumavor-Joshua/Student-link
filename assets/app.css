@@ -1481,3 +1481,16 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
     overflow:hidden;
   }
 }
+
+
+/* Requested mobile spacing: 5px around the body and 10px padding on the three header buttons. */
+@media(max-width:760px){
+  html,body{
+    padding:5px!important;
+    box-sizing:border-box!important;
+  }
+  body:not(:has(.auth)) .header>div:last-child .btn{
+    padding:10px!important;
+    box-sizing:border-box!important;
+  }
+}
