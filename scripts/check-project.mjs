@@ -47,7 +47,7 @@ assert.ok(js.includes("from('student_feedback').select"), 'Feedback history must
 assert.ok(js.includes("from('student_feedback').insert"), 'Feedback submissions must be stored in Supabase');
 assert.ok(js.includes("table:'friendships'"), 'Friendship changes must refresh through Realtime');
 assert.ok(js.includes("table:'post_likes'"), 'Like changes must refresh through Realtime');
-assert.ok(js.includes(".ilike('school',chosen)"), 'School pages must filter profiles in the database');
+assert.ok(js.includes('async function viewSchoolStudents(school)') && js.includes("schoolKey(canonicalSchoolName(p.school||''))===schoolKey(chosen)"), 'School pages must group spelling variants by canonical school name');
 assert.ok(!js.includes("studentlink-suggestion-reports"), 'Feedback must not rely on browser-only storage');
 
 
