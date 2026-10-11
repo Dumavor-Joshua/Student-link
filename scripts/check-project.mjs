@@ -17,6 +17,7 @@ const rlsOptimizationMigration = read('supabase/migrations/20261010_optimize_rls
 const tablePrivilegeMigration = read('supabase/migrations/20261010_revoke_unused_table_privileges.sql');
 const messageReadMigration = read('supabase/migrations/20261010_add_conversation_read_receipts.sql');
 const notificationHardeningMigration = read('supabase/migrations/20261010_harden_notification_rpc_and_indexes.sql');
+const blockContactMigration = read('supabase/migrations/20261011_enforce_blocks_on_contact.sql');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(html.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
@@ -122,6 +123,13 @@ for (const gameId of ['ttt','connect','rps','quiz','guess','scramble']) assert.o
 assert.ok(css.includes('.game-tile:focus-visible') && css.includes('@media(max-width:680px){.games-intro'), 'Game library must have keyboard focus and responsive mobile styles');
 assert.ok(notificationHardeningMigration.includes('revoke execute on function public.studentlink_record_message_notification() from public, anon, authenticated'), 'Notification trigger RPCs must not be callable directly by browser roles');
 assert.ok(notificationHardeningMigration.includes('create index if not exists notifications_actor_id_idx'), 'Notification foreign keys must have performance indexes');
+assert.ok(js.includes('async function sendBrowserNotification') && js.includes('registration.showNotification(title,options)'), 'Foreground alerts must use persistent service-worker notifications where available');
+assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
+assert.ok(html.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-shell-v49'), 'Notification fix must ship with matching fresh app-shell cache versions');
+assert.ok(blockContactMigration.includes('studentlink_are_blocked') && blockContactMigration.includes('not public.studentlink_are_blocked(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
+assert.ok(blockContactMigration.includes('not public.studentlink_are_blocked(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
+assert.ok(blockContactMigration.includes('revoke all on function public.studentlink_are_blocked(uuid, uuid) from public, anon'), 'Block-check helper must not be executable by anonymous users');
+
 
 console.log('StudentLink static checks passed.');
 
