@@ -1284,3 +1284,51 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
   html{scroll-behavior:auto}
   body:not(:has(.auth)) *,body:not(:has(.auth)) *:before,body:not(:has(.auth)) *:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+
+/* Focused mobile fixes: keep header actions aligned without changing desktop. */
+@media(max-width:760px){
+  body:not(:has(.auth)) .header{min-width:0;overflow:visible}
+  body:not(:has(.auth)) .header>div:last-child{
+    display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;
+    min-width:0;gap:6px!important
+  }
+  body:not(:has(.auth)) .header .btn{
+    flex:0 0 38px;width:38px;height:38px;min-width:38px;min-height:38px;
+    display:inline-flex;align-items:center;justify-content:center;
+    position:relative;padding:0;line-height:1;border:1px solid var(--line)
+  }
+  /* The separate Messages shortcut duplicates the bottom navigation on phones. */
+  body:not(:has(.auth)) .header #messages-shortcut{display:none!important}
+  body:not(:has(.auth)) .header #notifications-history-toggle{margin:0}
+  body:not(:has(.auth)) .header #notifications-history-count{
+    position:absolute;top:-5px;right:-5px;margin:0;min-width:17px;height:17px;
+    padding:0 4px;border-radius:999px;font-size:10px;line-height:17px
+  }
+  body:not(:has(.auth)) .header #logout:before,
+  body:not(:has(.auth)) .header #theme-toggle:before,
+  body:not(:has(.auth)) .header #notifications-history-toggle:before{
+    display:block;line-height:1
+  }
+  body:not(:has(.auth)) .trending-mobile-wrap{min-width:0;max-width:100%;overflow:hidden}
+  body:not(:has(.auth)) .trending-mobile{max-width:100%;overscroll-behavior-x:contain}
+  body:not(:has(.auth)) .main{width:100%;min-width:0;overflow-x:hidden}
+  body:not(:has(.auth)) .main .card,
+  body:not(:has(.auth)) .main button,
+  body:not(:has(.auth)) .main input,
+  body:not(:has(.auth)) .main select,
+  body:not(:has(.auth)) .main textarea{max-width:100%}
+  #studentlink-notification-history{
+    top:calc(66px + env(safe-area-inset-top))!important;
+    right:8px!important;left:8px!important;width:auto!important;
+    max-width:none!important;max-height:calc(100dvh - 86px - env(safe-area-inset-bottom))!important;
+    padding:12px!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch
+  }
+  #studentlink-notification-history form{align-items:stretch;min-width:0}
+  #studentlink-notification-history form input{min-width:0;width:0;flex:1}
+}
+@media(max-width:380px){
+  body:not(:has(.auth)) .header{padding-left:8px;padding-right:8px;gap:5px}
+  body:not(:has(.auth)) .header .btn{flex-basis:34px;width:34px;min-width:34px;height:34px;min-height:34px}
+  body:not(:has(.auth)) .header>div:last-child{gap:4px!important}
+}
