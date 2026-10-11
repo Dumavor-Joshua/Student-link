@@ -617,9 +617,9 @@ function setupNotificationControl(){
     }finally{button.disabled=Notification.permission==='denied';updateNotificationButton();}
   });
 }
-async function sendBrowserNotification(title,body,tag){
+async function sendBrowserNotification(title,body,tag,destination='?openMessages=1'){
   if(!('Notification' in window)||Notification.permission!=='granted')return;
-  const options={body:String(body||''),tag:String(tag||'studentlink-alert'),icon:new URL('./assets/icon-192.svg',document.baseURI).href,badge:new URL('./assets/icon-192.svg',document.baseURI).href,renotify:false,silent:false,data:{url:'?openMessages=1'}};
+  const options={body:String(body||''),tag:String(tag||'studentlink-alert'),icon:new URL('./assets/icon-192.svg',document.baseURI).href,badge:new URL('./assets/icon-192.svg',document.baseURI).href,renotify:false,silent:false,data:{url:new URL(destination,document.baseURI).href}};
   try{
     // Persistent notifications are the compatible path for mobile browsers and installed PWAs.
     // The Notification constructor is intentionally only a desktop fallback.
@@ -647,7 +647,7 @@ async function notifyFriendRequest(payload){
     S.notifiedFriendshipIds.add(id);
     const {data:person,error}=await db.from('profiles').select('nickname').eq('id',row.user_id).maybeSingle();
     if(error)console.warn('Could not load friend-request notification sender:',error);
-    sendBrowserNotification('New friend request',((person?.nickname||'A student')+' sent you a friend request.'),'friend-request-'+id);
+    sendBrowserNotification('New friend request',((person?.nickname||'A student')+' sent you a friend request.'),'friend-request-'+id,'?openFriends=1');
   }catch(error){console.warn('Could not process friend-request notification:',error);}
 }
 // A short, unobtrusive incoming-message tone. Browsers require a user gesture before audio can play.
@@ -684,13 +684,13 @@ async function notifyIncomingMessage(payload){
     const {data:conversation,error}=await db.from('conversations').select('user_a,user_b').eq('id',row.conversation_id).maybeSingle();
     if(error){console.warn('Could not verify message conversation for notification:',error);return;}
     if(!conversation||![conversation.user_a,conversation.user_b].includes(S.session?.user?.id))return;
-    playMessageSound();
     if(S.view==='messages'&&S.chat===row.conversation_id&&document.visibilityState==='visible')return;
+    playMessageSound();
     const {data:person,error:profileError}=await db.from('profiles').select('nickname').eq('id',row.sender_id).maybeSingle();
     if(profileError)console.warn('Could not load message notification sender:',profileError);
     const sender=person?.nickname||'A student';
     const body=String(row.body||'').trim();
-    sendBrowserNotification('New message from '+sender,body.length>140?body.slice(0,137)+'…':body||'You received a new message.','message-'+id);
+    sendBrowserNotification('New message from '+sender,body.length>140?body.slice(0,137)+'…':body||'You received a new message.','message-'+id,'?openMessages=1&conversation='+encodeURIComponent(row.conversation_id));
   }catch(error){console.warn('Could not process message notification:',error);}
 }
 async function setUpRealtime(){
