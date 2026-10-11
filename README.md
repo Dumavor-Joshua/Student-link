@@ -53,7 +53,7 @@ Do not re-run the base schema over an existing production database without revie
 
 ## Blocking and contact safety
 
-The migration `supabase/migrations/20261011_enforce_blocks_on_contact.sql` makes blocking a server-enforced contact boundary: new friend requests, acceptance of pending requests, new conversations, and new messages are rejected when either participant has blocked the other. Existing conversation history is not automatically deleted. Apply the migration to an existing database after reviewing its diff, and verify it with two test accounts before release.
+The migration `supabase/migrations/20261011_enforce_blocks_on_contact.sql` makes blocking a server-enforced contact boundary by reusing the existing caller-scoped `is_blocked_between` helper: new friend requests, acceptance of pending requests, new conversations, and new messages are rejected when either participant has blocked the other. Existing conversation history is not automatically deleted. Apply the migration to an existing database after reviewing its diff, and verify it with two test accounts before release.
 
 ## Notification compatibility
 
