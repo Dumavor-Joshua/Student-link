@@ -194,7 +194,13 @@ function installCanonicalSchoolDirectory(names){
     const inputType=schoolType(value),inputCore=core(value),a=schoolKey(value);
     const locationWords=['accra','kumasi','tamale','koforidua','cape coast','sekondi','takoradi','navrongo','mankessim','bekwai','suhum','aburi','legon','obuasi','ejisu','fiapre','sun y ani','sunyani','dunkwa','nkwatia','akw atia','mampong','asokwa','hohoe'];
     const hasWord=(key,word)=>(' '+key+' ').includes(' '+word+' ');
-    const scored=canonicalNames.map(name=>{
+    const inputFirst=a.split(' ')[0],coreFirst=inputCore.split(' ')[0];
+    const likely=canonicalNames.filter(name=>{
+      const key=schoolKey(name),candidateCore=core(name);
+      return key.split(' ')[0]===inputFirst||candidateCore.split(' ')[0]===coreFirst;
+    });
+    const searchNames=likely.length?likely:canonicalNames;
+    const scored=searchNames.map(name=>{
       const candidateType=schoolType(name),b=schoolKey(name);
       if(inputType&&candidateType&&inputType!==candidateType)return {name,score:0};
       const locationMismatch=locationWords.some(w=>hasWord(a,w)!==hasWord(b,w));
