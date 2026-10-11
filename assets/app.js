@@ -524,8 +524,9 @@ async function openNotificationHistory(){
     if(!id||!card)return;
     dismissButton.disabled=true;dismissButton.textContent='…';
     try{
-      const {error:dismissError}=await db.from('notifications').delete().eq('id',id);
+      const {data:deleted,error:dismissError}=await db.from('notifications').delete().eq('id',id).eq('user_id',S.session.user.id).select('id').maybeSingle();
       if(dismissError)throw dismissError;
+      if(!deleted?.id)throw new Error('This notification was not deleted. Refresh the panel and try again.');
       card.remove();
       const index=data.findIndex(row=>String(row.id)===String(id));
       if(index>=0)data.splice(index,1);
