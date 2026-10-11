@@ -125,6 +125,7 @@ assert.ok(notificationHardeningMigration.includes('revoke execute on function pu
 assert.ok(notificationHardeningMigration.includes('create index if not exists notifications_actor_id_idx'), 'Notification foreign keys must have performance indexes');
 assert.ok(js.includes('async function sendBrowserNotification') && js.includes('registration.showNotification(title,options)'), 'Foreground alerts must use persistent service-worker notifications where available');
 assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
+assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
 assert.ok(html.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-mobile-fix-49') && sw.includes('studentlink-shell-v49'), 'Notification fix must ship with matching fresh app-shell cache versions');
 assert.ok(blockContactMigration.includes('studentlink_are_blocked') && blockContactMigration.includes('not public.studentlink_are_blocked(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
 assert.ok(blockContactMigration.includes('not public.studentlink_are_blocked(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
