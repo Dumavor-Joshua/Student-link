@@ -7,33 +7,16 @@ self.addEventListener('fetch',event=>{
  const request=event.request;if(request.method!=='GET')return;
  const url=new URL(request.url);if(url.origin!==self.location.origin)return;
  if(request.mode==='navigate'){
-  event.respondWith((async()=>{
-   const cache=await caches.open(CACHE_NAME);
-   const cached=await cache.match(new URL('./',BASE).href)||await cache.match(request);
-   if(cached){
-    // Serve the cached app shell immediately, then refresh it without blocking launch.
-    event.waitUntil(fetch(request).then(response=>{if(response.ok)return cache.put(new URL('./',BASE).href,response.clone())}).catch(()=>{}));
-    return cached;
-   }
-   const response=await fetch(request);
-   if(response.ok)await cache.put(new URL('./',BASE).href,response.clone());
-   return response;
-  })());
+  const rootURL=new URL('./',BASE).href;
+  const refresh=fetch(request).then(response=>response.ok?caches.open(CACHE_NAME).then(cache=>cache.put(rootURL,response.clone()).then(()=>response)):response).catch(()=>null);
+  event.waitUntil(refresh.then(()=>{}));
+  event.respondWith((async()=>await caches.match(rootURL)||await caches.match(request)||await refresh||Response.error())());
   return;
  }
  if(APP_SHELL.includes(request.url)){
-  event.respondWith((async()=>{
-   const cache=await caches.open(CACHE_NAME);
-   const cached=await cache.match(request);
-   if(cached){
-    // Versioned static files are safe to serve from cache while a fresh copy is fetched.
-    event.waitUntil(fetch(request).then(response=>{if(response.ok)return cache.put(request,response.clone())}).catch(()=>{}));
-    return cached;
-   }
-   const response=await fetch(request);
-   if(response.ok)await cache.put(request,response.clone());
-   return response;
-  })());
+  const refresh=fetch(request).then(response=>response.ok?caches.open(CACHE_NAME).then(cache=>cache.put(request,response.clone()).then(()=>response)):response).catch(()=>null);
+  event.waitUntil(refresh.then(()=>{}));
+  event.respondWith((async()=>await caches.match(request)||await refresh||Response.error())());
  }
 });
 
@@ -52,7 +35,7 @@ self.addEventListener('push',event=>{
     vibrate:[120,60,120],
     data:{
       url:typeof payload.url==='string'?payload.url:(typeof payload.target_url==='string'?payload.target_url:'?openMessages=1'),
-      type:typeof payload.type==='string'?payload.type:'message',
+      type:typeof payload.type==='string'?payload.type:(String(payload.url||payload.target_url||'').includes('openFriends=1')?'friend_request':String(payload.url||payload.target_url||'').includes('openProfile=')?'album':'message'),
       conversationId:typeof payload.conversationId==='string'?payload.conversationId:'',
       profileId:typeof payload.profileId==='string'?payload.profileId:(typeof payload.actorId==='string'?payload.actorId:''),
       notificationId:typeof payload.notificationId==='string'?payload.notificationId:''
