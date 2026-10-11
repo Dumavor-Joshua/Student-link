@@ -1601,3 +1601,25 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
   overflow:hidden!important;
  }
 }
+
+
+/* Reliable visible close control and header shortcut on mobile notification overlay. */
+#studentlink-notification-history{box-sizing:border-box!important;padding-top:0!important;z-index:99999!important}
+#studentlink-notification-history>div:first-child{
+ position:sticky!important;top:0!important;z-index:100!important;
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ align-items:center!important;justify-content:space-between!important;
+ min-height:54px!important;background:var(--p)!important;
+ margin:0 -14px 10px!important;padding:10px 14px!important;
+ border-bottom:1px solid var(--line)!important;
+}
+#studentlink-notification-history #studentlink-notification-close{
+ display:inline-flex!important;visibility:visible!important;opacity:1!important;
+ pointer-events:auto!important;position:relative!important;z-index:101!important;
+ flex:0 0 auto!important;min-height:38px!important;padding:8px 14px!important;
+ color:var(--txt)!important;background:var(--p2)!important;
+ border:1px solid var(--line)!important;border-radius:9px!important;
+}
+@media(max-width:760px){
+ #studentlink-notification-history{top:calc(env(safe-area-inset-top,0px) + 12px)!important;right:5px!important;width:calc(100vw - 10px)!important;max-height:78dvh!important}
+}
