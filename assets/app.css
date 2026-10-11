@@ -1590,3 +1590,14 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
   opacity:0!important;visibility:hidden!important;pointer-events:none!important;
  }
 }
+
+
+/* Keep Trending Schools hidden while scrolling upward; show only at the page header. */
+@media(max-width:760px){
+ body:not(:has(.auth)) .trending-mobile-wrap.scroll-collapsed{
+  max-height:0!important;height:0!important;min-height:0!important;
+  padding:0!important;margin:0!important;border:0!important;
+  opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+  overflow:hidden!important;
+ }
+}
