@@ -224,6 +224,8 @@ assert.equal(new Set(schoolTest.VERIFIED_GHANA_SHS_TVET.map(schoolTest.schoolKey
 assert.equal(schoolTest.canonicalVerifiedSchoolName('PRESEC Legon'), "Presbyterian Boys' Secondary School (PRESEC Legon)", 'PRESEC aliases must resolve to the supplied canonical name');
 assert.equal(schoolTest.canonicalVerifiedSchoolName('Presby Senior High School, Legon'), "Presbyterian Boys' Secondary School (PRESEC Legon)", 'Older PRESEC spellings must resolve to the same canonical school');
 assert.equal(schoolTest.canonicalSchoolName('Riverside Community Senior High School'), schoolTest.canonicalSchoolName('Riverside Comunity Senior High School'), 'Unlisted but observed school spelling variants must converge on one stable name');
+schoolRuntime.S.schoolVariants=['Yaa Asantewaa Girls Senior High School','Yaa Asantewaa Girl Senior High School'];
+assert.equal(schoolTest.schoolKey(schoolTest.canonicalSchoolName('Yaa Asantewaa Girls Senior High School')), schoolTest.schoolKey(schoolTest.canonicalSchoolName('Yaa Asantewaa Girl Senior High School')), 'An exact directory spelling and a near-identical existing profile spelling must share one trending group');
 schoolRuntime.S.schoolVariants=['North Hill Senior High School','North Hill Senior High/Tech School'];
 assert.equal(schoolTest.canonicalSchoolName('North Hill Senior High School'), 'North Hill Senior High School', 'Observed schools with different SHS/SHTS types must not be merged');
 assert.equal(schoolTest.canonicalSchoolName('North Hill Senior High/Tech School'), 'North Hill Senior High/Tech School', 'Observed SHTS names must retain their distinct type');
