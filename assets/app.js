@@ -185,11 +185,11 @@ function installCanonicalSchoolDirectory(names){
   const legacyNames=[...VERIFIED_GHANA_SHS_TVET];
   const schoolType=value=>{
     const key=schoolKey(value);
-    return /\\bshts\\b/.test(key)?'shts':/\\bshs\\b/.test(key)?'shs':/\\btechinst\\b/.test(key)?'techinst':'';
+    return /\bshts\b/.test(key)?'shts':/\bshs\b/.test(key)?'shs':/\btechinst\b/.test(key)?'techinst':'';
   };
   const core=value=>schoolKey(value)
-    .replace(/\\b(shts|shs|techinst|senior|high|technical|institute|school|college|academy|of|the|and|for|girls|boys|community|presbyterian|presby|catholic|methodist|anglican|islamic|sda|stem|vocational|training|centre|center)\\b/g,' ')
-    .replace(/\\s+/g,' ').trim();
+    .replace(/\b(shts|shs|techinst|senior|high|technical|institute|school|college|academy|of|the|and|for|girls|boys|community|presbyterian|presby|catholic|methodist|anglican|islamic|sda|stem|vocational|training|centre|center)\b/g,' ')
+    .replace(/\s+/g,' ').trim();
   const candidatesFor=value=>{
     const inputType=schoolType(value),inputCore=core(value),a=schoolKey(value);
     const locationWords=['accra','kumasi','tamale','koforidua','cape coast','sekondi','takoradi','navrongo','mankessim','bekwai','suhum','aburi','legon','obuasi','ejisu','fiapre','sun y ani','sunyani','dunkwa','nkwatia','akw atia','mampong','asokwa','hohoe'];
