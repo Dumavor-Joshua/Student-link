@@ -26,11 +26,11 @@ These are design references, not claims of affiliation or copied assets.
 
 ## Ghana school directory and canonical grouping
 
-The machine-readable school checklist and alias index are in `data/ghana-shs-master.json`; the same list is embedded in `assets/app.js` so school selection still works during offline startup. Keep the JSON and embedded list synchronized when adding entries. The JSON records the sources used, known aliases, and current coverage. The frontend uses normalized school names plus explicit aliases and a conservative fuzzy matcher; uncertain matches are not automatically merged, and school/location distinctions such as SHS versus SHTS are preserved.
+The authoritative alphabetical display-name directory is `data/ghana-shs-master.json`. The frontend loads this file at startup and uses the older embedded list only as a fallback if the directory cannot be fetched. The service worker caches the JSON file for offline use. When updating school names, edit the master JSON first and keep the regression checks aligned.
 
-Trending-school counts are grouped by canonical name, and opening a school's student list filters profiles through the same canonicalization so existing spelling variants are shown together. Free-typed school names remain supported when the directory does not yet contain a name.
+School selection, trending-school counts, and school-student pages use one canonicalization path. Exact directory names and explicit aliases resolve immediately; legacy profile names are mapped only when the match is strong and unique. Ambiguous names, different campuses, and different school types should remain separate. The searchable school field still accepts a typed value when no safe directory match exists.
 
-**Coverage note:** the directory is an expanded working checklist, not yet a complete import of all public and private entries in the 2026 second-cycle register. The 2021 GES/TVET register enumerates 721 public SHS/technical-vocational institutions, while a 2026 directory update reports 955 public schools. See the source links in the JSON file before using this list for official admissions or placement decisions.
+**Coverage note:** the current list mirrors the supplied directory of 596 names. It is the product's display-name source, not an independently verified or exhaustive official register. Do not treat inclusion as proof of current school status or use this list as an official admissions/placement authority.
 
 ## Games
 
