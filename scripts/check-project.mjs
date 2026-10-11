@@ -127,7 +127,7 @@ assert.ok(notificationHardeningMigration.includes('create index if not exists no
 assert.ok(js.includes('async function sendBrowserNotification') && js.includes('registration.showNotification(title,options)'), 'Foreground alerts must use persistent service-worker notifications where available');
 assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
 assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
-assert.ok(html.includes('studentlink-school-directory-51') && sw.includes('studentlink-school-directory-51') && sw.includes('studentlink-shell-v51'), 'Notification fix must ship with matching fresh app-shell cache versions');
+assert.ok(html.includes('studentlink-school-directory-52') && sw.includes('studentlink-school-directory-52') && sw.includes('studentlink-shell-v52'), 'Notification fix must ship with matching fresh app-shell cache versions');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
 assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
@@ -157,7 +157,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-school-directory-51') && sw.includes('studentlink-school-directory-51') && sw.includes('studentlink-shell-v51'), 'Updated app and service-worker assets must use matching fresh cache versions');
+assert.ok(html.includes('studentlink-school-directory-52') && sw.includes('studentlink-school-directory-52') && sw.includes('studentlink-shell-v52'), 'Updated app and service-worker assets must use matching fresh cache versions');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -169,7 +169,7 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-school-directory-51') && sw.includes('studentlink-school-directory-51'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-school-directory-52') && sw.includes('studentlink-school-directory-52'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('data-message-nav-badge') && js.includes('messenger-unread-badge'), 'Messages navigation and chat rows must render unread badges');
 assert.ok(js.includes("count:'exact',head:true") && js.includes('updateMessageReadCursor'), 'Unread message counts must be computed and cleared when a visible chat is opened');
 assert.ok(js.includes("S.publicProfileId=null;S.view='messages';syncNavigationState();await renderView()}"), 'Profile and friends Message actions must use the shared view renderer');
