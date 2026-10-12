@@ -1662,3 +1662,69 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
 .profile-notification-actions .btn{min-height:42px;max-width:100%}
 #notifications-history-count:not([hidden]){display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;margin-left:5px;padding:0 5px;border-radius:999px;background:#e34855;color:#fff;font-size:11px;font-weight:800}
 @media(max-width:420px){.profile-notification-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}.profile-notification-actions .btn{width:100%;justify-content:center}}
+
+
+/* Tecno Spark 30C and compact Android phones: enforce the mobile layout below 768 CSS px.
+   Responsive breakpoints use the browser viewport, not the phone's physical pixel resolution. */
+@media screen and (max-width: 767px) {
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  body:not(:has(.auth)) .layout {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: calc(100dvh - 124px) !important;
+    min-height: 0 !important;
+    overflow: hidden;
+  }
+  body:not(:has(.auth)) .rightside {
+    display: none !important;
+  }
+  body:not(:has(.auth)) .main {
+    order: 1;
+    flex: 1 1 auto;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  body:not(:has(.auth)) .leftside {
+    order: 2;
+    display: flex !important;
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  body:not(:has(.auth)) .header {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  body:not(:has(.auth)) .main .card,
+  body:not(:has(.auth)) .main img,
+  body:not(:has(.auth)) .main video,
+  body:not(:has(.auth)) .main input,
+  body:not(:has(.auth)) .main textarea,
+  body:not(:has(.auth)) .main select,
+  body:not(:has(.auth)) .main button {
+    max-width: 100%;
+  }
+}
+@media screen and (max-width: 420px) {
+  body:not(:has(.auth)) .layout {
+    height: calc(100dvh - 124px) !important;
+  }
+  body:not(:has(.auth)) .main {
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+  }
+}
