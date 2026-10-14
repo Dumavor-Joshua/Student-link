@@ -69,9 +69,23 @@ async function rememberNotification(item){
   return fallbackNotificationQueue;
  }
 }
+async function clearNotificationQueue(){
+ try{
+  const db=await openNotificationQueueDB();
+  await new Promise((resolve,reject)=>{
+   const tx=db.transaction(NOTIFICATION_STORE,'readwrite');
+   tx.objectStore(NOTIFICATION_STORE).delete(NOTIFICATION_SUMMARY_KEY);
+   tx.oncomplete=resolve;
+   tx.onerror=()=>reject(tx.error||new Error('Could not clear notification queue'));
+   tx.onabort=()=>reject(tx.error||new Error('Notification queue clear aborted'));
+  });
+  db.close();
+ }catch(error){console.warn('StudentLink could not clear notification queue:',error)}
+ fallbackNotificationQueue=[];
+}
 function notificationLine(item){
  const heading=String(item.title||'StudentLink').trim();
- const message=String(item.body||'').replace(/\\s+/g,' ').trim();
+ const message=String(item.body||'').replace(/\s+/g,' ').trim();
  const shortened=message.length>110?message.slice(0,107)+'…':message;
  return shortened?heading+': '+shortened:heading;
 }
@@ -89,7 +103,7 @@ async function showGroupedStudentLinkNotification(title,options={}){
  const latest=items[items.length-1]||item;
  const count=items.length;
  const summaryTitle=count===1?'StudentLink · 1 notification':`StudentLink · ${count} notifications`;
- const summaryBody=items.map(notificationLine).join('\\n');
+ const summaryBody=items.map(notificationLine).join('\n');
  const summaryOptions={
   ...options,
   body:summaryBody,
@@ -172,6 +186,7 @@ async function openStudentLinkDestination(destination){
 }
 self.addEventListener('notificationclick',event=>{
   event.notification.close();
+  event.waitUntil(clearNotificationQueue());
   const data=event.notification.data||{};
   let destination=data.url||'?openMessages=1';
   if(data.type==='message'){
