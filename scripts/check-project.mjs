@@ -179,7 +179,7 @@ assert.ok(html.includes('studentlink-install-62') && sw.includes('studentlink-in
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
 assert.ok(js.includes('function messageBodyHTML') && js.includes('class="message-link"') && js.includes('target="_blank" rel="noopener noreferrer"'), 'Message URLs must be safely auto-linked and open in a new tab');
-assert.ok(js.includes('messageBodyHTML(m.body||\'\')'), 'Message text must be rendered with WhatsApp-style clickable links');
+assert.ok(js.includes('messageBodyHTML(displayBody)'), 'Message text must be rendered with WhatsApp-style clickable links');
 assert.ok(js.includes('id="attach-file"') && js.includes("message-files').upload"), 'Message composer must upload attachments to private Supabase Storage');
 assert.ok(js.includes('file.size>=5*1024*1024'), 'Message attachments must be strictly smaller than 5 MB');
 assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,attachment_size'), 'Messages must load attachment metadata');
@@ -187,6 +187,11 @@ assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})')
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
 assert.ok(html.includes('studentlink-install-62') && sw.includes('studentlink-install-62') && sw.includes('studentlink-shell-v62'), 'Updated messaging assets must bypass stale caches');
+assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
+assert.ok(js.includes('sendStickerMessage') && js.includes('[[sticker]]') && js.includes('sticker-picker'), 'Messages must support sticker sending and rendering');
+assert.ok(js.includes('studentlink_consume_view_once') && js.includes('[[view-once]]') && js.includes('view-once-open'), 'Messages must support one-time media opening');
+assert.ok(js.includes("if(!chat.dataset.viewOnceHandler)") && js.includes("!file.type.startsWith('image/')"), 'View-once controls must remain bound after chat rerenders and only accept images');
+assert.ok(css.includes('max-width:767px') && css.includes('max-width:340px') && css.includes('status-form'), 'Chat and statuses must support compact mobile viewports');
 assert.ok(js.includes('data-message-nav-badge') && js.includes('messenger-unread-badge'), 'Messages navigation and chat rows must render unread badges');
 assert.ok(js.includes("count:'exact',head:true") && js.includes('updateMessageReadCursor'), 'Unread message counts must be computed and cleared when a visible chat is opened');
 assert.ok(js.includes("S.publicProfileId=null;S.view='messages';syncNavigationState();await renderView()}"), 'Profile and friends Message actions must use the shared view renderer');
