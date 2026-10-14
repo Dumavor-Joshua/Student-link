@@ -190,6 +190,7 @@ assert.ok(html.includes('studentlink-install-62') && sw.includes('studentlink-in
 assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
 assert.ok(js.includes('sendStickerMessage') && js.includes('[[sticker]]') && js.includes('sticker-picker'), 'Messages must support sticker sending and rendering');
 assert.ok(js.includes('studentlink_consume_view_once') && js.includes('[[view-once]]') && js.includes('view-once-open'), 'Messages must support one-time media opening');
+assert.ok(js.includes("if(!chat.dataset.viewOnceHandler)") && js.includes("!file.type.startsWith('image/')"), 'View-once controls must remain bound after chat rerenders and only accept images');
 assert.ok(css.includes('max-width:767px') && css.includes('max-width:340px') && css.includes('status-form'), 'Chat and statuses must support compact mobile viewports');
 assert.ok(js.includes('data-message-nav-badge') && js.includes('messenger-unread-badge'), 'Messages navigation and chat rows must render unread badges');
 assert.ok(js.includes("count:'exact',head:true") && js.includes('updateMessageReadCursor'), 'Unread message counts must be computed and cleared when a visible chat is opened');
