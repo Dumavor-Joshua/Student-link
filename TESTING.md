@@ -82,3 +82,13 @@ Run these tests against a dedicated test Supabase project using two test account
 - [ ] Record release commit, date, device/browser coverage, known limitations, and rollback procedure.
 
 A checkbox means the test was actually performed and passed. Static source checks do not count as browser, database, push-delivery, or device verification.
+
+
+## Chat media and responsive release checks
+- [ ] Send and receive each built-in sticker in a two-account conversation; confirm ordinary text and attachments still work.
+- [ ] Send a view-once image. Confirm only the recipient sees the open control, the first open works, subsequent opens are refused, and non-image files cannot be sent as view-once.
+- [ ] Create a text status and an image status. Confirm active statuses are visible only to the owner and accepted friends, and no status is returned after its 24-hour expiry.
+- [ ] Confirm the `status-media` bucket is private and the status table plus view-once audit table have RLS enabled.
+- [ ] Test responsive layout at viewport widths 320, 340, 360, 375, 390, 414, 430, 600, 767, 768, 980, 1024, and 1440 CSS pixels. Include portrait and landscape where practical.
+- [ ] On small screens, confirm chat fills the main area, back-to-chats works, bottom navigation is not layered over the composer, and safe-area padding leaves the Send button accessible.
+- [ ] Test Android Chrome installed-PWA and browser modes; test iOS Safari separately if supported. Automated syntax/static checks are not substitutes for these browser checks.
