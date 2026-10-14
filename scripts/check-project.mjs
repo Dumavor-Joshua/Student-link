@@ -167,7 +167,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-school-directory-58') && sw.includes('studentlink-school-directory-58') && sw.includes('studentlink-shell-v58'), 'Updated app and service-worker assets must use matching fresh cache versions');
+assert.ok(html.includes('studentlink-perf-59') && sw.includes('studentlink-perf-59') && sw.includes('studentlink-shell-v59'), 'Updated app and service-worker assets must use matching fresh cache versions');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -179,7 +179,7 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-school-directory-58') && sw.includes('studentlink-school-directory-58'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-perf-59') && sw.includes('studentlink-perf-59') && sw.includes('studentlink-shell-v59'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('data-message-nav-badge') && js.includes('messenger-unread-badge'), 'Messages navigation and chat rows must render unread badges');
 assert.ok(js.includes("count:'exact',head:true") && js.includes('updateMessageReadCursor'), 'Unread message counts must be computed and cleared when a visible chat is opened');
 assert.ok(js.includes("S.publicProfileId=null;S.view='messages';syncNavigationState();await renderView()}"), 'Profile and friends Message actions must use the shared view renderer');
@@ -193,7 +193,7 @@ assert.equal((js.match(/function scrambleWord\(/g)||[]).length, 1, 'Word scrambl
 assert.ok(css.includes('.navitem span.nav-unread-badge{display:inline-flex}'), 'Unread conversation count must remain visible in mobile navigation');
 
 assert.ok(js.includes("studentlink_conversation_summaries") && js.includes('last_read_at'), 'Unread counts must use shared Supabase read receipts through the batched summary RPC');
-assert.ok(js.includes('await directoryReady;S.session=session;await loadProfile();'), 'Authentication restoration must run in parallel with school-directory loading');
+assert.ok(js.includes('S.session=session;await loadProfile();') && !js.includes('await directoryReady;S.session=session;'), 'Authentication restoration must not wait for school-directory loading');
 assert.ok(js.includes("from('conversation_reads').upsert({conversation_id:conversationId,user_id:S.session.user.id,last_read_at:timestamp}"), 'Opening a conversation must persist its read cursor to Supabase');
 assert.ok(!js.includes('id="messages-shortcut"') && !js.includes('data-message-header-badge'), 'The header must not show a separate Messages button');
 assert.ok(js.includes("nav('messages','💬','Messages')"), 'Messages must remain accessible from the sidebar navigation');
