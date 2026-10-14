@@ -733,13 +733,18 @@ function setupNotificationControl(){
 }
 async function sendBrowserNotification(title,body,tag,destination='?openMessages=1'){
   if(!('Notification' in window)||Notification.permission!=='granted')return;
-  const options={body:String(body||''),tag:String(tag||'studentlink-alert'),icon:new URL('./assets/icon-192.svg',document.baseURI).href,badge:new URL('./assets/icon-192.svg',document.baseURI).href,renotify:false,silent:false,data:{url:new URL(destination,document.baseURI).href}};
+  const options={body:String(body||''),tag:String(tag||'studentlink-alert'),icon:new URL('./assets/icon-192.svg',document.baseURI).href,badge:new URL('./assets/icon-192.svg',document.baseURI).href,renotify:true,silent:false,data:{url:new URL(destination,document.baseURI).href}};
   try{
-    // Persistent notifications are the compatible path for mobile browsers and installed PWAs.
-    // The Notification constructor is intentionally only a desktop fallback.
+    // Route notifications through the service worker so foreground and background
+    // alerts share one grouped notification instead of creating a new card per event.
     if('serviceWorker' in navigator){
       const registration=await navigator.serviceWorker.ready;
-      if(registration&&typeof registration.showNotification==='function'){
+      const worker=registration.active||registration.waiting||registration.installing;
+      if(worker){
+        worker.postMessage({type:'STUDENTLINK_SHOW_NOTIFICATION',title:String(title||'StudentLink'),options});
+        return;
+      }
+      if(typeof registration.showNotification==='function'){
         await registration.showNotification(title,options);
         return;
       }
