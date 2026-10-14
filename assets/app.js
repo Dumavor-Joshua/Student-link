@@ -1022,8 +1022,9 @@ async function sendStickerMessage(conversationId,sticker){
  catch(error){console.error('Sticker send failed:',error);toast('Sticker could not be sent. Try again.')}
 }
 async function openViewOnceMessage(messageId){
- try{const {data:path,error}=await db.rpc('studentlink_consume_view_once',{p_message_id:messageId});if(error)throw error;if(!path){toast('This view-once photo has already been opened or is unavailable.');return;}const {data,error:signedError}=await db.storage.from('message-files').createSignedUrl(path,60);if(signedError)throw signedError;const win=window.open(data.signedUrl,'_blank','noopener,noreferrer');if(!win)toast('Your browser blocked the photo. Allow pop-ups and try again.');await openConversation(S.chat)}
- catch(error){console.error('View-once open failed:',error);toast('This photo could not be opened. It may already have been viewed.')}
+ const win=window.open('about:blank','_blank');if(win)win.opener=null;
+ try{const {data:path,error}=await db.rpc('studentlink_consume_view_once',{p_message_id:messageId});if(error)throw error;if(!path){if(win)win.close();toast('This view-once photo has already been opened or is unavailable.');return;}const {data,error:signedError}=await db.storage.from('message-files').createSignedUrl(path,60);if(signedError)throw signedError;if(win)win.location.replace(data.signedUrl);else toast('Your browser blocked the photo. Allow pop-ups and try again.');await openConversation(S.chat)}
+ catch(error){if(win)win.close();console.error('View-once open failed:',error);toast('This photo could not be opened. It may already have been viewed.')}
 }
 function setupStatusPanel(){
  const form=$('#status-form'),list=$('#status-list');if(!form||!list)return;
