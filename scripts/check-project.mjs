@@ -261,3 +261,7 @@ assert.equal(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High School'),
 assert.equal(schoolTest.schoolKey(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High/Tech School')), schoolTest.schoolKey('Vakpo Senior High/Tech School'), 'A similarly named SHTS campus must retain its canonical key');
 assert.notEqual(schoolTest.schoolKey(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High/Tech School')), schoolTest.schoolKey(schoolTest.canonicalVerifiedSchoolName('Vakpo Senior High School')), 'A similarly named SHTS campus must not merge with the ordinary SHS');
 assert.notEqual(schoolTest.schoolKey('St. John’s Senior High School, Sekondi'), schoolTest.schoolKey('St. John’s Grammar Senior High School'), 'Different schools with shared words must retain distinct keys');
+
+assert.ok(js.includes('setupStudentLinkImageViewer') && js.includes('studentlink-image-viewer'), 'In-app image preview must be wired through delegated click handling');
+assert.ok(css.includes('.studentlink-image-viewer') && css.includes('image-viewer-prev'), 'Image preview must have responsive overlay and image navigation styles');
+assert.ok(html.includes('studentlink-install-63') && sw.includes('studentlink-shell-v63'), 'Image preview release must refresh shell and service-worker cache versions');
