@@ -144,7 +144,7 @@ assert.ok(js.includes('async function sendBrowserNotification') && js.includes('
 assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
 assert.ok(js.includes("pushParams.get('openProfile')") && js.includes("item.type==='message'") && js.includes('S.publicProfileId=item.actor_id'), 'Notification links must open message conversations or the relevant profile');
 assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
-assert.ok(html.includes('studentlink-install-62') && sw.includes('studentlink-install-62') && sw.includes('studentlink-shell-v62'), 'Performance fix must ship with matching fresh app-shell cache versions');
+assert.ok(html.includes('studentlink-install-64') && sw.includes('studentlink-install-64') && sw.includes('studentlink-shell-v64'), 'Performance fix must ship with matching fresh app-shell cache versions');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
 assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
@@ -183,7 +183,7 @@ assert.ok(js.includes('messageBodyHTML(displayBody)'), 'Message text must be ren
 assert.ok(js.includes('id="attach-file"') && js.includes("message-files').upload"), 'Message composer must upload attachments to private Supabase Storage');
 assert.ok(js.includes('file.size>=5*1024*1024'), 'Message attachments must be strictly smaller than 5 MB');
 assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,attachment_size'), 'Messages must load attachment metadata');
-assert.ok(js.includes('createSignedUrl(m.attachment_path,3600,{download:true})'), 'Message files must use expiring download links');
+assert.ok(js.includes('createSignedUrl(m.attachment_path,3600)'), 'Message files must use expiring signed URLs suitable for inline previews');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
 assert.ok(html.includes('studentlink-install-62') && sw.includes('studentlink-install-62') && sw.includes('studentlink-shell-v62'), 'Updated messaging assets must bypass stale caches');
