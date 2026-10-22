@@ -1041,10 +1041,15 @@ async function renderMessageRows(rows){
    let attachmentHTML='';
    if(m.attachment_path){
      try{
-       const {data:signed,error:signedError}=await db.storage.from('message-files').createSignedUrl(m.attachment_path,3600,{download:true});
+       const {data:signed,error:signedError}=await db.storage.from('message-files').createSignedUrl(m.attachment_path,3600);
        if(signedError)throw signedError;
-       if(signed?.signedUrl)attachmentHTML='<a class="message-attachment" href="'+esc(signed.signedUrl)+'" target="_blank" rel="noopener noreferrer" download="'+esc(m.attachment_name||'attachment')+'">📎 '+esc(m.attachment_name||'Download attachment')+' <span class="message-attachment-size">'+esc(formatAttachmentSize(m.attachment_size))+'</span></a>';
-       else attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>';
+       if(signed?.signedUrl){
+         const fileName=esc(m.attachment_name||'attachment');
+         const fileSize=esc(formatAttachmentSize(m.attachment_size));
+         const isImage=String(m.attachment_mime_type||'').toLowerCase().startsWith('image/');
+         const imagePreview=isImage?'<img class="message-attachment-image" src="'+esc(signed.signedUrl)+'" alt="'+fileName+'" loading="lazy" decoding="async">':'';
+         attachmentHTML=(imagePreview?'<div class="message-attachment-image-wrap">'+imagePreview+'</div>':'')+'<a class="message-attachment" href="'+esc(signed.signedUrl)+'" target="_blank" rel="noopener noreferrer" download="'+fileName+'">'+(isImage?'⬇️ Download image':'📎 '+fileName)+' <span class="message-attachment-size">'+fileSize+'</span></a>';
+       }else attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>';
      }catch(_){attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>'}
    }
    const rawBody=String(m.body||''),isOnce=rawBody.startsWith('[[view-once]] '),isSticker=rawBody.startsWith('[[sticker]]'),displayBody=isOnce?rawBody.slice(14):isSticker?'':rawBody;let finalAttachment=attachmentHTML;if(isOnce&&m.attachment_path)finalAttachment=m.sender_id===S.session.user.id?'<span class="view-once-label">◉ View-once photo sent</span>':openedOnceIds.has(m.id)?'<span class="view-once-label">✓ Photo already viewed</span>':'<button type="button" class="view-once-open" data-view-once="'+esc(m.id)+'">◉ Tap to view photo once</button>';const stickerHTML=isSticker?'<div class="message-sticker" role="img" aria-label="Sticker">'+esc(rawBody.slice(11))+'</div>':'';return '<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+stickerHTML+(displayBody?messageBodyHTML(displayBody):'')+(finalAttachment?'<div class="message-attachment-wrap">'+finalAttachment+'</div>':'')+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>';
