@@ -1621,3 +1621,21 @@ window.addEventListener('error',event=>{
 });
 
 startStudentLink();
+
+
+/* In-app image viewer: delegated so feed, profile and status images work after rerenders. */
+(function setupStudentLinkImageViewer(){
+ if(typeof document==='undefined'||document.documentElement.dataset.studentlinkImageViewer==='ready')return;
+ document.documentElement.dataset.studentlinkImageViewer='ready';
+ let overlay=null,previousFocus=null;
+ function close(){if(!overlay)return;overlay.remove();overlay=null;document.body.classList.remove('image-viewer-open');if(previousFocus&&previousFocus.isConnected)previousFocus.focus();previousFocus=null;}
+ function open(img){
+  const source=img.currentSrc||img.src;if(!source)return;
+  if(!overlay){overlay=document.createElement('div');overlay.className='studentlink-image-viewer';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Image preview');overlay.innerHTML='<button type="button" class="image-viewer-close" aria-label="Close image preview">×</button><button type="button" class="image-viewer-prev" aria-label="Previous image" hidden>‹</button><img class="image-viewer-full" alt="Expanded image preview"><button type="button" class="image-viewer-next" aria-label="Next image" hidden>›</button><div class="image-viewer-caption" aria-live="polite"></div>';document.body.appendChild(overlay);overlay.addEventListener('click',e=>{if(e.target===overlay||e.target.closest('.image-viewer-close'))close();});overlay.querySelector('.image-viewer-prev').addEventListener('click',()=>step(-1));overlay.querySelector('.image-viewer-next').addEventListener('click',()=>step(1));}
+  const candidates=[...document.querySelectorAll('.post-image, .profile-public-post img, .status-panel img, .message-bubble img')].filter(node=>node.complete&&node.naturalWidth>0&&node.offsetParent!==null);
+  const index=Math.max(0,candidates.indexOf(img));overlay._images=candidates;overlay._index=index;previousFocus=document.activeElement;overlay.querySelector('.image-viewer-full').src=source;overlay.querySelector('.image-viewer-full').alt=img.alt||'Expanded image preview';overlay.querySelector('.image-viewer-caption').textContent=(img.alt||'Image preview')+' · Tap outside or press Escape to close';const multi=candidates.length>1;overlay.querySelector('.image-viewer-prev').hidden=!multi;overlay.querySelector('.image-viewer-next').hidden=!multi;document.body.classList.add('image-viewer-open');overlay.querySelector('.image-viewer-close').focus();
+ }
+ function step(delta){if(!overlay||!overlay._images?.length)return;overlay._index=(overlay._index+delta+overlay._images.length)%overlay._images.length;const img=overlay._images[overlay._index];overlay.querySelector('.image-viewer-full').src=img.currentSrc||img.src;overlay.querySelector('.image-viewer-full').alt=img.alt||'Expanded image preview';overlay.querySelector('.image-viewer-caption').textContent=(img.alt||'Image preview')+' · '+(overlay._index+1)+' of '+overlay._images.length;}
+ document.addEventListener('click',e=>{const img=e.target.closest('img.post-image, .profile-public-post img, .status-panel img, .message-bubble img');if(!img||e.target.closest('a'))return;if(img.complete&&img.naturalWidth>0)open(img);});
+ document.addEventListener('keydown',e=>{if(!overlay)return;if(e.key==='Escape'){e.preventDefault();close();}else if(e.key==='ArrowLeft')step(-1);else if(e.key==='ArrowRight')step(1);});
+})();
