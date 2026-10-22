@@ -1748,3 +1748,10 @@ body:not(:has(.auth)) .header-message-badge[hidden],body:not(:has(.auth)) #notif
 body.image-viewer-open{overflow:hidden!important;touch-action:none}
 @media(max-width:480px){.studentlink-image-viewer{padding:56px 6px 48px}.studentlink-image-viewer .image-viewer-full{max-width:100%;max-height:calc(100dvh - 112px);border-radius:4px}.studentlink-image-viewer .image-viewer-prev{left:4px}.studentlink-image-viewer .image-viewer-next{right:4px}.studentlink-image-viewer button{min-width:42px;min-height:42px}.studentlink-image-viewer .image-viewer-caption{left:52px;right:52px}}
 @media(prefers-reduced-motion:reduce){.studentlink-image-viewer *{scroll-behavior:auto!important}}
+
+/* WhatsApp-style inline image attachments in chat bubbles. */
+.message-attachment-image-wrap{display:block;max-width:min(100%,360px);margin:6px 0 4px;overflow:hidden;border-radius:12px;background:var(--p2,#203454)}
+.message-attachment-image{display:block;width:auto;max-width:100%;max-height:360px;min-width:0;object-fit:contain;border-radius:12px;cursor:zoom-in}
+.message-attachment-image-wrap+.message-attachment{display:inline-flex;align-items:center;gap:6px;margin-top:3px}
+.message-bubble .message-attachment-image{touch-action:manipulation}
+@media(max-width:600px){.message-attachment-image-wrap{max-width:min(76vw,320px)}.message-attachment-image{max-height:300px}}
