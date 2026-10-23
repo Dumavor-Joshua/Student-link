@@ -1,66 +1,10 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1224"><title>StudentLink — Connect with classmates</title><link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=studentlink-install-62"><link rel="manifest" href="./manifest.json?v=studentlink-install-62"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="StudentLink"><link rel="apple-touch-icon" href="assets/icon-192.png?v=studentlink-install-62"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin><link rel="stylesheet" href="assets/app.css?v=studentlink-school-directory-64"></head><body><div id="app" class="startup-skeleton" role="status" aria-live="polite" aria-label="Loading StudentLink">
-  <style>
-    .startup-skeleton{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:0;background:#101b35;color:#f5f7ff;font-family:system-ui,-apple-system,sans-serif}
-    .startup-skeleton .sk-top{height:68px;padding:0 20px;display:flex;align-items:center;gap:16px;background:#172746;border-bottom:1px solid #354a6d}
-    .startup-skeleton .sk-brand{width:142px;height:24px;border-radius:6px;flex:none}
-    .startup-skeleton .sk-search{height:34px;max-width:460px;flex:1;border:1px solid #354a6d;border-radius:8px}
-    .startup-skeleton .sk-top-action{width:36px;height:36px;border-radius:50%;border:1px solid #354a6d;flex:none}
-    .startup-skeleton .sk-shimmer{background:linear-gradient(100deg,#203454 20%,#2a4064 38%,#203454 56%);background-size:220% 100%;animation:studentlink-sk-shimmer 1.5s ease-in-out infinite}
-    .startup-skeleton .sk-wrap{width:100%;max-width:1500px;flex:1;box-sizing:border-box;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr) 280px;min-height:calc(100vh - 68px);min-height:calc(100dvh - 68px)}
-    .startup-skeleton .sk-side{padding:16px;background:#172746;border-right:1px solid #354a6d}
-    .startup-skeleton .sk-main{padding:16px;min-width:0;display:flex;flex-direction:column;gap:12px}
-    .startup-skeleton .sk-outline{border:1px solid #354a6d;border-radius:8px;background:#172746;padding:16px;margin-bottom:0}
-    .startup-skeleton .sk-line{height:10px;border-radius:5px;margin:9px 0}
-    .startup-skeleton .sk-line.short{width:38%}.startup-skeleton .sk-line.medium{width:65%}.startup-skeleton .sk-line.long{width:88%}
-    .startup-skeleton .sk-nav{height:38px;border-radius:6px;margin:10px 0}
-    .startup-skeleton .sk-post-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-    .startup-skeleton .sk-circle{width:40px;height:40px;border-radius:50%;flex:none}
-    .startup-skeleton .sk-compose{height:42px;border:1px solid #354a6d;border-radius:6px;margin-top:14px}
-    .startup-skeleton .sk-post-image{height:120px;border:1px solid #354a6d;border-radius:6px;margin-top:14px;background:#14213b}
-    .startup-skeleton .sk-label{font-size:13px;text-align:center;color:#b7c5df;padding:0 12px 16px}
-    @keyframes studentlink-sk-shimmer{to{background-position-x:-220%}}
-    @media(max-width:900px){.startup-skeleton .sk-wrap{grid-template-columns:190px minmax(0,1fr)}.startup-skeleton .sk-right{display:none}}
-    @media(max-width:620px){.startup-skeleton .sk-top{height:60px;padding:0 12px;gap:10px;flex:none}.startup-skeleton .sk-brand{width:96px}.startup-skeleton .sk-search{min-width:0}.startup-skeleton .sk-top-action{width:30px;height:30px}.startup-skeleton .sk-label{flex:none}.startup-skeleton .sk-wrap{flex:1;grid-template-columns:minmax(0,1fr);min-height:calc(100dvh - 96px)}.startup-skeleton .sk-side{display:none}.startup-skeleton .sk-main{padding:10px;gap:10px;min-height:0}.startup-skeleton .sk-outline{flex:1;min-height:120px;padding:12px;display:flex;flex-direction:column;justify-content:space-around}.startup-skeleton .sk-post-head{margin-bottom:8px}.startup-skeleton .sk-post-image{flex:1;min-height:80px;height:auto}.startup-skeleton .sk-line{margin:6px 0}}
-    @media(prefers-reduced-motion:reduce){.startup-skeleton .sk-shimmer{animation:none}}
-  </style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1224"><title>StudentLink — Connect with classmates</title><link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=studentlink-install-62"><link rel="manifest" href="./manifest.json?v=studentlink-install-62"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="StudentLink"><link rel="apple-touch-icon" href="assets/icon-192.png?v=studentlink-install-62"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin><link rel="stylesheet" href="assets/app.css?v=studentlink-school-directory-64"><link rel="stylesheet" href="assets/startup.css?v=studentlink-split-65"></head><body><div id="app" class="startup-skeleton" role="status" aria-live="polite" aria-label="Loading StudentLink">
+  
   <div class="sk-top"><div class="sk-brand sk-shimmer"></div><div class="sk-search"></div><div class="sk-top-action sk-shimmer"></div><div class="sk-top-action sk-shimmer"></div></div>
-  <div class="sk-label" style="padding-top:12px">Getting StudentLink ready…</div>
+  <div class="sk-label" class="sk-label-top">Getting StudentLink ready…</div>
   <div class="sk-wrap">
-    <aside class="sk-side"><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div></div><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-line long sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></aside>
-    <main class="sk-main"><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-compose"></div></div><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div><div class="sk-post-image"></div><div class="sk-line short sk-shimmer"></div></div><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div></div></main>
-    <aside class="sk-side sk-right"><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div style="flex:1"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div></div></aside>
+    <aside class="sk-side"><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div class="sk-flex"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div><div class="sk-nav sk-shimmer"></div></div><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-line long sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></aside>
+    <main class="sk-main"><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-compose"></div></div><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div class="sk-flex"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div><div class="sk-post-image"></div><div class="sk-line short sk-shimmer"></div></div><div class="sk-outline"><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div class="sk-flex"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div></div></main>
+    <aside class="sk-side sk-right"><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-line long sk-shimmer"></div><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div><div class="sk-outline"><div class="sk-line medium sk-shimmer"></div><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div class="sk-flex"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div><div class="sk-post-head"><div class="sk-circle sk-shimmer"></div><div class="sk-flex"><div class="sk-line medium sk-shimmer"></div><div class="sk-line short sk-shimmer"></div></div></div></div></aside>
   </div>
-</div><div class="modalbg" id="modalbg" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modal"><button type="button" id="modalclose" aria-label="Close window" onclick="document.getElementById('modalbg').classList.remove('show')" style="position:absolute;top:10px;right:10px">✕</button><div id="modaltitle" style="font-size:18px;font-weight:600;margin-bottom:16px"></div><div id="modalcontent"></div></div></div><script>
-(function(){
-  window.studentLinkInstallPrompt=null;
-  window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();window.studentLinkInstallPrompt=event;var button=document.getElementById('install-app');if(button)button.hidden=false;});
-  window.addEventListener('appinstalled',function(){window.studentLinkInstallPrompt=null;var button=document.getElementById('install-app');if(button)button.hidden=true;});
-  var appSrc='assets/app.js?v=studentlink-install-64';
-  var sources=[
-    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
-    'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'
-  ];
-  function loadApp(){
-    var app=document.createElement('script');
-    app.src=appSrc;
-    app.onerror=function(){
-      var root=document.getElementById('app');
-      if(root)root.innerHTML='<section style="max-width:620px;margin:24px auto;padding:24px;text-align:left;font-family:system-ui,sans-serif"><h2>StudentLink could not load</h2><p>The app script could not be downloaded. Check your connection, then reload this page.</p><button type="button" onclick="window.location.reload()">Reload StudentLink</button></section>';
-    };
-    document.body.appendChild(app);
-  }
-  function loadLibrary(index){
-    if(window.supabase&&typeof window.supabase.createClient==='function'){loadApp();return;}
-    if(index>=sources.length){loadApp();return;}
-    var script=document.createElement('script');
-    script.src=sources[index];
-    script.onload=function(){
-      if(window.supabase&&typeof window.supabase.createClient==='function')loadApp();
-      else loadLibrary(index+1);
-    };
-    script.onerror=function(){loadLibrary(index+1);};
-    document.head.appendChild(script);
-  }
-  loadLibrary(0);
-})();
-</script><script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-install-64").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}</script></body></html>
+</div><div class="modalbg" id="modalbg" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modal"><button type="button" id="modalclose" aria-label="Close window" class="modal-close">✕</button><div id="modaltitle" class="modal-title"></div><div id="modalcontent"></div></div></div><script src="assets/bootstrap.js?v=studentlink-split-65" defer></script></body></html>
