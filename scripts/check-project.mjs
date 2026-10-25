@@ -232,7 +232,7 @@ assert.ok(js.includes('messageBodyHTML(displayBody)'), 'Message text must be ren
 assert.ok(js.includes('id="attach-file"') && js.includes("message-files').upload"), 'Message composer must upload attachments to private Supabase Storage');
 assert.ok(js.includes('file.size>=5*1024*1024'), 'Message attachments must be strictly smaller than 5 MB');
 assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,attachment_size'), 'Messages must load attachment metadata');
-assert.ok(js.includes('createSignedUrl(m.attachment_path,3600)'), 'Message files must use expiring signed URLs suitable for inline previews');
+assert.ok(js.includes('createSignedUrls(regularPaths,3600)') && js.includes("createSignedUrl(path,60)"), 'Regular message files must use batched expiring URLs while view-once files use short-lived URLs only after consumption');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
 assert.ok(html.includes('studentlink-refactor-79') && sw.includes('studentlink-refactor-79') && sw.includes('studentlink-shell-v83'), 'Updated messaging assets must bypass stale caches');
