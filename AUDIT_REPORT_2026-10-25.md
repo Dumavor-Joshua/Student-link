@@ -68,7 +68,8 @@ These require a dedicated test Supabase project and real browser/device testing.
 ## Changes in this refactor branch so far
 
 - Fixed the duplicate `class` attribute in the startup skeleton.
-- Added a regression assertion to catch duplicate class attributes and require the corrected startup label.
+- Removed one provably identical duplicate `.feed-controls` rule from `assets/css/feed.css`; the remaining rule preserves the same styling.
+- Added regression assertions for duplicate class attributes, duplicate IDs in the HTML shell, missing local asset references, and the duplicate feed-controls rule.
 - Kept the work on a separate branch so `main` remains untouched while broader changes are reviewed.
 
 ## Recommended implementation order
