@@ -17,6 +17,6 @@ jobs:
         with:
           node-version: 20
       - name: Check JavaScript syntax
-        run: node --check assets/app.js
+        run: for file in assets/js/*.js; do node --check "$file"; done
       - name: Run static project checks
         run: node scripts/check-project.mjs

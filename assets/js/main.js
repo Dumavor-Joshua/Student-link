@@ -104,7 +104,7 @@ async function startStudentLink(){
   const app=document.getElementById('app');
   try{
     if(!configured){
-      renderAuth('signup','Setup needed: create Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/app.js.');
+      renderAuth('signup','Setup needed: create Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/js/core.js.');
       return;
     }
     // Fetch the school directory while Supabase restores the session instead of blocking it first.

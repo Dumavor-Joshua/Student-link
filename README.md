@@ -5,8 +5,9 @@ StudentLink is a student-focused social platform for school communities, posts, 
 ## Repository map
 
 - `index.html` — app shell, CDN fallback loader, PWA registration.
-- `assets/app.js` — client-side routing, Supabase integration, social features, notifications, and game interfaces.
-- `assets/app.css` — responsive design system and component styling.
+- `assets/js/` — ordered classic-script modules for shared state, notifications, feed, messaging/status, games, profile, and startup.
+- `assets/css/` — shared design tokens/layout and feature-specific stylesheets linked directly by `index.html` for parallel downloads.
+- `assets/bootstrap.js` — Supabase CDN fallback and ordered parallel module loader.
 - `sw.js` and `manifest.json` — offline app shell, install metadata, and push-notification click handling.
 - `supabase_schema.sql` — base database schema, triggers, and row-level security.
 - `supabase/migrations/` — incremental database changes. Apply each migration to an existing database in chronological order.
@@ -45,7 +46,7 @@ Online multiplayer requires a signed-in account, Supabase RPCs/tables from the g
 
 1. Create a Supabase project and configure the allowed site URL plus redirect URLs for each deployed origin.
 2. Run `supabase_schema.sql` for a new database, then apply the required migrations in `supabase/migrations/` in chronological order.
-3. Set the Supabase project URL and publishable/anon key in `assets/app.js`. Never expose a service-role or secret key in browser code.
+3. Set the Supabase project URL and publishable/anon key in `assets/js/core.js`. Never expose a service-role or secret key in browser code.
 4. Enable Realtime for the tables used by active live features, including `messages`, `friendships`, and multiplayer game tables.
 5. Run the static regression suite with Node.js: `node scripts/check-project.mjs`.
 
