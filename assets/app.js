@@ -1,7 +1,7 @@
 // Configure these two values from your own Supabase project. Never use a service-role key here.
 const SUPABASE_URL='https://fpdcetkvxdryogtvldax.supabase.co';const SUPABASE_ANON_KEY='sb_publishable_HMzJqdTbufV4vvJ6QyWl5A_-0PPa0Rs';
 const configured=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('YOUR_')&&!SUPABASE_ANON_KEY.includes('YOUR_');const db=configured&&window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
-const $=s=>document.querySelector(s),$=s=>[...document.querySelectorAll(s)];
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 let activeStatusUserIds=new Set();
 function safeSessionGet(key){try{return window.sessionStorage.getItem(key)}catch(_){return null}}function safeSessionSet(key,value){try{window.sessionStorage.setItem(key,value);return true}catch(_){return false}}function safeSessionRemove(key){try{window.sessionStorage.removeItem(key)}catch(_){}}const S={session:null,profile:null,schools:[],schoolVariants:[],view:'feed',publicProfileId:null,schoolFilter:'',feedMode:'all',feedOrderIds:[],feedOrderMode:'',friends:[],requests:[],convos:[],chat:null,replyOnOpen:false,channel:null,tttChannel:null,tttGameId:null,onlineGameChannel:null,cfGameId:null,rpsGameId:null,rpsMode:'computer',game:'',ttt:Array(9).fill(0),notifiedMessageIds:new Set(),notifiedFriendshipIds:new Set(),messageReadAt:{},schoolStatsCache:null,schoolStatsLoadedAt:0,schoolStatsPromise:null,};
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function initials(s='S'){return esc(s.trim().split(/\s+/).slice(0,2).map(x=>x[0].toUpperCase()).join(''))}
