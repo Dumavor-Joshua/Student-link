@@ -95,24 +95,34 @@ async function openViewOnceMessage(messageId){
  catch(error){if(win)win.close();console.error('View-once open failed:',error);toast('This photo could not be opened. It may already have been viewed.')}
 }
 async function renderMessageRows(rows){
- const onceIds=(rows||[]).filter(m=>String(m.body||'').startsWith('[[view-once]] ')).map(m=>m.id);let openedOnceIds=new Set();if(onceIds.length&&S.session?.user?.id){try{const {data}=await db.from('message_view_once_opens').select('message_id').in('message_id',onceIds);openedOnceIds=new Set((data||[]).map(r=>r.message_id))}catch(_){}}
- return Promise.all((rows||[]).map(async m=>{
+ const messages=rows||[];
+ const onceMessages=messages.filter(m=>String(m.body||'').startsWith('[[view-once]] '));
+ const onceIds=onceMessages.map(m=>m.id);
+ let openedOnceIds=new Set();
+ if(onceIds.length&&S.session?.user?.id){try{const {data,error}=await db.from('message_view_once_opens').select('message_id').in('message_id',onceIds);if(!error)openedOnceIds=new Set((data||[]).map(r=>r.message_id))}catch(_){}}
+ // Batch signed URL creation: one Storage request instead of one request per attachment.
+ // View-once media is deliberately excluded so it cannot be previewed before consumption.
+ const regularPaths=[...new Set(messages.filter(m=>m.attachment_path&&!String(m.body||'').startsWith('[[view-once]] ')).map(m=>m.attachment_path))];
+ const signedByPath=new Map();
+ if(regularPaths.length){try{const {data,error}=await db.storage.from('message-files').createSignedUrls(regularPaths,3600);if(!error)(data||[]).forEach(item=>{if(item.path&&item.signedUrl)signedByPath.set(item.path,item.signedUrl)})}catch(error){console.warn('Could not sign message attachments:',error)}}
+ return messages.map(m=>{
    let attachmentHTML='';
-   if(m.attachment_path){
-     try{
-       const {data:signed,error:signedError}=await db.storage.from('message-files').createSignedUrl(m.attachment_path,3600);
-       if(signedError)throw signedError;
-       if(signed?.signedUrl){
-         const fileName=esc(m.attachment_name||'attachment');
-         const fileSize=esc(formatAttachmentSize(m.attachment_size));
-         const isImage=String(m.attachment_mime_type||'').toLowerCase().startsWith('image/');
-         const imagePreview=isImage?'<img class="message-attachment-image" src="'+esc(signed.signedUrl)+'" alt="'+fileName+'" loading="lazy" decoding="async">':'';
-         attachmentHTML=(imagePreview?'<div class="message-attachment-image-wrap">'+imagePreview+'</div>':'')+'<a class="message-attachment" href="'+esc(signed.signedUrl)+'" target="_blank" rel="noopener noreferrer" download="'+fileName+'">'+(isImage?'⬇️ Download image':'📎 '+fileName)+' <span class="message-attachment-size">'+fileSize+'</span></a>';
-       }else attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>';
-     }catch(_){attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>'}
+   const rawBody=String(m.body||''),isOnce=rawBody.startsWith('[[view-once]] '),isSticker=rawBody.startsWith('[[sticker]]'),displayBody=isOnce?rawBody.slice(14):isSticker?'':rawBody;
+   if(m.attachment_path&&!isOnce){
+     const signedUrl=signedByPath.get(m.attachment_path);
+     if(signedUrl){
+       const fileName=esc(m.attachment_name||'attachment');
+       const fileSize=esc(formatAttachmentSize(m.attachment_size));
+       const isImage=String(m.attachment_mime_type||'').toLowerCase().startsWith('image/');
+       const imagePreview=isImage?'<img class="message-attachment-image" data-message-image-preview src="'+esc(signedUrl)+'" alt="'+fileName+'" loading="lazy" decoding="async">':'';
+       attachmentHTML=(imagePreview?'<div class="message-attachment-image-wrap">'+imagePreview+'</div>':'')+'<a class="message-attachment" href="'+esc(signedUrl)+'" target="_blank" rel="noopener noreferrer" download="'+fileName+'">'+(isImage?'⬇️ Download image':'📎 '+fileName)+' <span class="message-attachment-size">'+fileSize+'</span></a>';
+     }else attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>';
    }
-   const rawBody=String(m.body||''),isOnce=rawBody.startsWith('[[view-once]] '),isSticker=rawBody.startsWith('[[sticker]]'),displayBody=isOnce?rawBody.slice(14):isSticker?'':rawBody;let finalAttachment=attachmentHTML;if(isOnce&&m.attachment_path)finalAttachment=m.sender_id===S.session.user.id?'<span class="view-once-label">◉ View-once photo sent</span>':openedOnceIds.has(m.id)?'<span class="view-once-label">✓ Photo already viewed</span>':'<button type="button" class="view-once-open" data-view-once="'+esc(m.id)+'">◉ Tap to view photo once</button>';const stickerHTML=isSticker?'<div class="message-sticker" role="img" aria-label="Sticker">'+esc(rawBody.slice(11))+'</div>':'';return '<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+stickerHTML+(displayBody?messageBodyHTML(displayBody):'')+(finalAttachment?'<div class="message-attachment-wrap">'+finalAttachment+'</div>':'')+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>';
- }));
+   let finalAttachment=attachmentHTML;
+   if(isOnce&&m.attachment_path)finalAttachment=m.sender_id===S.session.user.id?'<span class="view-once-label">◉ View-once photo sent</span>':openedOnceIds.has(m.id)?'<span class="view-once-label">✓ Photo already viewed</span>':'<button type="button" class="view-once-open" data-view-once="'+esc(m.id)+'">◉ Tap to view photo once</button>';
+   const stickerHTML=isSticker?'<div class="message-sticker" role="img" aria-label="Sticker">'+esc(rawBody.slice(11))+'</div>':'';
+   return '<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+stickerHTML+(displayBody?messageBodyHTML(displayBody):'')+(finalAttachment?'<div class="message-attachment-wrap">'+finalAttachment+'</div>':'')+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>';
+ });
 }
 function messageBodyHTML(value=''){
  const text=String(value),urlPattern=/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|org|net|edu|gov|gh|io|co|uk|app|dev|info|biz|me|ai|tech|online|site|store|school)(?:\/[^\s<>"']*)?)/gi;
