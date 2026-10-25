@@ -3,7 +3,7 @@
   window.studentLinkInstallPrompt=null;
   window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();window.studentLinkInstallPrompt=event;var button=document.getElementById('install-app');if(button)button.hidden=false;});
   window.addEventListener('appinstalled',function(){window.studentLinkInstallPrompt=null;var button=document.getElementById('install-app');if(button)button.hidden=true;});
-  var appSrc='assets/app.js?v=studentlink-status-whatsapp-67';
+  var appSrc='assets/app.js?v=studentlink-status-whatsapp-68';
   var sources=[
     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
     'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'
