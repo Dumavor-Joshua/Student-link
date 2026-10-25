@@ -34,7 +34,7 @@ for (const match of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)(?:[?#][^"]*)?
 }
 
 assert.ok(html.includes('href="assets/css/base.css?v=studentlink-refactor-79"') && html.includes('href="assets/css/feed.css?v=studentlink-refactor-79"') && html.includes('href="assets/css/messages.css?v=studentlink-refactor-79"'), 'HTML must load the extracted stylesheet, including its cache version');
-assert.equal((read('assets/css/feed.css').match(/\\.feed-controls\\{display:flex;align-items:center;gap:8px;flex-wrap:wrap\\}/g) || []).length, 1, 'Feed controls CSS rule must not be duplicated');
+assert.equal((read('assets/css/feed.css').match(/\.feed-controls\{display:flex;align-items:center;gap:8px;flex-wrap:wrap\}/g) || []).length, 1, 'Feed controls CSS rule must not be duplicated');
 assert.ok(sw.includes('assets/icon-192.png?v=studentlink-install-62'), 'Service worker must precache the PNG app icon');
 assert.ok(sw.includes('const refresh=fetch(request)') && sw.includes('await caches.match(rootURL)'), 'Service worker must serve cached shell assets immediately and refresh them in the background');
 assert.ok(sw.includes("payload.conversation_id") && sw.includes("payload.actor_id"), 'Push notification routing must accept database-style snake_case identifiers');
