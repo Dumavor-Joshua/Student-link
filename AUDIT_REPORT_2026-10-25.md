@@ -73,6 +73,7 @@ These require a dedicated test Supabase project and real browser/device testing.
 - Added a regression assertion against duplicate named function declarations across the application JavaScript modules.
 - Fixed a service-worker fallback bug: notification queue cleanup was scoped inside `try` but called from `catch`, which could throw a `ReferenceError` when IndexedDB was unavailable. The cleanup now lives in a shared helper, and a regression assertion covers the fallback path.
 - Fixed an offline app-shell gap: the service worker previously precached application modules and feature CSS but omitted `assets/bootstrap.js` and `assets/startup.css`, both required to boot and render the app shell offline. Added both exact versioned URLs, bumped the shell cache to `studentlink-shell-v80`, and added a regression assertion for these assets.
+- Hardened notification clicks against malformed or external URLs in push payloads. Destinations are now parsed and constrained to the StudentLink scope before query parameters are changed; invalid or out-of-scope destinations fall back to the app's messages view. Added a runtime regression test for malformed message URLs.
 - Kept the work on a separate branch so `main` remains untouched while broader changes are reviewed.
 
 ## Recommended implementation order
