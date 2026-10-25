@@ -4,14 +4,14 @@
   window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();window.studentLinkInstallPrompt=event;var button=document.getElementById('install-app');if(button)button.hidden=false;});
   window.addEventListener('appinstalled',function(){window.studentLinkInstallPrompt=null;var button=document.getElementById('install-app');if(button)button.hidden=true;});
   var appSources=[
-    'assets/js/core.js?v=studentlink-refactor-77',
-    'assets/js/notifications.js?v=studentlink-refactor-77',
-    'assets/js/feed.js?v=studentlink-refactor-77',
-    'assets/js/messages.js?v=studentlink-refactor-77',
-    'assets/js/status.js?v=studentlink-refactor-77',
-    'assets/js/games.js?v=studentlink-refactor-77',
-    'assets/js/profile.js?v=studentlink-refactor-77',
-    'assets/js/main.js?v=studentlink-refactor-77'
+    'assets/js/core.js?v=studentlink-refactor-78',
+    'assets/js/notifications.js?v=studentlink-refactor-78',
+    'assets/js/feed.js?v=studentlink-refactor-78',
+    'assets/js/messages.js?v=studentlink-refactor-78',
+    'assets/js/status.js?v=studentlink-refactor-78',
+    'assets/js/games.js?v=studentlink-refactor-78',
+    'assets/js/profile.js?v=studentlink-refactor-78',
+    'assets/js/main.js?v=studentlink-refactor-78'
   ];
   var sources=[
     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
@@ -48,4 +48,4 @@
   document.addEventListener('click',function(event){if(event.target&&event.target.closest('#modalclose')){var modal=document.getElementById('modalbg');if(modal)modal.classList.remove('show');}});
 })();
 
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-refactor-77").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-refactor-78").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
