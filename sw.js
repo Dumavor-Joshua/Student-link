@@ -38,11 +38,11 @@ function openNotificationQueueDB(){
   request.onerror=()=>reject(request.error||new Error('Could not open notification queue'));
  });
 }
+function cleanNotificationQueue(items){
+ const cutoff=Date.now()-NOTIFICATION_MAX_AGE;
+ return items.filter(entry=>entry&&Number(entry.timestamp)>=cutoff).slice(-NOTIFICATION_QUEUE_LIMIT);
+}
 async function rememberNotification(item){
- const clean=items=>{
-  const cutoff=Date.now()-NOTIFICATION_MAX_AGE;
-  return items.filter(entry=>entry&&Number(entry.timestamp)>=cutoff).slice(-NOTIFICATION_QUEUE_LIMIT);
- };
  try{
   const db=await openNotificationQueueDB();
   const items=await new Promise((resolve,reject)=>{
@@ -52,7 +52,7 @@ async function rememberNotification(item){
    const request=store.get(NOTIFICATION_SUMMARY_KEY);
    request.onsuccess=()=>{
     const previous=Array.isArray(request.result?.items)?request.result.items:[];
-    nextItems=clean([...previous,item]);
+    nextItems=cleanNotificationQueue([...previous,item]);
     store.put({key:NOTIFICATION_SUMMARY_KEY,items:nextItems});
    };
    request.onerror=()=>reject(request.error||new Error('Could not read notification queue'));
@@ -65,7 +65,7 @@ async function rememberNotification(item){
   return items;
  }catch(error){
   console.warn('StudentLink notification queue persistence unavailable:',error);
-  fallbackNotificationQueue=clean([...fallbackNotificationQueue,item]);
+  fallbackNotificationQueue=cleanNotificationQueue([...fallbackNotificationQueue,item]);
   return fallbackNotificationQueue;
  }
 }
