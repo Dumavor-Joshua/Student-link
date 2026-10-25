@@ -27,6 +27,11 @@ assert.ok(manifest.icons.some(icon => icon.src.endsWith('.png?v=studentlink-inst
 assert.ok(html.includes('assets/css/base.css?v=') && html.includes('assets/bootstrap.js?v=') && sw.includes('assets/js/core.js?v=studentlink-refactor-79'), 'StudentLink must keep its multi-file application assets separately versioned');
 assert.ok(html.includes('<div class="sk-label sk-label-top">'), 'Startup skeleton label must use one valid class attribute');
 assert.ok(!/<[^>]+\bclass="[^"]*"\s+class="/.test(html), 'HTML must not contain duplicate class attributes on one element');
+const htmlIds = [...html.matchAll(/\\bid="([^"]+)"/g)].map((match) => match[1]);
+assert.equal(new Set(htmlIds).size, htmlIds.length, 'The app shell must not contain duplicate HTML IDs');
+for (const match of html.matchAll(/(?:src|href)="(assets\\/[^"?#]+)(?:[?#][^"]*)?"/g)) {
+  assert.doesNotThrow(() => read(match[1]), `Referenced local asset must exist: ${match[1]}`);
+}
 
 assert.ok(html.includes('href="assets/css/base.css?v=studentlink-refactor-79"') && html.includes('href="assets/css/feed.css?v=studentlink-refactor-79"') && html.includes('href="assets/css/messages.css?v=studentlink-refactor-79"'), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(sw.includes('assets/icon-192.png?v=studentlink-install-62'), 'Service worker must precache the PNG app icon');
