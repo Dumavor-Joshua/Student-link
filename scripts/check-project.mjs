@@ -43,6 +43,29 @@ assert.ok(sw.includes('const refresh=fetch(request)') && sw.includes('await cach
 assert.ok(sw.includes("payload.conversation_id") && sw.includes("payload.actor_id"), 'Push notification routing must accept database-style snake_case identifiers');
 assert.ok(sw.includes("NOTIFICATION_SUMMARY_TAG='studentlink-notification-summary-v1'") && sw.includes('showGroupedStudentLinkNotification') && sw.includes("NOTIFICATION_QUEUE_LIMIT=5"), 'Push notifications must be aggregated into one expandable, bounded summary');
 assert.ok(sw.includes('function cleanNotificationQueue(items)') && sw.includes('fallbackNotificationQueue=cleanNotificationQueue([...fallbackNotificationQueue,item])'), 'Notification queue fallback must remain usable when IndexedDB is unavailable');
+const swHandlers = {};
+const capturedNotifications = [];
+const swRuntime = {
+  self: {
+    location: { href: 'https://studentlink.test/sw.js', origin: 'https://studentlink.test' },
+    registration: {
+      scope: 'https://studentlink.test/',
+      showNotification: async (title, options) => { capturedNotifications.push({ title, options }); }
+    },
+    addEventListener: (type, handler) => { swHandlers[type] = handler; }
+  },
+  caches: { open: async () => ({ addAll: async () => {}, put: async () => {} }), keys: async () => [], match: async () => null },
+  console: { warn: () => {}, error: () => {}, log: () => {} }
+};
+runInNewContext(sw, swRuntime);
+const messageWaits = [];
+swHandlers.message({
+  data: { type: 'STUDENTLINK_SHOW_NOTIFICATION', title: 'Fallback test', options: { body: 'Queue works without IndexedDB' } },
+  waitUntil: promise => messageWaits.push(promise)
+});
+await Promise.all(messageWaits);
+assert.equal(capturedNotifications.length, 1, 'Service worker must still show a notification when IndexedDB is unavailable');
+assert.match(capturedNotifications[0].options.body, /Queue works without IndexedDB/, 'Fallback notification must preserve its message body');
 assert.ok(js.includes("type:'STUDENTLINK_SHOW_NOTIFICATION'") && sw.includes("message.type!=='STUDENTLINK_SHOW_NOTIFICATION'"), 'Foreground notifications must use the same grouping path as background push');
 assert.ok(bootstrap.includes("'assets/js/core.js?v=studentlink-refactor-79'"), 'HTML must load the extracted application script through the resilient loader with its cache version');
 assert.ok(bootstrap.includes('loadLibrary(0)') && bootstrap.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
