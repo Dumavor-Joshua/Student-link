@@ -191,7 +191,7 @@ assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachme
 assert.ok(html.includes('studentlink-refactor-78') && sw.includes('studentlink-refactor-78') && sw.includes('studentlink-shell-v78'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
 
-assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('<details class="status-compose">'), 'Statuses must use a compact horizontal story tray with an expandable composer and viewer');
+assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('<details class="status-compose'), 'Statuses must use a compact horizontal story tray with an expandable composer and viewer');
 assert.ok(js.includes('status-thumb-image') && js.includes('status-thumb-video') && js.includes('status-thumb-text'), 'Status tray icons must use media thumbnails or text artwork instead of profile photos');
 assert.ok(js.includes('accept="image/*,video/*"') && js.includes('status-preview-video'), 'Statuses must support photo and video uploads and playback');
 assert.ok(css.includes('.status-viewer{') && css.includes('flex:0 0 68px'), 'Status stories must stay compact until opened in the full-screen viewer');
