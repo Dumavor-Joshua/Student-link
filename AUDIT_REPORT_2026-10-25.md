@@ -71,6 +71,7 @@ These require a dedicated test Supabase project and real browser/device testing.
 - Removed one provably identical duplicate `.feed-controls` rule from `assets/css/feed.css`; the remaining rule preserves the same styling.
 - Added regression assertions for duplicate class attributes, duplicate IDs in the HTML shell, missing local asset references, and the duplicate feed-controls rule.
 - Added a regression assertion against duplicate named function declarations across the application JavaScript modules.
+- Fixed a service-worker fallback bug: notification queue cleanup was scoped inside `try` but called from `catch`, which could throw a `ReferenceError` when IndexedDB was unavailable. The cleanup now lives in a shared helper, and a regression assertion covers the fallback path.
 - Kept the work on a separate branch so `main` remains untouched while broader changes are reviewed.
 
 ## Recommended implementation order
