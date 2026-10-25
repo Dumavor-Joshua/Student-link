@@ -159,7 +159,7 @@ assert.ok(html.includes('rel="icon" type="image/svg+xml" href="assets/favicon.sv
 assert.ok(js.includes("document.getElementById('google-signin')"), 'Google button must be located during auth rendering');
 assert.ok(js.includes("googleButton?.addEventListener('click'") , 'Continue with Google must have a click handler');
 assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), 'Continue with Google must use Supabase Google OAuth');
-assert.match(html, /var appSrc='assets\/app\.js\?v=studentlink-[^']+'/, 'App script cache version must be refreshed after application changes');
+assert.match(bootstrap, /var appSrc='assets\/app\.js\?v=studentlink-[^']+'/, 'App script cache version must be refreshed after application changes');
 assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
@@ -192,6 +192,8 @@ assert.ok(html.includes('studentlink-status-whatsapp-67') && sw.includes('studen
 assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
 
 assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('<details class="status-compose">'), 'Statuses must use a compact horizontal story tray with an expandable composer and viewer');
+assert.ok(js.includes('status-thumb-image') && js.includes('status-thumb-video') && js.includes('status-thumb-text'), 'Status tray icons must use media thumbnails or text artwork instead of profile photos');
+assert.ok(js.includes('accept="image/*,video/*"') && js.includes('status-preview-video'), 'Statuses must support photo and video uploads and playback');
 assert.ok(css.includes('.status-viewer{') && css.includes('flex:0 0 68px'), 'Status stories must stay compact until opened in the full-screen viewer');
 assert.ok(js.includes('sendStickerMessage') && js.includes('[[sticker]]') && js.includes('sticker-picker'), 'Messages must support sticker sending and rendering');
 assert.ok(js.includes('studentlink_consume_view_once') && js.includes('[[view-once]]') && js.includes('view-once-open'), 'Messages must support one-time media opening');
