@@ -7,6 +7,7 @@ const html = read('index.html');
 const bootstrap = read('assets/bootstrap.js');
 const js = read('assets/app.js');
 const css = read('assets/app.css');
+const startup = read('assets/startup.css');
 const sw = read('sw.js');
 const schema = read('supabase_schema.sql');
 const migration = read('supabase/migrations/20261009_harden_poll_vote_policy.sql');
@@ -35,7 +36,7 @@ assert.ok(bootstrap.includes("var appSrc='assets/app.js?v="), 'HTML must load th
 assert.ok(bootstrap.includes('loadLibrary(0)') && bootstrap.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
 assert.ok(html.includes('rel="preconnect" href="https://cdn.jsdelivr.net"') && html.includes('rel="preconnect" href="https://unpkg.com"'), 'Supabase CDNs must be preconnected to reduce startup latency');
 assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstatic.com'), 'A remote emoji font must not block initial rendering');
-assert.ok(html.includes('min-height:calc(100dvh - 96px)') && html.includes('.startup-skeleton .sk-outline{flex:1;min-height:120px'), 'The mobile sketch skeleton must fill the available viewport height');
+assert.ok(startup.includes('min-height:calc(100dvh - 96px)') && startup.includes('.startup-skeleton .sk-outline{flex:1;min-height:120px'), 'The mobile sketch skeleton must fill the available viewport height');
 assert.ok(js.includes('body:body||q'), 'Poll posts must provide a non-empty posts.body field');
 assert.ok(js.includes('data-vote'), 'Poll options must expose voting controls');
 assert.ok(js.includes("if(data.length)") || js.includes("if(data?.length)"), 'An empty feed must not issue queries using an empty post-ID list');
