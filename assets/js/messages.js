@@ -1,5 +1,185 @@
-/* StudentLink messages feature module.
- * Existing feature logic is still shared through core.js; this module boundary is reserved
- * for dependency-safe extraction. Do not load as a classic script alongside core.js.
- */
-export {};
+async function viewFriends(){
+  const {data:rows,error}=await db.from('friendships').select('user_id,friend_id,status').or(`user_id.eq.${S.session.user.id},friend_id.eq.${S.session.user.id}`);
+  if(error)throw error;
+  const sent=new Set((rows||[]).filter(r=>r.status==='pending'&&r.user_id===S.session.user.id).map(r=>r.friend_id));
+  const received=new Set((rows||[]).filter(r=>r.status==='pending'&&r.friend_id===S.session.user.id).map(r=>r.user_id));
+  const friendIds=new Set((rows||[]).filter(r=>r.status==='accepted').map(r=>r.user_id===S.session.user.id?r.friend_id:r.user_id));
+  const {data:people,error:peopleError}=await db.from('profiles').select('id,nickname,school,avatar_url').neq('id',S.session.user.id).order('nickname').limit(100);
+  if(peopleError)throw peopleError;
+  // Keep discovery bounded, but always load all friends and pending-request participants.
+  const relatedIds=[...new Set([...friendIds,...sent,...received])].filter(id=>id!==S.session.user.id);
+  const relatedResult=relatedIds.length?await db.from('profiles').select('id,nickname,school,avatar_url').in('id',relatedIds):{data:[],error:null};
+  if(relatedResult.error)throw relatedResult.error;
+  const visibleById=new Map((people||[]).map(p=>[p.id,p]));
+  (relatedResult.data||[]).forEach(p=>visibleById.set(p.id,p));
+  const visiblePeople=[...visibleById.values()].sort((a,b)=>String(a.nickname||'').localeCompare(String(b.nickname||'')));
+  S.friends=visiblePeople.filter(p=>friendIds.has(p.id));
+  let html=`<div class='head'><h1 class='title'>Friends</h1><span class='tiny'>${S.friends.length} friends</span></div>`;
+  html+=visiblePeople.map(p=>`<div class='card'><div style='display:flex;justify-content:space-between;align-items:center;gap:12px'><div style='display:flex;align-items:center;gap:10px;min-width:0'><button type="button" class="profile-open" data-public-profile="${esc(p.id)}" aria-label="View ${esc(p.nickname)}'s profile">${profileAvatarMarkup(p.nickname,p.avatar_url,'avatar')}</button><div><button type="button" class="profile-name-link" data-public-profile="${esc(p.id)}">${esc(p.nickname)}</button><div class='tiny'>${esc(p.school||'No school')}</div></div></div><div style='display:flex;gap:8px;flex-wrap:wrap'>${friendIds.has(p.id)?`<button type='button' class='btn btn-secondary' data-messagefriend='${esc(p.id)}'>Message</button>`:received.has(p.id)?`<button type='button' class='btn' data-accept='${esc(p.id)}'>Accept</button><button type='button' class='btn btn-secondary' data-decline='${esc(p.id)}'>Decline</button>`:sent.has(p.id)?`<button type='button' class='btn btn-secondary' disabled>Requested</button>`:`<button type='button' class='btn' data-add='${esc(p.id)}'>Add friend</button>`}</div></div></div>`).join('');
+  $('#main').innerHTML=html;wireActions();
+}
+async function startConversation(friendId){if(friendId===S.session?.user?.id)return toast('You cannot message yourself.');if(!S.friends.some(f=>f.id===friendId)){const {data:relationship,error:relationshipError}=await db.from('friendships').select('user_id,friend_id,status').or(`and(user_id.eq.${S.session.user.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${S.session.user.id})`).eq('status','accepted').limit(1).maybeSingle();if(relationshipError)throw relationshipError;if(!relationship)return toast('Add this student as a friend first.');const {data:friendProfile,error:profileError}=await db.from('profiles').select('id,nickname,school,avatar_url').eq('id',friendId).maybeSingle();if(profileError)throw profileError;if(friendProfile)S.friends=[...S.friends.filter(f=>f.id!==friendId),friendProfile]}const me=S.session.user.id;const [user_a,user_b]=[me,friendId].sort();let {data,error}=await db.from('conversations').select('id').eq('user_a',user_a).eq('user_b',user_b).maybeSingle();if(error)throw error;if(!data){let {data:newConvo,error:createErr}=await db.from('conversations').insert({user_a,user_b}).select();if(createErr)throw createErr;data=newConvo[0]}S.chat=data.id;S.publicProfileId=null;S.view='messages';syncNavigationState();await renderView()}
+async function viewMessages(){
+ await loadConvos();
+ $('#main').innerHTML='<div class="head messages-page-head"><button type="button" class="btn btn-secondary messages-back-feed" id="messages-back-feed" aria-label="Back to feed">← Feed</button><div class="messages-page-title"><h1 class="title">Messages</h1><p class="tiny">Chat privately with accepted friends.</p></div><div class="messages-status-strip" aria-label="Status updates"><details class="status-compose status-compose-inline"><summary aria-label="Add status"><span class="status-add-wide">＋ Add status</span><span class="status-add-compact">＋</span></summary><form id="status-form" class="status-form"><input id="status-text" maxlength="240" placeholder="Share a short status…" aria-label="Status text"><input id="status-file" type="file" accept="image/*,video/*" aria-label="Add a status photo or video"><button class="btn" type="submit" id="status-publish">Post status</button></form></details><div id="status-list" class="status-list"><span class="tiny">Loading statuses…</span></div></div></div><section class="status-panel card" aria-label="Student statuses"><div class="status-panel-heading"><h2>Statuses</h2><span class="tiny">Updates disappear after 24 hours</span></div></section><section class="messenger-layout" id="messenger-layout"><aside class="messenger-sidebar"><div class="messenger-sidebar-head"><h2>Chats</h2><input class="messenger-search" id="messenger-search" type="search" placeholder="Search conversations" aria-label="Search conversations"></div><div class="messenger-conversation-list" id="convos"></div></aside><section class="messenger-chat" id="messenger-chat"><div class="messenger-empty">Choose a conversation to start chatting.</div></section></section>';
+ const container=$('#convos'),layout=$('#messenger-layout');
+ $('#messages-back-feed').onclick=()=>{S.chat=null;setView('feed')};
+ setupStatusPanel();
+ const renderList=(filter='')=>{const q=filter.trim().toLowerCase(),items=S.convos.filter(c=>c.otherNickname.toLowerCase().includes(q)||String(c.lastMessage||'').toLowerCase().includes(q));
+ container.innerHTML=items.length?items.map(c=>'<button type="button" class="messenger-conversation '+(S.chat===c.id?'active':'')+'" data-convo="'+esc(c.id)+'">'+profileAvatarMarkup(c.otherNickname,c.otherAvatar||'','avatar',c.otherId)+'<span class="messenger-conversation-copy"><strong>'+esc(c.otherNickname)+'</strong><span class="tiny messenger-preview">'+esc(c.lastMessage||'No messages yet')+'</span></span><span class="messenger-unread-badge"'+(c.unreadCount?'':' hidden')+' aria-label="'+esc(c.unreadCount)+' unread messages">'+esc(c.unreadCount||0)+'</span></button>').join(''):'<div class="messenger-empty">'+(S.convos.length?'No matching conversations.':'No conversations yet. Add a friend to start chatting.')+'</div>';
+ container.querySelectorAll('[data-convo]').forEach(el=>el.onclick=()=>openConversation(el.dataset.convo));};
+ renderList();updateMessageBadges();$('#messenger-search').oninput=e=>renderList(e.target.value);
+ if(S.chat&&S.convos.some(c=>c.id===S.chat))await openConversation(S.chat);
+}
+async function openConversation(conversationId){
+ S.chat=conversationId;const convo=S.convos.find(c=>c.id===conversationId);
+ const {data:messages,error}=await db.from('messages').select('id,conversation_id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size').eq('conversation_id',conversationId).order('created_at',{ascending:false}).limit(50);
+ if(error)throw error;
+ (messages||[]).reverse();
+ let displayedMessages=messages||[];
+ const isVisibleChat=S.view==='messages'&&S.chat===conversationId&&document.visibilityState==='visible';
+ if(isVisibleChat){const latestKnown=(messages||[]).reduce((latest,m)=>!latest||String(m.created_at)>latest?String(m.created_at):latest,'')||new Date().toISOString();try{await updateMessageReadCursor(conversationId,latestKnown);const stateConvo=S.convos.find(c=>c.id===conversationId);if(stateConvo)stateConvo.unreadCount=0;updateMessageBadges()}catch(readError){console.warn('Could not sync this conversation read status:',readError);toast('Messages opened, but read status could not sync. Please try again.')}}
+ const chat=$('#messenger-chat'),layout=$('#messenger-layout');
+ if(!chat||!layout){await viewMessages();return}layout.classList.add('chat-open');document.querySelector('.layout')?.classList.add('messages-chat-open');
+ const renderedMessages=await renderMessageRows(messages||[]);
+ chat.innerHTML='<header class="messenger-chat-head"><button type="button" class="btn btn-secondary messenger-back" id="messenger-back" aria-label="Back to conversations">← Chats</button>'+profileAvatarMarkup(convo?.otherNickname||'Student',convo?.otherAvatar||'','avatar',convo?.otherId)+'<div class="messenger-chat-person"><h2>'+esc(convo?.otherNickname||'Conversation')+'</h2><span class="tiny">StudentLink chat</span></div></header><div class="messenger-scroll" id="message-list">'+((messages||[]).length===50?'<button type="button" class="btn btn-secondary" id="load-older-messages">Load older messages</button>':'')+(renderedMessages.join('')||'<div class="messenger-empty">This is the beginning of your conversation.</div>')+'</div><form id="msgform" class="messenger-composer"><input id="message-file" class="message-file-input" type="file" aria-label="Choose a file to attach"><button type="button" class="btn btn-secondary messenger-attach" id="attach-file" aria-label="Attach a file" title="Attach a file">📎</button><button type="button" class="btn btn-secondary messenger-sticker-toggle" id="sticker-toggle" aria-label="Choose a sticker" title="Stickers">☺</button><textarea id="msgtext" maxlength="1500" rows="1" placeholder="Message…" aria-label="Message text"></textarea><label class="view-once-toggle"><input id="view-once-toggle" type="checkbox"> View once</label><button type="submit" class="btn" id="send-message">Send</button><div id="sticker-picker" class="sticker-picker" hidden aria-label="Sticker picker"><button type="button" class="sticker-choice" data-sticker="😀" aria-label="Send 😀 sticker">😀</button><button type="button" class="sticker-choice" data-sticker="😂" aria-label="Send 😂 sticker">😂</button><button type="button" class="sticker-choice" data-sticker="🥹" aria-label="Send 🥹 sticker">🥹</button><button type="button" class="sticker-choice" data-sticker="😍" aria-label="Send 😍 sticker">😍</button><button type="button" class="sticker-choice" data-sticker="😎" aria-label="Send 😎 sticker">😎</button><button type="button" class="sticker-choice" data-sticker="🤔" aria-label="Send 🤔 sticker">🤔</button><button type="button" class="sticker-choice" data-sticker="😭" aria-label="Send 😭 sticker">😭</button><button type="button" class="sticker-choice" data-sticker="🔥" aria-label="Send 🔥 sticker">🔥</button><button type="button" class="sticker-choice" data-sticker="❤️" aria-label="Send ❤️ sticker">❤️</button><button type="button" class="sticker-choice" data-sticker="💯" aria-label="Send 💯 sticker">💯</button><button type="button" class="sticker-choice" data-sticker="👏" aria-label="Send 👏 sticker">👏</button><button type="button" class="sticker-choice" data-sticker="🎉" aria-label="Send 🎉 sticker">🎉</button><button type="button" class="sticker-choice" data-sticker="✨" aria-label="Send ✨ sticker">✨</button><button type="button" class="sticker-choice" data-sticker="🙌" aria-label="Send 🙌 sticker">🙌</button><button type="button" class="sticker-choice" data-sticker="🤝" aria-label="Send 🤝 sticker">🤝</button><button type="button" class="sticker-choice" data-sticker="💪" aria-label="Send 💪 sticker">💪</button><button type="button" class="sticker-choice" data-sticker="🌟" aria-label="Send 🌟 sticker">🌟</button><button type="button" class="sticker-choice" data-sticker="🫶" aria-label="Send 🫶 sticker">🫶</button></div></form><div id="attachment-status" class="messenger-attachment-status" hidden></div>';
+ if(S.replyOnOpen){S.replyOnOpen=false;const composer=$('#msgtext');if(composer){composer.placeholder='Write your reply…';composer.focus();}}
+ const list=$('#message-list');if(list)list.scrollTop=list.scrollHeight;
+ if(!chat.dataset.viewOnceHandler){chat.dataset.viewOnceHandler='bound';chat.addEventListener('click',e=>{const onceButton=e.target.closest('[data-view-once]');if(onceButton){onceButton.disabled=true;openViewOnceMessage(onceButton.dataset.viewOnce).finally(()=>{if(onceButton.isConnected)onceButton.disabled=false})}})}
+ const olderButton=$('#load-older-messages');
+ if(olderButton)olderButton.onclick=async()=>{
+   const oldest=displayedMessages[0];if(!oldest)return;
+   olderButton.disabled=true;
+   try{
+     const {data:olderRows,error:olderError}=await db.from('messages').select('id,conversation_id,sender_id,body,created_at,attachment_path,attachment_name,attachment_mime_type,attachment_size').eq('conversation_id',conversationId).lt('created_at',oldest.created_at).order('created_at',{ascending:false}).limit(50);
+     if(olderError)throw olderError;
+     const older=(olderRows||[]).reverse();
+     if(!older.length){olderButton.remove();return;}
+     const markup=await renderMessageRows(older);
+     const previousHeight=list.scrollHeight,previousTop=list.scrollTop;
+     olderButton.insertAdjacentHTML('afterend',markup.join(''));
+     displayedMessages=[...older,...displayedMessages];
+     list.scrollTop=previousTop+(list.scrollHeight-previousHeight);
+     if(older.length<50)olderButton.remove();
+   }catch(error){console.warn('Could not load older messages:',error);toast('Older messages could not be loaded. Try again.');}
+   finally{if(olderButton.isConnected)olderButton.disabled=false;}
+ };
+ $('#messenger-back').onclick=()=>{layout.classList.remove('chat-open');document.querySelector('.layout')?.classList.remove('messages-chat-open');S.chat=null};
+ const fileInput=$('#message-file'),attachButton=$('#attach-file'),attachmentStatus=$('#attachment-status');
+ const stickerPicker=$('#sticker-picker');$('#sticker-toggle').onclick=()=>{stickerPicker.hidden=!stickerPicker.hidden};stickerPicker.querySelectorAll('[data-sticker]').forEach(b=>b.onclick=async()=>{stickerPicker.hidden=true;await sendStickerMessage(conversationId,b.dataset.sticker)});
+ attachButton.onclick=()=>fileInput.click();
+ fileInput.onchange=()=>{const file=fileInput.files?.[0];if(!file){attachmentStatus.hidden=true;attachmentStatus.textContent='';return;}if(file.size<=0||file.size>=5*1024*1024){toast('Choose a non-empty file smaller than 5 MB.');fileInput.value='';attachmentStatus.hidden=true;attachmentStatus.textContent='';return;}attachmentStatus.textContent='📎 '+file.name+' · '+formatAttachmentSize(file.size)+' · ready to send';attachmentStatus.hidden=false;};
+ $('#msgtext').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#msgform').requestSubmit()}});
+ $('#msgform').onsubmit=async e=>{e.preventDefault();const input=$('#msgtext'),body=input.value.trim(),send=$('#send-message'),file=fileInput.files?.[0];if(!body&&!file)return;if(file&&(file.size<=0||file.size>=5*1024*1024)){toast('Choose a non-empty file smaller than 5 MB.');return;}if(file&&$('#view-once-toggle')?.checked&&!file.type.startsWith('image/')){toast('View once is only available for image attachments.');return;}send.disabled=true;attachButton.disabled=true;let uploadedPath=null;try{if(file){const extension=(file.name.match(/\.([a-zA-Z0-9]{1,12})$/)||[])[1]||'bin';uploadedPath=conversationId+'/'+S.session.user.id+'/'+makeRandomId()+'.'+extension.toLowerCase();const {error:uploadError}=await db.storage.from('message-files').upload(uploadedPath,file,{cacheControl:'3600',upsert:false,contentType:file.type||'application/octet-stream'});if(uploadError)throw uploadError;}const once=Boolean(file&&$('#view-once-toggle')?.checked);const messageBody=(once?'[[view-once]] ':'')+(body||(file?'📎 File attached':'Message'));const {error:sendError}=await db.from('messages').insert({conversation_id:conversationId,sender_id:S.session.user.id,body:messageBody,attachment_path:uploadedPath,attachment_name:file?.name||null,attachment_mime_type:file?.type||null,attachment_size:file?.size||null});if(sendError)throw sendError;input.value='';fileInput.value='';if($('#view-once-toggle'))$('#view-once-toggle').checked=false;attachmentStatus.hidden=true;attachmentStatus.textContent='';await loadConvos();await openConversation(conversationId)}catch(err){console.error(err);if(uploadedPath){const {error:cleanupError}=await db.storage.from('message-files').remove([uploadedPath]);if(cleanupError)console.warn('Could not clean up an unsent attachment:',cleanupError)}toast(file?'The message or attachment could not be sent. Please try again.':'Message could not be sent. Please try again.')}finally{if($('#send-message'))$('#send-message').disabled=false;if($('#attach-file'))$('#attach-file').disabled=false}};
+
+}
+async function sendStickerMessage(conversationId,sticker){
+ try{const {error}=await db.from('messages').insert({conversation_id:conversationId,sender_id:S.session.user.id,body:'[[sticker]]'+sticker});if(error)throw error;await loadConvos();await openConversation(conversationId)}
+ catch(error){console.error('Sticker send failed:',error);toast('Sticker could not be sent. Try again.')}
+}
+async function openViewOnceMessage(messageId){
+ const win=window.open('about:blank','_blank');if(win)win.opener=null;
+ try{const {data:path,error}=await db.rpc('studentlink_consume_view_once',{p_message_id:messageId});if(error)throw error;if(!path){if(win)win.close();toast('This view-once photo has already been opened or is unavailable.');return;}const {data,error:signedError}=await db.storage.from('message-files').createSignedUrl(path,60);if(signedError)throw signedError;if(win)win.location.replace(data.signedUrl);else toast('Your browser blocked the photo. Allow pop-ups and try again.');await openConversation(S.chat)}
+ catch(error){if(win)win.close();console.error('View-once open failed:',error);toast('This photo could not be opened. It may already have been viewed.')}
+}
+function setupStatusPanel(){
+ const form=$('#status-form'),list=$('#status-list');if(!form||!list)return;
+ const refresh=async()=>{try{const {data:rows,error}=await db.from('studentlink_statuses').select('id,user_id,body,media_path,media_mime_type,created_at,expires_at').gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false}).limit(1000);if(error)throw error;activeStatusUserIds=new Set((rows||[]).map(r=>r.user_id));document.querySelectorAll('[data-avatar-user]').forEach(el=>el.classList.toggle('has-active-status',activeStatusUserIds.has(el.dataset.avatarUser)));
+ const ids=[...new Set((rows||[]).map(r=>r.user_id))];const {data:profiles,error:pe}=ids.length?await db.from('profiles').select('id,nickname,avatar_url').in('id',ids):{data:[],error:null};if(pe)throw pe;const byId=Object.fromEntries((profiles||[]).map(p=>[p.id,p]));
+ list.innerHTML=(rows||[]).length?(await Promise.all(rows.map(async r=>{let media='',thumbnail='';if(r.media_path){try{const {data,error}=await db.storage.from('status-media').createSignedUrl(r.media_path,300);if(!error&&data?.signedUrl){const url=esc(data.signedUrl);const isVideo=String(r.media_mime_type||'').startsWith('video/');thumbnail=isVideo?'<video class="status-thumb-video" src="'+url+'" muted playsinline preload="auto" aria-label="Video status thumbnail"></video>':'<img class="status-thumb-image" src="'+url+'" alt="Status photo" loading="lazy">';media=isVideo?'<video class="status-preview-video" src="'+url+'" controls playsinline preload="metadata" style="display:block;max-width:min(100%,300px);max-height:60dvh;border-radius:10px;margin-top:8px"></video>':'<img class="status-preview-image" src="'+url+'" alt="Status photo" loading="lazy" style="display:block;max-width:min(100%,240px);max-height:300px;object-fit:contain;border-radius:10px;margin-top:8px">'}}catch(_){}}const person=byId[r.user_id]||{};return '<article class="status-item" role="button" tabindex="0" data-status-item aria-label="View status from '+esc(person.nickname||'Student')+'"><div class="status-avatar">'+(thumbnail||(r.body?'<span class="status-thumb-text">Aa</span>':profileAvatarMarkup(person.nickname||'Student',person.avatar_url||'','avatar')))+'</div><div class="status-copy"><strong>'+esc(person.nickname||'Student')+'</strong><time class="tiny" datetime="'+esc(r.created_at)+'">'+esc(new Date(r.created_at).toLocaleString())+'</time>'+(r.body?'<p>'+esc(r.body)+'</p>':'')+media+'</div></article>'}))).join(''):'<p class="tiny status-empty">No active statuses from your friends yet.</p>';
+ }catch(error){console.warn('Could not load statuses:',error);list.innerHTML='<p class="tiny">Statuses are temporarily unavailable. Please try again later.</p>'}};
+ form.onsubmit=async e=>{e.preventDefault();const body=$('#status-text').value.trim(),file=$('#status-file').files?.[0],button=$('#status-publish');if(!body&&!file){toast('Add text or a photo/video to your status.');return;}if(file&&(!/^(image|video)\//.test(file.type)||file.size<=0||file.size>10*1024*1024)){toast('Choose an image or video no larger than 10 MB.');return;}if(file&&file.type.startsWith('video/')){try{const duration=await new Promise((resolve,reject)=>{const video=document.createElement('video');video.preload='metadata';video.muted=true;video.onloadedmetadata=()=>{URL.revokeObjectURL(video.src);resolve(video.duration)};video.onerror=()=>{URL.revokeObjectURL(video.src);reject(new Error('Could not read video metadata'))};video.src=URL.createObjectURL(file)});if(!Number.isFinite(duration)||duration<=0||duration>30){toast('Videos must be 30 seconds or shorter.');return;}}catch(_){toast('This video could not be checked. Try another video file.');return;}}button.disabled=true;let path=null;try{if(file){path=S.session.user.id+'/'+makeRandomId()+'.'+((file.name.match(/\.([a-zA-Z0-9]{1,8})$/)||[])[1]||'jpg').toLowerCase();const {error}=await db.storage.from('status-media').upload(path,file,{upsert:false,contentType:file.type,cacheControl:'300'});if(error)throw error;}const {error}=await db.from('studentlink_statuses').insert({user_id:S.session.user.id,body,media_path:path,media_mime_type:file?.type||null});if(error)throw error;$('#status-text').value='';$('#status-file').value='';await refresh();toast('Status posted. It will expire after 24 hours.')}catch(error){console.error('Status publish failed:',error);if(path)await db.storage.from('status-media').remove([path]);toast('Status could not be posted. If it is under 10 MB but upload fails, the status-media storage bucket limit may need increasing to 10 MB.')}finally{button.disabled=false}};
+ list.addEventListener('click',e=>{const item=e.target.closest('[data-status-item]');if(!item)return;openStatusViewer(item)});
+ list.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('[data-status-item]')){e.preventDefault();openStatusViewer(e.target.closest('[data-status-item]'))}});
+ function openStatusViewer(item){
+  const copy=item.querySelector('.status-copy'),name=copy?.querySelector('strong')?.textContent||'Student',body=copy?.querySelector('p')?.textContent||'',img=copy?.querySelector('img');
+  const viewer=document.createElement('div');viewer.className='status-viewer';viewer.setAttribute('role','dialog');viewer.setAttribute('aria-modal','true');viewer.setAttribute('aria-label','Status from '+name);
+  const close=document.createElement('button');close.type='button';close.className='status-viewer-close';close.setAttribute('aria-label','Close status');close.textContent='×';
+  const progress=document.createElement('div');progress.className='status-viewer-progress';progress.innerHTML='<span></span>';
+  const heading=document.createElement('div');heading.className='status-viewer-heading';heading.textContent=name+' · '+(copy?.querySelector('time')?.textContent||'');
+  const content=document.createElement('div');content.className='status-viewer-content';
+  const video=copy?.querySelector('video.status-preview-video');if(video){const player=video.cloneNode();player.removeAttribute('style');player.className='status-viewer-video';player.controls=true;player.autoplay=true;player.playsInline=true;content.append(player)}else if(img){const image=img.cloneNode();image.removeAttribute('style');image.className='status-viewer-image';image.loading='eager';content.append(image)}
+  if(body){const text=document.createElement('p');text.className='status-viewer-text';text.textContent=body;content.append(text)}
+  viewer.append(progress,heading,close,content);document.body.append(viewer);document.body.classList.add('status-viewer-open');
+  const dismiss=()=>{viewer.remove();document.body.classList.remove('status-viewer-open');document.removeEventListener('keydown',onKey)};
+  const onKey=event=>{if(event.key==='Escape')dismiss()};close.addEventListener('click',dismiss);viewer.addEventListener('click',event=>{if(event.target===viewer)dismiss()});document.addEventListener('keydown',onKey);close.focus();
+ }
+ refresh();
+}
+async function renderMessageRows(rows){
+ const onceIds=(rows||[]).filter(m=>String(m.body||'').startsWith('[[view-once]] ')).map(m=>m.id);let openedOnceIds=new Set();if(onceIds.length&&S.session?.user?.id){try{const {data}=await db.from('message_view_once_opens').select('message_id').in('message_id',onceIds);openedOnceIds=new Set((data||[]).map(r=>r.message_id))}catch(_){}}
+ return Promise.all((rows||[]).map(async m=>{
+   let attachmentHTML='';
+   if(m.attachment_path){
+     try{
+       const {data:signed,error:signedError}=await db.storage.from('message-files').createSignedUrl(m.attachment_path,3600);
+       if(signedError)throw signedError;
+       if(signed?.signedUrl){
+         const fileName=esc(m.attachment_name||'attachment');
+         const fileSize=esc(formatAttachmentSize(m.attachment_size));
+         const isImage=String(m.attachment_mime_type||'').toLowerCase().startsWith('image/');
+         const imagePreview=isImage?'<img class="message-attachment-image" src="'+esc(signed.signedUrl)+'" alt="'+fileName+'" loading="lazy" decoding="async">':'';
+         attachmentHTML=(imagePreview?'<div class="message-attachment-image-wrap">'+imagePreview+'</div>':'')+'<a class="message-attachment" href="'+esc(signed.signedUrl)+'" target="_blank" rel="noopener noreferrer" download="'+fileName+'">'+(isImage?'⬇️ Download image':'📎 '+fileName)+' <span class="message-attachment-size">'+fileSize+'</span></a>';
+       }else attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>';
+     }catch(_){attachmentHTML='<span class="message-attachment-unavailable">📎 Attachment unavailable</span>'}
+   }
+   const rawBody=String(m.body||''),isOnce=rawBody.startsWith('[[view-once]] '),isSticker=rawBody.startsWith('[[sticker]]'),displayBody=isOnce?rawBody.slice(14):isSticker?'':rawBody;let finalAttachment=attachmentHTML;if(isOnce&&m.attachment_path)finalAttachment=m.sender_id===S.session.user.id?'<span class="view-once-label">◉ View-once photo sent</span>':openedOnceIds.has(m.id)?'<span class="view-once-label">✓ Photo already viewed</span>':'<button type="button" class="view-once-open" data-view-once="'+esc(m.id)+'">◉ Tap to view photo once</button>';const stickerHTML=isSticker?'<div class="message-sticker" role="img" aria-label="Sticker">'+esc(rawBody.slice(11))+'</div>':'';return '<div class="message-row '+(m.sender_id===S.session.user.id?'mine':'')+'"><div class="message-bubble">'+stickerHTML+(displayBody?messageBodyHTML(displayBody):'')+(finalAttachment?'<div class="message-attachment-wrap">'+finalAttachment+'</div>':'')+'</div><time class="message-time" datetime="'+esc(m.created_at)+'">'+esc(new Date(m.created_at).toLocaleString())+'</time></div>';
+ }));
+}
+function messageBodyHTML(value=''){
+ const text=String(value),urlPattern=/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|org|net|edu|gov|gh|io|co|uk|app|dev|info|biz|me|ai|tech|online|site|store|school)(?:\/[^\s<>"']*)?)/gi;
+ let html='',lastIndex=0,match;
+ while((match=urlPattern.exec(text))){
+   let raw=match[0],trailing='';
+   while(/[.,!?;:)}\]]$/.test(raw)){trailing=raw.slice(-1)+trailing;raw=raw.slice(0,-1)}
+   html+=esc(text.slice(lastIndex,match.index));
+   if(raw){
+     const href=/^www\./i.test(raw)?'https://'+raw:raw;
+     try{const parsed=new URL(href);if(parsed.protocol==='http:'||parsed.protocol==='https:')html+='<a class="message-link" href="'+esc(parsed.href)+'" target="_blank" rel="noopener noreferrer">'+esc(raw)+'</a>';else html+=esc(raw)}
+     catch(_){html+=esc(raw)}
+   }
+   html+=esc(trailing);lastIndex=match.index+match[0].length;
+ }
+ return html+esc(text.slice(lastIndex));
+}
+function formatAttachmentSize(bytes){const size=Number(bytes)||0;return size<1024*1024?Math.max(1,Math.round(size/1024))+' KB':(size/(1024*1024)).toFixed(2)+' MB'}
+async function updateMessageReadCursor(conversationId,timestamp){if(!conversationId||!timestamp||!S.session?.user?.id)return;const {error}=await db.from('conversation_reads').upsert({conversation_id:conversationId,user_id:S.session.user.id,last_read_at:timestamp},{onConflict:'conversation_id,user_id'});if(error)throw error;S.messageReadAt[conversationId]=timestamp}
+function updateMessageBadges(){
+  const unreadChats=(S.convos||[]).filter(c=>Number(c.unreadCount)>0).length;
+  document.querySelectorAll('[data-message-nav-badge],[data-home-unread-badge]').forEach(badge=>{badge.textContent=String(unreadChats);badge.hidden=unreadChats===0;badge.setAttribute('aria-label',unreadChats+' chats with unread messages')});
+  
+  // On supported installed PWAs, mirror the unread-chat count on the phone's home-screen app icon.
+  try{if('setAppBadge' in navigator){if(unreadChats>0)navigator.setAppBadge(unreadChats).catch(()=>{});else if('clearAppBadge' in navigator)navigator.clearAppBadge().catch(()=>{});}}catch(_){}
+  document.querySelectorAll('[data-convo]').forEach(button=>{const convo=(S.convos||[]).find(c=>c.id===button.dataset.convo);const badge=button.querySelector('.messenger-unread-badge');if(!badge)return;const count=Number(convo?.unreadCount)||0;badge.textContent=String(count);badge.hidden=count===0;badge.setAttribute('aria-label',count+' unread messages')});
+}
+// Realtime is the fast path; periodic and foreground refreshes keep badges correct if a mobile browser drops a socket event.
+let unreadBadgeRefreshInFlight=false;
+async function refreshUnreadMessageBadges(){
+  if(!db||!S.session?.user?.id||unreadBadgeRefreshInFlight)return;
+  unreadBadgeRefreshInFlight=true;
+  try{await loadConvos()}catch(error){console.warn('Could not refresh unread message badges:',error)}
+  finally{unreadBadgeRefreshInFlight=false}
+}
+function startUnreadBadgeSync(){
+  if(window.studentLinkUnreadBadgeSyncStarted)return;
+  window.studentLinkUnreadBadgeSyncStarted=true;
+  window.setInterval(()=>{if(document.visibilityState==='visible')refreshUnreadMessageBadges()},15000);
+  window.addEventListener('focus',refreshUnreadMessageBadges);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshUnreadMessageBadges()});
+}
+async function loadConvos(){
+  const {data:rows,error}=await db.rpc('studentlink_conversation_summaries');
+  if(error)throw error;
+  const conversations=rows||[];
+  const otherIds=[...new Set(conversations.map(c=>c.user_a===S.session.user.id?c.user_b:c.user_a))];
+  const {data:profiles,error:profileError}=otherIds.length?await db.from('profiles').select('id,nickname,avatar_url').in('id',otherIds):{data:[],error:null};
+  if(profileError)throw profileError;
+  const profilesById=Object.fromEntries((profiles||[]).map(p=>[p.id,p]));
+  S.messageReadAt=Object.fromEntries(conversations.map(c=>[c.conversation_id,c.last_read_at]).filter(r=>r[1]));
+  S.convos=conversations.map(c=>{
+    const otherId=c.user_a===S.session.user.id?c.user_b:c.user_a,person=profilesById[otherId]||{};
+    return{id:c.conversation_id,otherId,otherNickname:person.nickname||'Student',otherAvatar:person.avatar_url||'',lastMessage:c.last_message_body||'',lastMessageAt:c.last_message_at||c.updated_at,unreadCount:Number(c.unread_count)||0};
+  });
+  S.convos.sort((a,b)=>new Date(b.lastMessageAt||0)-new Date(a.lastMessageAt||0));
+  updateMessageBadges();
+}
