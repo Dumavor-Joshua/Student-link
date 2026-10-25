@@ -246,6 +246,8 @@ assert.ok(js.includes('accept="image/*,video/*"') && js.includes('status-preview
 assert.ok(css.includes('.status-viewer{') && css.includes('flex:0 0 68px'), 'Status stories must stay compact until opened in the full-screen viewer');
 assert.ok(js.includes('sendStickerMessage') && js.includes('[[sticker]]') && js.includes('sticker-picker'), 'Messages must support sticker sending and rendering');
 assert.ok(js.includes('createSignedUrls(regularPaths,3600)') && js.includes('data-message-image-preview') && js.includes('[[view-once]] '), 'Message images must use batched signed URLs and keep view-once media out of ordinary previews');
+assert.ok(js.includes('showViewOnceImagePreview(data.signedUrl)') && js.includes('view-once-image-viewer') && js.includes("event.key==='Escape'"), 'View-once photos must open in an in-app overlay that can be closed with Escape');
+assert.ok(js.includes("stickerToggle.setAttribute('aria-expanded'") && js.includes('stickerDismissBound'), 'Sticker picker must expose expanded state and dismiss predictably');
 assert.ok(js.includes('studentlink_consume_view_once') && js.includes('[[view-once]]') && js.includes('view-once-open'), 'Messages must support one-time media opening');
 assert.ok(js.includes("if(!chat.dataset.viewOnceHandler)") && js.includes("!file.type.startsWith('image/')"), 'View-once controls must remain bound after chat rerenders and only accept images');
 assert.ok(css.includes('max-width:767px') && css.includes('max-width:340px') && css.includes('status-form'), 'Chat and statuses must support compact mobile viewports');
