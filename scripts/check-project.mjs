@@ -237,6 +237,8 @@ assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
 assert.ok(html.includes('studentlink-refactor-79') && sw.includes('studentlink-refactor-79') && sw.includes('studentlink-shell-v80'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
+assert.ok(js.includes("statusToggle.addEventListener('click'") && js.includes("statusComposer.open=!statusComposer.open") && js.includes("requestAnimationFrame(()=>$('#status-text')?.focus())"), 'Add status control must explicitly open and focus the status composer');
+assert.ok(html.includes('studentlink-status-button-1') && bootstrap.includes('studentlink-status-button-1') && sw.includes('studentlink-status-button-1') && sw.includes('studentlink-shell-v81'), 'Status button release must update preload, loader, and service-worker cache versions');
 
 assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('<details class="status-compose'), 'Statuses must use a compact horizontal story tray with an expandable composer and viewer');
 assert.ok(js.includes('status-thumb-image') && js.includes('status-thumb-video') && js.includes('status-thumb-text'), 'Status tray icons must use media thumbnails or text artwork instead of profile photos');
