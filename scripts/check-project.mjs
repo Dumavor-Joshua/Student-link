@@ -322,7 +322,7 @@ assert.notEqual(schoolTest.schoolKey(schoolTest.canonicalVerifiedSchoolName('Vak
 assert.notEqual(schoolTest.schoolKey('St. John’s Senior High School, Sekondi'), schoolTest.schoolKey('St. John’s Grammar Senior High School'), 'Different schools with shared words must retain distinct keys');
 
 assert.ok(js.includes('setupStudentLinkImageViewer') && js.includes('studentlink-image-viewer'), 'In-app image preview must be wired through delegated click handling');
-assert.ok(js.includes('message-attachment-image') && js.includes("startsWith('image/')") && js.includes('createSignedUrl(m.attachment_path,3600)'), 'Chat image attachments must render inline using viewable signed URLs');
+assert.ok(js.includes('message-attachment-image') && js.includes("startsWith('image/')") && js.includes('createSignedUrls(regularPaths,3600)') && js.includes('data-message-image-preview'), 'Chat image attachments must render inline using batched signed URLs');
 assert.ok(css.includes('.message-attachment-image-wrap') && css.includes('.message-attachment-image'), 'Chat image previews must have responsive styles');
 assert.ok(css.includes('.studentlink-image-viewer') && css.includes('image-viewer-prev'), 'Image preview must have responsive overlay and image navigation styles');
 assert.ok(html.includes('studentlink-refactor-79') && sw.includes('studentlink-shell-v83'), 'Image preview release must refresh shell and service-worker cache versions');
