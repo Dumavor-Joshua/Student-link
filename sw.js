@@ -1,6 +1,6 @@
-const CACHE_NAME='studentlink-shell-v79';
+const CACHE_NAME='studentlink-shell-v80';
 const BASE=new URL('./',self.location.href);
-const APP_SHELL=[new URL('./',BASE).href,new URL('./manifest.json?v=studentlink-install-62',BASE).href,new URL('./data/ghana-shs-master.json',BASE).href,new URL('./assets/css/base.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/feed.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/messages.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/profile.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/notifications.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/games.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/core.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/notifications.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/feed.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/messages.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/status.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/games.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/profile.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/main.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.png?v=studentlink-install-62',BASE).href,new URL('./assets/icon-192.svg?v=studentlink-install-62',BASE).href,new URL('./assets/icon-512.svg?v=studentlink-install-62',BASE).href];
+const APP_SHELL=[new URL('./',BASE).href,new URL('./manifest.json?v=studentlink-install-62',BASE).href,new URL('./data/ghana-shs-master.json',BASE).href,new URL('./assets/css/base.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/feed.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/messages.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/profile.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/notifications.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/css/games.css?v=studentlink-refactor-79',BASE).href,new URL('./assets/startup.css?v=studentlink-split-65',BASE).href,new URL('./assets/bootstrap.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/core.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/notifications.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/feed.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/messages.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/status.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/games.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/profile.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/js/main.js?v=studentlink-refactor-79',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.png?v=studentlink-install-62',BASE).href,new URL('./assets/icon-192.svg?v=studentlink-install-62',BASE).href,new URL('./assets/icon-512.svg?v=studentlink-install-62',BASE).href];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('studentlink-')&&key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
@@ -38,11 +38,11 @@ function openNotificationQueueDB(){
   request.onerror=()=>reject(request.error||new Error('Could not open notification queue'));
  });
 }
+function cleanNotificationQueue(items){
+ const cutoff=Date.now()-NOTIFICATION_MAX_AGE;
+ return items.filter(entry=>entry&&Number(entry.timestamp)>=cutoff).slice(-NOTIFICATION_QUEUE_LIMIT);
+}
 async function rememberNotification(item){
- const clean=items=>{
-  const cutoff=Date.now()-NOTIFICATION_MAX_AGE;
-  return items.filter(entry=>entry&&Number(entry.timestamp)>=cutoff).slice(-NOTIFICATION_QUEUE_LIMIT);
- };
  try{
   const db=await openNotificationQueueDB();
   const items=await new Promise((resolve,reject)=>{
@@ -52,7 +52,7 @@ async function rememberNotification(item){
    const request=store.get(NOTIFICATION_SUMMARY_KEY);
    request.onsuccess=()=>{
     const previous=Array.isArray(request.result?.items)?request.result.items:[];
-    nextItems=clean([...previous,item]);
+    nextItems=cleanNotificationQueue([...previous,item]);
     store.put({key:NOTIFICATION_SUMMARY_KEY,items:nextItems});
    };
    request.onerror=()=>reject(request.error||new Error('Could not read notification queue'));
@@ -65,7 +65,7 @@ async function rememberNotification(item){
   return items;
  }catch(error){
   console.warn('StudentLink notification queue persistence unavailable:',error);
-  fallbackNotificationQueue=clean([...fallbackNotificationQueue,item]);
+  fallbackNotificationQueue=cleanNotificationQueue([...fallbackNotificationQueue,item]);
   return fallbackNotificationQueue;
  }
 }
@@ -188,24 +188,28 @@ self.addEventListener('notificationclick',event=>{
   event.notification.close();
   event.waitUntil(clearNotificationQueue());
   const data=event.notification.data||{};
-  let destination=data.url||'?openMessages=1';
+  const scopeURL=new URL(self.registration.scope);
+  let destination;
+  try{
+    destination=new URL(data.url||'?openMessages=1',scopeURL);
+  }catch(_){
+    destination=new URL('?openMessages=1',scopeURL);
+  }
+  // Normalize untrusted push payload URLs before manipulating their query strings.
+  if(destination.origin!==scopeURL.origin||!destination.pathname.startsWith(scopeURL.pathname)){
+    destination=new URL('?openMessages=1',scopeURL);
+  }
   if(data.type==='message'){
-    const messageDestination=new URL(destination,self.registration.scope);
-    messageDestination.searchParams.set('openMessages','1');
-    if(data.conversationId&&!messageDestination.searchParams.has('conversation'))messageDestination.searchParams.set('conversation',data.conversationId);
-    destination=messageDestination.href;
+    destination.searchParams.set('openMessages','1');
+    if(data.conversationId&&!destination.searchParams.has('conversation'))destination.searchParams.set('conversation',String(data.conversationId));
   }else if(['album','photo','profile_photo','profile_picture','profile'].includes(data.type)&&data.profileId){
-    const profileDestination=new URL(destination,self.registration.scope);
-    profileDestination.searchParams.set('openProfile',data.profileId);
-    destination=profileDestination.href;
+    destination.searchParams.set('openProfile',String(data.profileId));
   }
   if(event.action==='reply'){
     // The action opens StudentLink's chat composer; web push actions cannot
     // reliably provide a native text field across supported browsers.
-    const replyDestination=new URL(destination,self.registration.scope);
-    replyDestination.searchParams.set('openMessages','1');
-    replyDestination.searchParams.set('reply','1');
-    destination=replyDestination.href;
+    destination.searchParams.set('openMessages','1');
+    destination.searchParams.set('reply','1');
   }
-  event.waitUntil(openStudentLinkDestination(destination));
+  event.waitUntil(openStudentLinkDestination(destination.href));
 });
