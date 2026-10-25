@@ -3,7 +3,7 @@
   window.studentLinkInstallPrompt=null;
   window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();window.studentLinkInstallPrompt=event;var button=document.getElementById('install-app');if(button)button.hidden=false;});
   window.addEventListener('appinstalled',function(){window.studentLinkInstallPrompt=null;var button=document.getElementById('install-app');if(button)button.hidden=true;});
-  var appSrc='assets/app.js?v=studentlink-status-global-fix-75';
+  var appSrc='assets/js/core.js?v=studentlink-refactor-76';
   var sources=[
     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
     'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'
@@ -33,4 +33,4 @@
   document.addEventListener('click',function(event){if(event.target&&event.target.closest('#modalclose')){var modal=document.getElementById('modalbg');if(modal)modal.classList.remove('show');}});
 })();
 
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-install-64").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-refactor-76").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
