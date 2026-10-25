@@ -50,4 +50,4 @@
   document.addEventListener('click',function(event){if(event.target&&event.target.closest('#modalclose')){var modal=document.getElementById('modalbg');if(modal)modal.classList.remove('show');}});
 })();
 
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-refactor-79").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-messages-media-1").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
