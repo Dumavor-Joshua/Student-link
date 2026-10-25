@@ -1788,3 +1788,18 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
  .layout.messages-mode .messenger-chat{height:100%!important;max-height:none!important;min-height:0!important}
  .layout.messages-mode.chat-open .messenger-layout{height:100%!important}
 }
+
+/* Deterministic viewport layout for the Messages workspace. */
+.layout.messages-mode{position:fixed!important;top:68px!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;overflow:hidden!important;z-index:5}
+.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none!important}
+.layout.messages-mode>.main{height:100%!important;min-height:0!important;max-height:none!important;overflow:hidden!important;padding:12px 16px!important;display:flex!important;flex-direction:column!important;gap:0!important}
+.layout.messages-mode>.main>.head{flex:0 0 auto!important;margin:0 0 10px!important}
+.layout.messages-mode>.main>.status-panel{flex:0 0 auto!important;max-height:180px;overflow:hidden;transition:max-height .18s ease,padding .18s ease,margin .18s ease}
+.layout.messages-mode .messenger-layout{flex:1 1 0!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;overflow:hidden!important}
+.layout.messages-mode .messenger-sidebar,.layout.messages-mode .messenger-chat{height:100%!important;min-height:0!important;max-height:none!important}
+.layout.messages-mode .messenger-conversation-list,.layout.messages-mode .messenger-scroll{min-height:0;overscroll-behavior:contain}
+.layout.messages-mode.messages-status-collapsed>.main>.status-panel{max-height:30px!important;padding:4px 10px!important;margin-bottom:6px!important}
+.layout.messages-mode.messages-status-collapsed .status-panel-heading{margin:0!important}
+.layout.messages-mode.messages-status-collapsed .status-panel-heading>span,.layout.messages-mode.messages-status-collapsed .status-compose,.layout.messages-mode.messages-status-collapsed .status-list{display:none!important}
+.layout.messages-mode.messages-status-collapsed .status-panel-heading h2{font-size:13px!important;line-height:20px!important}
+@media(max-width:760px){.layout.messages-mode{top:58px!important}.layout.messages-mode>.main{padding:8px!important}.layout.messages-mode .messenger-layout{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:0!important}.layout.messages-mode .messenger-sidebar{height:100%!important;min-height:0!important}.layout.messages-mode .messenger-chat{height:100%!important;min-height:0!important;max-height:none!important}.layout.messages-mode.chat-open .messenger-layout{height:100%!important}.layout.messages-mode.chat-open .messenger-sidebar{display:none!important}.layout.messages-mode.chat-open .messenger-chat{display:flex!important}}
