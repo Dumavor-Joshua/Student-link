@@ -1822,3 +1822,8 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
 .layout.messages-mode .status-panel{margin-top:0!important}
 .layout.messages-mode.messages-status-collapsed .messages-status-strip .status-list{display:flex!important}
 @media(max-width:760px){.layout.messages-mode .messages-page-head{gap:7px!important;margin-bottom:8px!important}.layout.messages-mode .messages-page-title .title{font-size:18px!important}.layout.messages-mode .messages-page-title p{display:none}.layout.messages-mode .messages-back-feed{min-height:36px!important;padding:6px 8px!important}.layout.messages-mode .messages-status-strip .status-item{flex-basis:40px!important;width:40px!important;min-width:40px!important}.layout.messages-mode .messages-status-strip .status-avatar{width:34px!important;height:34px!important;flex-basis:34px!important}.layout.messages-mode .messages-status-strip .status-copy strong{font-size:9px!important;max-width:40px}}
+
+/* WhatsApp-style active-status ring follows the student across avatars throughout the app. */
+.profile-avatar.has-active-status,.avatar.has-active-status{position:relative;isolation:isolate;border:2px solid transparent!important;background:linear-gradient(var(--card-bg,#172438),var(--card-bg,#172438)) padding-box,conic-gradient(from 0deg,#20c96b,#17b978,#42a5f5,#20c96b) border-box!important;padding:3px!important;box-shadow:0 0 0 1px rgba(32,201,107,.28)!important}
+.profile-avatar.has-active-status img,.avatar.has-active-status img{border-radius:50%;width:100%;height:100%;object-fit:cover}
+.profile-avatar.has-active-status::after,.avatar.has-active-status::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:1px solid rgba(32,201,107,.42);pointer-events:none}
