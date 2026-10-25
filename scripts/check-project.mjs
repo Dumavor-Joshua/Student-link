@@ -4,6 +4,7 @@ import { runInNewContext } from 'node:vm';
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const html = read('index.html');
+const bootstrap = read('assets/bootstrap.js');
 const js = read('assets/app.js');
 const css = read('assets/app.css');
 const sw = read('sw.js');
@@ -30,8 +31,8 @@ assert.ok(sw.includes('const refresh=fetch(request)') && sw.includes('await cach
 assert.ok(sw.includes("payload.conversation_id") && sw.includes("payload.actor_id"), 'Push notification routing must accept database-style snake_case identifiers');
 assert.ok(sw.includes("NOTIFICATION_SUMMARY_TAG='studentlink-notification-summary-v1'") && sw.includes('showGroupedStudentLinkNotification') && sw.includes("NOTIFICATION_QUEUE_LIMIT=5"), 'Push notifications must be aggregated into one expandable, bounded summary');
 assert.ok(js.includes("type:'STUDENTLINK_SHOW_NOTIFICATION'") && sw.includes("message.type!=='STUDENTLINK_SHOW_NOTIFICATION'"), 'Foreground notifications must use the same grouping path as background push');
-assert.ok(html.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
-assert.ok(html.includes('loadLibrary(0)') && html.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
+assert.ok(bootstrap.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
+assert.ok(bootstrap.includes('loadLibrary(0)') && bootstrap.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
 assert.ok(html.includes('rel="preconnect" href="https://cdn.jsdelivr.net"') && html.includes('rel="preconnect" href="https://unpkg.com"'), 'Supabase CDNs must be preconnected to reduce startup latency');
 assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstatic.com'), 'A remote emoji font must not block initial rendering');
 assert.ok(html.includes('min-height:calc(100dvh - 96px)') && html.includes('.startup-skeleton .sk-outline{flex:1;min-height:120px'), 'The mobile sketch skeleton must fill the available viewport height');
