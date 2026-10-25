@@ -5,8 +5,8 @@ import { runInNewContext } from 'node:vm';
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const html = read('index.html');
 const bootstrap = read('assets/bootstrap.js');
-const js = read('assets/app.js');
-const css = read('assets/app.css');
+const js = ['assets/js/core.js','assets/js/notifications.js','assets/js/feed.js','assets/js/messages.js','assets/js/status.js','assets/js/games.js','assets/js/profile.js','assets/js/main.js'].map(read).join('\n');
+const css = ['assets/css/base.css','assets/css/feed.css','assets/css/messages.css','assets/css/profile.css','assets/css/notifications.css','assets/css/games.css'].map(read).join('\n');
 const startup = read('assets/startup.css');
 const sw = read('sw.js');
 const schema = read('supabase_schema.sql');
@@ -24,7 +24,7 @@ const notificationRlsMigration = read('supabase/migrations/20261011_optimize_not
 const manifest = JSON.parse(read('manifest.json'));
 assert.ok(html.includes('href="./manifest.json?v=studentlink-install-62"') && manifest.start_url.includes('source=pwa'), 'PWA entry point must use the refreshed manifest and a stable install start URL');
 assert.ok(manifest.icons.some(icon => icon.src.endsWith('.png?v=studentlink-install-62') && icon.sizes === '192x192' && icon.type === 'image/png' && icon.purpose === 'any') && manifest.icons.some(icon => icon.sizes === '512x512' && icon.purpose === 'maskable'), 'PWA manifest must declare a standard PNG icon and a maskable high-resolution icon');
-assert.ok(html.includes('assets/app.css?v=') && html.includes('assets/bootstrap.js?v=') && sw.includes('assets/app.js?v='), 'StudentLink must keep its multi-file application assets separately versioned');
+assert.ok(html.includes('assets/app.css?v=') && html.includes('assets/bootstrap.js?v=') && sw.includes('assets/js/core.js?v=studentlink-refactor-78'), 'StudentLink must keep its multi-file application assets separately versioned');
 
 assert.ok(html.includes('href="assets/app.css?v='), 'HTML must load the extracted stylesheet, including its cache version');
 assert.ok(sw.includes('assets/icon-192.png?v=studentlink-install-62'), 'Service worker must precache the PNG app icon');
@@ -32,7 +32,7 @@ assert.ok(sw.includes('const refresh=fetch(request)') && sw.includes('await cach
 assert.ok(sw.includes("payload.conversation_id") && sw.includes("payload.actor_id"), 'Push notification routing must accept database-style snake_case identifiers');
 assert.ok(sw.includes("NOTIFICATION_SUMMARY_TAG='studentlink-notification-summary-v1'") && sw.includes('showGroupedStudentLinkNotification') && sw.includes("NOTIFICATION_QUEUE_LIMIT=5"), 'Push notifications must be aggregated into one expandable, bounded summary');
 assert.ok(js.includes("type:'STUDENTLINK_SHOW_NOTIFICATION'") && sw.includes("message.type!=='STUDENTLINK_SHOW_NOTIFICATION'"), 'Foreground notifications must use the same grouping path as background push');
-assert.ok(bootstrap.includes("var appSrc='assets/app.js?v="), 'HTML must load the extracted application script through the resilient loader with its cache version');
+assert.ok(bootstrap.includes("'assets/js/core.js?v=studentlink-refactor-78'"), 'HTML must load the extracted application script through the resilient loader with its cache version');
 assert.ok(bootstrap.includes('loadLibrary(0)') && bootstrap.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
 assert.ok(html.includes('rel="preconnect" href="https://cdn.jsdelivr.net"') && html.includes('rel="preconnect" href="https://unpkg.com"'), 'Supabase CDNs must be preconnected to reduce startup latency');
 assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstatic.com'), 'A remote emoji font must not block initial rendering');
@@ -146,7 +146,7 @@ assert.ok(js.includes('async function sendBrowserNotification') && js.includes('
 assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
 assert.ok(js.includes("pushParams.get('openProfile')") && js.includes("item.type==='message'") && js.includes('S.publicProfileId=item.actor_id'), 'Notification links must open message conversations or the relevant profile');
 assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
-assert.ok(html.includes('studentlink-status-add-placement-73') && sw.includes('studentlink-status-add-placement-73') && sw.includes('studentlink-shell-v73'), 'Performance fix must ship with matching fresh app-shell cache versions');
+assert.ok(html.includes('studentlink-refactor-78') && sw.includes('studentlink-refactor-78') && sw.includes('studentlink-shell-v78'), 'Performance fix must ship with matching fresh app-shell cache versions');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
 assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
@@ -159,7 +159,7 @@ assert.ok(html.includes('rel="icon" type="image/svg+xml" href="assets/favicon.sv
 assert.ok(js.includes("document.getElementById('google-signin')"), 'Google button must be located during auth rendering');
 assert.ok(js.includes("googleButton?.addEventListener('click'") , 'Continue with Google must have a click handler');
 assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), 'Continue with Google must use Supabase Google OAuth');
-assert.match(bootstrap, /var appSrc='assets\/app\.js\?v=studentlink-[^']+'/, 'App script cache version must be refreshed after application changes');
+assert.ok(bootstrap.includes('var appSources=[') && bootstrap.includes("'assets/js/main.js?v=studentlink-refactor-78'"), 'Feature modules must load sequentially through the resilient app loader');
 assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
@@ -176,7 +176,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-status-add-placement-73') && sw.includes('studentlink-status-add-placement-73') && sw.includes('studentlink-shell-v73'), 'Updated app and service-worker assets must use matching fresh cache versions');
+assert.ok(html.includes('studentlink-refactor-78') && sw.includes('studentlink-refactor-78') && sw.includes('studentlink-shell-v78'), 'Updated app and service-worker assets must use matching fresh cache versions');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -188,7 +188,7 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600)'), 'Message files must use expiring signed URLs suitable for inline previews');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-status-add-placement-73') && sw.includes('studentlink-status-add-placement-73') && sw.includes('studentlink-shell-v73'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-refactor-78') && sw.includes('studentlink-refactor-78') && sw.includes('studentlink-shell-v78'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
 
 assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('<details class="status-compose">'), 'Statuses must use a compact horizontal story tray with an expandable composer and viewer');
@@ -273,7 +273,7 @@ assert.ok(js.includes('setupStudentLinkImageViewer') && js.includes('studentlink
 assert.ok(js.includes('message-attachment-image') && js.includes("startsWith('image/')") && js.includes('createSignedUrl(m.attachment_path,3600)'), 'Chat image attachments must render inline using viewable signed URLs');
 assert.ok(css.includes('.message-attachment-image-wrap') && css.includes('.message-attachment-image'), 'Chat image previews must have responsive styles');
 assert.ok(css.includes('.studentlink-image-viewer') && css.includes('image-viewer-prev'), 'Image preview must have responsive overlay and image navigation styles');
-assert.ok(html.includes('studentlink-status-add-placement-73') && sw.includes('studentlink-shell-v73'), 'Image preview release must refresh shell and service-worker cache versions');
+assert.ok(html.includes('studentlink-refactor-78') && sw.includes('studentlink-shell-v78'), 'Image preview release must refresh shell and service-worker cache versions');
 
 assert.ok(css.includes('messages-status-collapsed') && css.includes('.layout.messages-mode .messenger-layout{flex:1 1 auto!important'), 'Messages should collapse statuses on scroll and fill the available viewport');
 assert.ok(js.includes('setupMessagesStatusCollapse') && js.includes('main.scrollTop>35'), 'Messages page should collapse status section after scrolling');
