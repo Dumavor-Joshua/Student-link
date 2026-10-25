@@ -57,6 +57,7 @@ const swRuntime = {
     addEventListener: (type, handler) => { swHandlers[type] = handler; }
   },
   caches: { open: async () => ({ addAll: async () => {}, put: async () => {} }), keys: async () => [], match: async () => null },
+  clients: { matchAll: async () => [], openWindow: async url => { swRuntime.openedUrl = url; return { url }; } },
   console: { warn: () => {}, error: () => {}, log: () => {} }
 };
 runInNewContext(sw, swRuntime);
@@ -68,6 +69,15 @@ swHandlers.message({
 await Promise.all(messageWaits);
 assert.equal(capturedNotifications.length, 1, 'Service worker must still show a notification when IndexedDB is unavailable');
 assert.match(capturedNotifications[0].options.body, /Queue works without IndexedDB/, 'Fallback notification must preserve its message body');
+const clickWaits = [];
+swHandlers.notificationclick({
+  notification: { data: { url: 'http://[invalid-url', type: 'message' }, close: () => {} },
+  action: '',
+  waitUntil: promise => clickWaits.push(promise)
+});
+await Promise.all(clickWaits);
+assert.match(swRuntime.openedUrl, /^https:\/\/studentlink\.test\//, 'Malformed notification URLs must safely fall back inside StudentLink');
+assert.match(swRuntime.openedUrl, /openMessages=1/, 'Malformed message notification URLs must fall back to the messages view');
 assert.ok(js.includes("type:'STUDENTLINK_SHOW_NOTIFICATION'") && sw.includes("message.type!=='STUDENTLINK_SHOW_NOTIFICATION'"), 'Foreground notifications must use the same grouping path as background push');
 assert.ok(bootstrap.includes("'assets/js/core.js?v=studentlink-refactor-79'"), 'HTML must load the extracted application script through the resilient loader with its cache version');
 assert.ok(bootstrap.includes('loadLibrary(0)') && bootstrap.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
