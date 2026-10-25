@@ -6,6 +6,9 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf
 const html = read('index.html');
 const bootstrap = read('assets/bootstrap.js');
 const js = ['assets/js/core.js','assets/js/notifications.js','assets/js/feed.js','assets/js/messages.js','assets/js/status.js','assets/js/games.js','assets/js/profile.js','assets/js/main.js'].map(read).join('\n');
+const declaredFunctions = [...js.matchAll(/(?:^|\n)\s*(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g)].map((match) => match[1]);
+const duplicateFunctionNames = declaredFunctions.filter((name, index) => declaredFunctions.indexOf(name) !== index);
+assert.deepEqual([...new Set(duplicateFunctionNames)], [], 'Application JavaScript must not redeclare named functions across modules');
 const css = ['assets/css/base.css','assets/css/feed.css','assets/css/messages.css','assets/css/profile.css','assets/css/notifications.css','assets/css/games.css'].map(read).join('\n');
 const startup = read('assets/startup.css');
 const sw = read('sw.js');
