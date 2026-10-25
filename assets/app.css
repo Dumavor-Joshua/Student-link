@@ -1827,3 +1827,19 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
 .profile-avatar.has-active-status,.avatar.has-active-status{position:relative;isolation:isolate;border:2px solid transparent!important;background:linear-gradient(var(--card-bg,#172438),var(--card-bg,#172438)) padding-box,conic-gradient(from 0deg,#20c96b,#17b978,#42a5f5,#20c96b) border-box!important;padding:3px!important;box-shadow:0 0 0 1px rgba(32,201,107,.28)!important}
 .profile-avatar.has-active-status img,.avatar.has-active-status img{border-radius:50%;width:100%;height:100%;object-fit:cover}
 .profile-avatar.has-active-status::after,.avatar.has-active-status::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:1px solid rgba(32,201,107,.42);pointer-events:none}
+
+/* Add-status control is the first item in the status row, not above the chats. */
+.layout.messages-mode .messages-status-strip{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important}
+.layout.messages-mode .messages-status-strip .status-compose-inline{position:relative;flex:0 0 auto;margin:0!important;align-self:center}
+.layout.messages-mode .messages-status-strip .status-compose-inline>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;white-space:nowrap;min-height:36px;padding:7px 12px;border:1px solid var(--border,#344054);border-radius:18px;background:var(--card-bg,transparent);font-size:13px;font-weight:600}
+.layout.messages-mode .messages-status-strip .status-compose-inline>summary::-webkit-details-marker{display:none}
+.layout.messages-mode .messages-status-strip .status-compose-inline .status-add-compact{display:none}
+.layout.messages-mode .messages-status-strip .status-compose-inline[open] .status-form{position:absolute;z-index:40;right:0;top:calc(100% + 8px);width:min(320px,80vw);padding:12px;border:1px solid var(--border,#344054);border-radius:12px;background:var(--card-bg,#101827);box-shadow:0 8px 28px #0004;display:flex;flex-direction:column;gap:8px}
+.layout.messages-mode .messages-status-strip .status-compose-inline .status-form input{max-width:100%;min-width:0}
+.layout.messages-mode .messages-status-strip .status-list{flex:0 1 auto!important;justify-content:flex-end!important}
+@media(max-width:760px){
+.layout.messages-mode .messages-status-strip{gap:5px!important}
+.layout.messages-mode .messages-status-strip .status-compose-inline>summary{width:36px;height:36px;min-height:36px;padding:0;border-radius:50%;font-size:22px;line-height:1}
+.layout.messages-mode .messages-status-strip .status-add-wide{display:none}
+.layout.messages-mode .messages-status-strip .status-add-compact{display:inline}
+}
