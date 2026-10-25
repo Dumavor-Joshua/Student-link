@@ -54,10 +54,10 @@ const swRuntime = {
       scope: 'https://studentlink.test/',
       showNotification: async (title, options) => { capturedNotifications.push({ title, options }); }
     },
-    addEventListener: (type, handler) => { swHandlers[type] = handler; }
+    addEventListener: (type, handler) => { swHandlers[type] = handler; },
+    clients: { matchAll: async () => [], openWindow: async url => { swRuntime.openedUrl = url; return { url }; } }
   },
   caches: { open: async () => ({ addAll: async () => {}, put: async () => {} }), keys: async () => [], match: async () => null },
-  clients: { matchAll: async () => [], openWindow: async url => { swRuntime.openedUrl = url; return { url }; } },
   console: { warn: () => {}, error: () => {}, log: () => {} }
 };
 runInNewContext(sw, swRuntime);
