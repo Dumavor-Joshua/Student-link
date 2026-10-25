@@ -42,6 +42,7 @@ assert.ok(sw.includes('assets/icon-192.png?v=studentlink-install-62'), 'Service 
 assert.ok(sw.includes('const refresh=fetch(request)') && sw.includes('await caches.match(rootURL)'), 'Service worker must serve cached shell assets immediately and refresh them in the background');
 assert.ok(sw.includes("payload.conversation_id") && sw.includes("payload.actor_id"), 'Push notification routing must accept database-style snake_case identifiers');
 assert.ok(sw.includes("NOTIFICATION_SUMMARY_TAG='studentlink-notification-summary-v1'") && sw.includes('showGroupedStudentLinkNotification') && sw.includes("NOTIFICATION_QUEUE_LIMIT=5"), 'Push notifications must be aggregated into one expandable, bounded summary');
+assert.ok(sw.includes('function cleanNotificationQueue(items)') && sw.includes('fallbackNotificationQueue=cleanNotificationQueue([...fallbackNotificationQueue,item])'), 'Notification queue fallback must remain usable when IndexedDB is unavailable');
 assert.ok(js.includes("type:'STUDENTLINK_SHOW_NOTIFICATION'") && sw.includes("message.type!=='STUDENTLINK_SHOW_NOTIFICATION'"), 'Foreground notifications must use the same grouping path as background push');
 assert.ok(bootstrap.includes("'assets/js/core.js?v=studentlink-refactor-79'"), 'HTML must load the extracted application script through the resilient loader with its cache version');
 assert.ok(bootstrap.includes('loadLibrary(0)') && bootstrap.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
