@@ -7,7 +7,7 @@
     'assets/js/core.js?v=studentlink-refactor-79',
     'assets/js/notifications.js?v=studentlink-refactor-79',
     'assets/js/feed.js?v=studentlink-refactor-79',
-    'assets/js/messages.js?v=studentlink-status-button-2',
+    'assets/js/messages.js?v=studentlink-messages-media-1',
     'assets/js/status.js?v=studentlink-refactor-79',
     'assets/js/games.js?v=studentlink-refactor-79',
     'assets/js/profile.js?v=studentlink-refactor-79',
@@ -50,4 +50,4 @@
   document.addEventListener('click',function(event){if(event.target&&event.target.closest('#modalclose')){var modal=document.getElementById('modalbg');if(modal)modal.classList.remove('show');}});
 })();
 
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-refactor-79").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-messages-media-1").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
