@@ -188,24 +188,28 @@ self.addEventListener('notificationclick',event=>{
   event.notification.close();
   event.waitUntil(clearNotificationQueue());
   const data=event.notification.data||{};
-  let destination=data.url||'?openMessages=1';
+  const scopeURL=new URL(self.registration.scope);
+  let destination;
+  try{
+    destination=new URL(data.url||'?openMessages=1',scopeURL);
+  }catch(_){
+    destination=new URL('?openMessages=1',scopeURL);
+  }
+  // Normalize untrusted push payload URLs before manipulating their query strings.
+  if(destination.origin!==scopeURL.origin||!destination.pathname.startsWith(scopeURL.pathname)){
+    destination=new URL('?openMessages=1',scopeURL);
+  }
   if(data.type==='message'){
-    const messageDestination=new URL(destination,self.registration.scope);
-    messageDestination.searchParams.set('openMessages','1');
-    if(data.conversationId&&!messageDestination.searchParams.has('conversation'))messageDestination.searchParams.set('conversation',data.conversationId);
-    destination=messageDestination.href;
+    destination.searchParams.set('openMessages','1');
+    if(data.conversationId&&!destination.searchParams.has('conversation'))destination.searchParams.set('conversation',String(data.conversationId));
   }else if(['album','photo','profile_photo','profile_picture','profile'].includes(data.type)&&data.profileId){
-    const profileDestination=new URL(destination,self.registration.scope);
-    profileDestination.searchParams.set('openProfile',data.profileId);
-    destination=profileDestination.href;
+    destination.searchParams.set('openProfile',String(data.profileId));
   }
   if(event.action==='reply'){
     // The action opens StudentLink's chat composer; web push actions cannot
     // reliably provide a native text field across supported browsers.
-    const replyDestination=new URL(destination,self.registration.scope);
-    replyDestination.searchParams.set('openMessages','1');
-    replyDestination.searchParams.set('reply','1');
-    destination=replyDestination.href;
+    destination.searchParams.set('openMessages','1');
+    destination.searchParams.set('reply','1');
   }
-  event.waitUntil(openStudentLinkDestination(destination));
+  event.waitUntil(openStudentLinkDestination(destination.href));
 });
