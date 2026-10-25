@@ -46,6 +46,7 @@ assert.ok(sw.includes('function cleanNotificationQueue(items)') && sw.includes('
 const swHandlers = {};
 const capturedNotifications = [];
 const swRuntime = {
+  URL,
   self: {
     location: { href: 'https://studentlink.test/sw.js', origin: 'https://studentlink.test' },
     registration: {
