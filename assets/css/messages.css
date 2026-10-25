@@ -1,1 +1,273 @@
-/* messages styles are currently retained in base.css in original cascade order. */
+/* StudentLink messages styles extracted from the shared stylesheet. */
+
+.messenger-layout{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:14px;min-height:460px;height:min(68vh,720px)}
+
+.messenger-sidebar,.messenger-chat{border:1px solid var(--line);border-radius:12px;background:var(--p);min-width:0;min-height:0;overflow:hidden}
+
+.messenger-sidebar{display:flex;flex-direction:column}
+.messenger-sidebar-head{padding:14px;border-bottom:1px solid var(--line)}
+
+.messenger-conversation-list{overflow-y:auto;min-height:0}
+
+.messenger-conversation{display:flex;gap:10px;align-items:center;width:100%;padding:12px;text-align:left;background:transparent;color:var(--txt);border:0;border-bottom:1px solid var(--line);cursor:pointer;min-width:0}
+
+.messenger-conversation:hover,.messenger-conversation.active{background:var(--p2)}
+
+.messenger-conversation-copy{min-width:0;flex:1}
+.messenger-conversation-copy strong,.messenger-preview{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.messenger-chat{display:flex;flex-direction:column}
+.messenger-chat-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+
+.messenger-chat-head .messenger-chat-person{flex:1;min-width:0}
+.messenger-chat-head h2{font-size:16px;margin:0}
+
+.messenger-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:16px;min-height:0;overscroll-behavior:contain}
+
+.messenger-empty{margin:auto;text-align:center;color:var(--muted);padding:24px}
+
+.message-row{display:flex;flex-direction:column;max-width:min(78%,520px);align-self:flex-start;gap:3px}
+.message-row.mine{align-self:flex-end;align-items:flex-end}
+
+.message-bubble{background:var(--p2);padding:9px 13px;border-radius:18px 18px 18px 5px;overflow-wrap:anywhere;white-space:pre-wrap}
+
+.message-row.mine .message-bubble{background:var(--blue);color:white;border-radius:18px 18px 5px 18px}
+
+.message-time{font-size:10px;color:var(--muted);padding:0 5px}
+
+.messenger-composer{display:flex;gap:8px;align-items:flex-end;padding:12px;border-top:1px solid var(--line);padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+
+.messenger-composer textarea{flex:1;min-width:0;min-height:42px;max-height:120px;resize:vertical;border-radius:20px;padding:10px 14px;font-size:16px}
+
+.messenger-composer .btn{min-height:42px}
+.messenger-back{display:none}
+.messenger-search{margin-top:10px;font-size:16px}
+
+.layout.messages-mode .messenger-layout{flex:1 1 auto;width:100%;min-width:0;height:calc(100dvh - 150px);min-height:360px;max-height:900px}
+
+.layout.messages-mode .messenger-sidebar{min-width:0}
+
+.layout.messages-mode .messenger-chat{min-width:0}
+
+.layout.messages-mode .messenger-scroll{overscroll-behavior:contain}
+
+.message-attachment,.message-attachment-unavailable{display:inline-flex;align-items:center;gap:6px;max-width:100%;margin-top:5px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--p);color:var(--txt);text-decoration:none;overflow-wrap:anywhere;word-break:break-word}
+
+.message-attachment{text-decoration:underline;text-underline-offset:3px}
+
+.message-attachment:hover{background:var(--p2)}
+
+.message-attachment-size{font-size:11px;color:var(--muted);text-decoration:none;white-space:nowrap}
+
+.messenger-attachment-status{padding:7px 12px 0;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+
+.messenger-composer .messenger-attach{flex:0 0 auto;min-width:42px;padding:9px 11px;font-size:18px}
+
+.messenger-composer .messenger-attach:disabled{opacity:.55;cursor:wait}
+
+.messages-back-feed:focus-visible,.message-link:focus-visible{outline:3px solid #7da2ff;outline-offset:2px}
+
+.message-link{color:#1459c7;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;overflow-wrap:anywhere;word-break:break-word}
+
+.message-row.mine .message-link{color:#fff;text-decoration-thickness:1.5px}
+
+.message-attachment-wrap{max-width:100%}
+
+.message-file-input{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+
+.message-file-input:focus-visible+.messenger-attach{outline:3px solid #7da2ff;outline-offset:2px}
+
+.messenger-composer .messenger-attach{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border-radius:50%;flex:0 0 42px;padding:8px}
+
+.messenger-attachment-status[hidden]{display:none!important}
+
+.messenger-attachment-status{flex:0 0 100%;padding:4px 10px 0}
+
+.feedback-status.status-in_review,.feedback-status.status-planned{background:#fff4d9;color:#765019}
+
+.feedback-status.status-closed,.feedback-status.status-rejected{background:#eef1f5;color:#566174}
+
+.feedback-status.status-resolved{background:#e8f7f1;color:#126b57}
+
+.nav-unread-badge,.messenger-unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#e5484d;color:#fff;font-size:11px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+
+.nav-unread-badge[hidden],.messenger-unread-badge[hidden]{display:none!important}
+
+.messenger-conversation{position:relative}
+
+.messenger-conversation .messenger-unread-badge{flex:0 0 auto;margin-left:auto;align-self:center}
+
+
+/* Main-app shortcut shares the unread-conversation count with the sidebar. */
+.message-count-shortcut{white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+
+.layout.messages-mode .messenger-layout{width:100%!important;min-width:0!important;max-width:none!important}
+
+body:not(:has(.auth)) .messages-mode .messenger-layout{border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--surface-shadow)}
+
+body:not(:has(.auth)) .messages-mode .messenger-sidebar,
+body:not(:has(.auth)) .messages-mode .messenger-chat{background:var(--p)}
+
+
+/* StudentLink cross-device layout and chat media controls. */
+.status-panel{padding:12px 14px;margin-bottom:14px;min-width:0}
+.status-panel-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.status-panel-heading h2{font-size:16px;margin:0}
+.status-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,220px) auto;gap:8px;margin:10px 0}
+.status-form input{min-width:0;max-width:100%;font-size:16px}
+.status-list{display:flex;gap:10px;overflow-x:auto;max-width:100%;padding:4px 0 8px;overscroll-behavior-x:contain}
+.status-item{flex:0 0 min(260px,82vw);display:flex;gap:9px;align-items:flex-start;min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--p2)}
+.status-avatar{flex:0 0 auto}
+.status-copy{min-width:0;overflow-wrap:anywhere}
+.status-copy strong,.status-copy time{display:block}
+.status-copy p{margin:5px 0;white-space:pre-wrap}
+.status-media-link{display:inline-flex;margin-top:4px;color:var(--mint)}
+.status-empty{padding:6px}
+.messenger-composer{flex-wrap:wrap}
+.messenger-composer textarea{flex:1 1 160px}
+.view-once-toggle{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-size:12px;color:var(--muted)}
+.view-once-toggle input{width:18px;height:18px}
+.sticker-picker{order:5;flex:1 0 100%;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--p2)}
+.sticker-picker[hidden]{display:none}
+.sticker-choice{min-width:0;min-height:40px;font-size:23px;border:0;border-radius:8px;background:transparent;color:var(--txt);cursor:pointer}
+.sticker-choice:hover{background:var(--line)}
+.message-sticker{font-size:48px;line-height:1.2;white-space:normal}
+.view-once-open{border:1px solid var(--line);border-radius:9px;background:var(--p);color:var(--txt);padding:9px 12px;min-height:42px;cursor:pointer;max-width:100%;overflow-wrap:anywhere}
+.view-once-label{font-size:13px;color:var(--muted)}
+
+.studentlink-image-viewer .image-viewer-full{display:block;max-width:min(100%,1200px);max-height:calc(100dvh - 100px);width:auto;height:auto;object-fit:contain;border-radius:8px;cursor:default;user-select:none;-webkit-user-drag:none}
+
+.studentlink-image-viewer .image-viewer-close{top:max(12px,env(safe-area-inset-top,0px));right:12px;font-size:30px}
+
+.studentlink-image-viewer .image-viewer-prev{left:12px;top:50%;transform:translateY(-50%)}
+.studentlink-image-viewer .image-viewer-next{right:12px;top:50%;transform:translateY(-50%)}
+
+.studentlink-image-viewer .image-viewer-caption{position:absolute;left:64px;right:64px;bottom:max(12px,env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;line-height:1.4;color:#dce5f7;overflow-wrap:anywhere}
+
+body.image-viewer-open{overflow:hidden!important;touch-action:none}
+
+
+/* WhatsApp-style inline image attachments in chat bubbles. */
+.message-attachment-image-wrap{display:block;max-width:min(100%,360px);margin:6px 0 4px;overflow:hidden;border-radius:12px;background:var(--p2,#203454)}
+
+.message-attachment-image{display:block;width:auto;max-width:100%;max-height:360px;min-width:0;object-fit:contain;border-radius:12px;cursor:zoom-in}
+
+.message-attachment-image-wrap+.message-attachment{display:inline-flex;align-items:center;gap:6px;margin-top:3px}
+
+.message-bubble .message-attachment-image{touch-action:manipulation}
+
+
+
+/* WhatsApp-style compact status tray and full-screen story viewer. */
+.status-panel{padding:10px 12px!important;margin-bottom:10px!important}
+.status-panel-heading{align-items:center!important;margin-bottom:7px}
+.status-panel-heading h2{font-size:15px!important}
+.status-panel-heading>span{font-size:11px}
+.status-compose{margin:4px 0 8px}
+.status-compose summary{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:5px 10px;border:1px solid var(--line);border-radius:18px;color:var(--txt);font-size:12px;cursor:pointer;list-style:none}
+.status-compose summary::-webkit-details-marker{display:none}
+.status-form{grid-template-columns:minmax(0,1fr) minmax(120px,180px) auto!important;gap:6px!important;margin:8px 0 4px!important}
+.status-form input{min-width:0;font-size:13px!important;padding:7px 9px!important}
+.status-form button{min-height:34px;padding:6px 10px!important}
+.status-list{display:flex;align-items:flex-start;gap:14px!important;overflow-x:auto!important;overflow-y:hidden;max-width:100%;padding:5px 2px 8px!important;scrollbar-width:thin}
+.status-item{position:relative;flex:0 0 68px!important;width:68px;display:flex!important;flex-direction:column;align-items:center!important;gap:5px!important;min-width:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;text-align:center;cursor:pointer;outline-offset:3px}
+.status-avatar{width:60px;height:60px;flex:0 0 60px!important;display:flex;align-items:center;justify-content:center;padding:3px;border-radius:50%;border:2px solid var(--mint);background:var(--bg);overflow:hidden}
+.status-avatar .avatar{width:100%!important;height:100%!important;border-radius:50%!important;overflow:hidden}
+.status-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.status-copy{width:100%;min-width:0!important;overflow:hidden;text-align:center}
+.status-copy strong{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:500}
+.status-copy time,.status-copy p,.status-copy img{display:none!important}
+.status-empty{padding:4px 0!important;margin:0;font-size:12px}
+.status-item:focus-visible .status-avatar,.status-item:hover .status-avatar{box-shadow:0 0 0 2px var(--blue)}
+.status-viewer{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;gap:12px;padding:calc(12px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px));background:rgba(3,8,20,.98);color:#fff}
+.status-viewer-progress{height:3px;flex:0 0 3px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden}
+.status-viewer-progress span{display:block;width:100%;height:100%;background:#fff}
+.status-viewer-heading{padding-right:42px;font-size:13px;font-weight:600;overflow-wrap:anywhere}
+.status-viewer-close{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:28px;line-height:1;cursor:pointer}
+.status-viewer-content{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:auto}
+.status-viewer-image{display:block;max-width:100%;max-height:76dvh;width:auto;height:auto;object-fit:contain;border-radius:10px}
+.status-viewer-text{max-width:680px;margin:0;padding:10px 14px;text-align:center;font-size:17px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.status-viewer-open{overflow:hidden}
+
+
+/* Story tray media thumbnails: media, not the poster's profile photo. */
+.status-thumb-image,.status-thumb-video{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.status-thumb-text{display:flex;width:100%;height:100%;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(145deg,#536dfe,#b34de5);color:#fff;font-size:20px;font-weight:700}
+.status-avatar:has(.status-thumb-image),.status-avatar:has(.status-thumb-video){padding:2px;border-color:var(--mint)}
+.status-copy .status-preview-video{display:none!important}
+.status-viewer-video{display:block;max-width:100%;max-height:76dvh;width:auto;height:auto;border-radius:10px;background:#000}
+.status-thumb-video{pointer-events:none}
+
+.layout.messages-mode .status-panel{flex:0 0 auto;transition:padding .18s ease,margin .18s ease}
+
+.layout.messages-mode .messenger-layout{flex:1 1 auto!important;height:auto!important;min-height:0!important;max-height:none!important;width:100%;margin-bottom:0}
+
+.layout.messages-mode .messenger-sidebar,.layout.messages-mode .messenger-chat{height:100%;min-height:0}
+
+.layout.messages-mode .messenger-conversation-list,.layout.messages-mode .messenger-scroll{overscroll-behavior:contain}
+
+.layout.messages-mode .messenger-chat{min-height:0}
+
+.layout.messages-mode.messages-status-collapsed .status-panel{padding:5px 10px!important;margin-bottom:6px!important}
+
+.layout.messages-mode.messages-status-collapsed .status-panel-heading{margin-bottom:0!important}
+
+.layout.messages-mode.messages-status-collapsed .status-panel-heading>span,
+.layout.messages-mode.messages-status-collapsed .status-compose,
+.layout.messages-mode.messages-status-collapsed .status-list{display:none!important}
+
+.layout.messages-mode.messages-status-collapsed .status-panel-heading h2{font-size:13px!important}
+
+.layout.messages-mode>.main>.status-panel{flex:0 0 auto!important;max-height:180px;overflow:hidden;transition:max-height .18s ease,padding .18s ease,margin .18s ease}
+
+.layout.messages-mode .messenger-layout{flex:1 1 0!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;overflow:hidden!important}
+
+.layout.messages-mode .messenger-sidebar,.layout.messages-mode .messenger-chat{height:100%!important;min-height:0!important;max-height:none!important}
+
+.layout.messages-mode .messenger-conversation-list,.layout.messages-mode .messenger-scroll{min-height:0;overscroll-behavior:contain}
+
+.layout.messages-mode.messages-status-collapsed>.main>.status-panel{max-height:30px!important;padding:4px 10px!important;margin-bottom:6px!important}
+
+.layout.messages-mode.messages-status-collapsed .status-panel-heading{margin:0!important}
+
+.layout.messages-mode.messages-status-collapsed .status-panel-heading>span,.layout.messages-mode.messages-status-collapsed .status-compose,.layout.messages-mode.messages-status-collapsed .status-list{display:none!important}
+
+.layout.messages-mode.messages-status-collapsed .status-panel-heading h2{font-size:13px!important;line-height:20px!important}
+
+
+/* Final behavior: hide the entire status section while scrolling down the conversation list. */
+.layout.messages-mode.messages-status-collapsed>.main>.status-panel{max-height:0!important;height:0!important;min-height:0!important;flex-basis:0!important;padding-top:0!important;padding-bottom:0!important;margin-top:0!important;margin-bottom:0!important;border-width:0!important;opacity:0!important;overflow:hidden!important;pointer-events:none!important;visibility:hidden!important;transition:max-height .2s ease,opacity .15s ease,padding .2s ease,margin .2s ease!important}
+
+.layout.messages-mode>.main>.status-panel{opacity:1;visibility:visible;transition:max-height .2s ease,opacity .15s ease,padding .2s ease,margin .2s ease!important}
+
+.layout.messages-mode .messages-status-strip .status-list{display:flex!important;flex:0 1 auto!important;justify-content:flex-end!important;align-items:center!important;width:max-content;max-width:100%;min-width:0;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;padding:2px 4px!important;gap:8px!important;scroll-behavior:smooth;overscroll-behavior-x:contain;mask-image:linear-gradient(to left,#000 0%,#000 88%,transparent 100%)}
+
+.layout.messages-mode .messages-status-strip .status-list::-webkit-scrollbar{display:none}
+
+.layout.messages-mode .messages-status-strip .status-item{flex:0 0 48px!important;width:48px!important;min-width:48px!important;gap:2px!important;transition:transform .22s ease,opacity .22s ease}
+
+.layout.messages-mode .messages-status-strip .status-avatar{width:42px!important;height:42px!important;flex-basis:42px!important;padding:2px!important}
+
+.layout.messages-mode .messages-status-strip .status-copy strong{font-size:10px!important;max-width:48px}
+
+.layout.messages-mode .messages-status-strip .status-copy time,.layout.messages-mode .messages-status-strip .status-copy p{display:none!important}
+
+.layout.messages-mode .messages-status-strip .status-item:hover{transform:translateY(-2px) scale(1.04)}
+
+.layout.messages-mode .status-panel{margin-top:0!important}
+
+.layout.messages-mode.messages-status-collapsed .messages-status-strip .status-list{display:flex!important}
+
+.layout.messages-mode .messages-status-strip .status-compose-inline{position:relative;flex:0 0 auto;margin:0!important;align-self:center}
+
+.layout.messages-mode .messages-status-strip .status-compose-inline>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;white-space:nowrap;min-height:36px;padding:7px 12px;border:1px solid var(--border,#344054);border-radius:18px;background:var(--card-bg,transparent);font-size:13px;font-weight:600}
+
+.layout.messages-mode .messages-status-strip .status-compose-inline>summary::-webkit-details-marker{display:none}
+
+.layout.messages-mode .messages-status-strip .status-compose-inline .status-add-compact{display:none}
+
+.layout.messages-mode .messages-status-strip .status-compose-inline[open] .status-form{position:absolute;z-index:40;right:0;top:calc(100% + 8px);width:min(320px,80vw);padding:12px;border:1px solid var(--border,#344054);border-radius:12px;background:var(--card-bg,#101827);box-shadow:0 8px 28px #0004;display:flex;flex-direction:column;gap:8px}
+
+.layout.messages-mode .messages-status-strip .status-compose-inline .status-form input{max-width:100%;min-width:0}
+
+.layout.messages-mode .messages-status-strip .status-list{flex:0 1 auto!important;justify-content:flex-end!important}

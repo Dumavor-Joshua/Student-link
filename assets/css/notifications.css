@@ -1,1 +1,26 @@
-/* notifications styles are currently retained in base.css in original cascade order. */
+/* StudentLink notifications styles extracted from the shared stylesheet. */
+
+#studentlink-notification-history .notification-card-actions{display:flex;align-items:flex-start;gap:8px;min-width:0}
+
+#studentlink-notification-history .notification-open{overflow-wrap:anywhere}
+
+#studentlink-notification-history .notification-dismiss{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ flex:0 0 34px!important;width:34px!important;min-width:34px!important;height:34px!important;
+ padding:0!important;border:1px solid var(--line)!important;border-radius:9px!important;
+ background:var(--p)!important;color:var(--txt)!important;font-size:16px!important;
+ line-height:1!important;cursor:pointer!important;opacity:1!important;visibility:visible!important
+}
+
+#studentlink-notification-history .notification-dismiss:disabled{opacity:.6!important;cursor:wait!important}
+
+#studentlink-notification-history .notification-empty-state{padding:12px;text-align:center;color:var(--muted)}
+
+
+#studentlink-notification-history .notification-panel-heading{
+ position:sticky!important;top:0!important;z-index:2147483001!important;
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:12px!important;min-height:58px!important;margin:0 -14px 10px!important;
+ padding:10px 14px!important;background:var(--p)!important;
+ border-bottom:1px solid var(--line)!important;box-sizing:border-box!important;
+}

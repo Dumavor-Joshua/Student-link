@@ -1,1 +1,246 @@
-/* feed styles are currently retained in base.css in original cascade order. */
+/* StudentLink feed styles extracted from the shared stylesheet. */
+.post-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+
+
+
+/* Responsive trending schools and school-filter results */
+.trending-mobile-wrap{display:none}
+
+.trending-school{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;width:100%;text-align:left;cursor:pointer;font:inherit}
+
+.trending-school:hover{border-color:var(--mint)}
+
+.trending-school .tiny{display:block}
+
+.post-top{gap:10px;align-items:center}
+
+.post-top b{color:#283448}
+
+body:not(:has(.auth)) .leftside,body:not(:has(.auth)) .rightside,body:not(:has(.auth)) .trending-mobile-wrap{background:#172746;border-color:#354a6d}
+
+body:not(:has(.auth)) .trending-mobile-wrap h3,body:not(:has(.auth)) .rightside h3{color:#f5f7ff}
+
+body:not(:has(.auth)) .trending-school{background:#eaf0f8;color:#202938;border:1px solid #cbd6e6}
+
+body:not(:has(.auth)) .trending-school b{color:#202938;display:block;overflow-wrap:anywhere;white-space:normal}
+
+body:not(:has(.auth)) .trending-school .tiny{color:#5b687c}
+
+
+
+/* StudentLink profile/feed controls */
+.feed-head{align-items:flex-start;gap:14px;flex-wrap:wrap}
+.feed-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.feed-controls select{max-width:170px;min-height:40px;border:1px solid var(--border,#d8deea);border-radius:10px;padding:8px;background:var(--surface,#fff);color:inherit}
+.post-delete{padding:6px 10px;min-height:34px;font-size:12px}
+
+.post-image-wrap{margin:12px 0;overflow:hidden;border-radius:10px;background:var(--p2);text-align:center}
+
+.post-image{display:block;width:auto;max-width:100%;max-height:560px;margin:0 auto;object-fit:contain}
+
+:root[data-theme="light"] .header,
+:root[data-theme="light"] .leftside,
+:root[data-theme="light"] .rightside,
+:root[data-theme="light"] .trending-mobile-wrap,
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .modal,
+:root[data-theme="light"] .search-results{background:var(--p);color:var(--txt);border-color:var(--line)}
+
+:root[data-theme="dark"] .header,
+:root[data-theme="dark"] .leftside,
+:root[data-theme="dark"] .rightside,
+:root[data-theme="dark"] .trending-mobile-wrap,
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .modal,
+:root[data-theme="dark"] .search-results{background:var(--p);color:var(--txt);border-color:var(--line)}
+
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3,
+:root[data-theme="light"] .title,
+:root[data-theme="light"] .profile-name-link,
+:root[data-theme="light"] .post-content,
+:root[data-theme="light"] .comment,
+:root[data-theme="light"] .comment-content,
+:root[data-theme="light"] .trending-school b{color:#171a17}
+
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] .title,
+:root[data-theme="dark"] .profile-name-link,
+:root[data-theme="dark"] .post-content,
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-content,
+:root[data-theme="dark"] .trending-school b{color:#f7f8fa}
+
+:root[data-theme="light"] .tiny,
+:root[data-theme="light"] .trending-school .tiny{color:var(--muted)}
+
+:root[data-theme="dark"] .tiny,
+:root[data-theme="dark"] .trending-school .tiny{color:var(--muted)}
+
+:root[data-theme="light"] .btn-secondary,
+:root[data-theme="light"] .trending-school,
+:root[data-theme="light"] .comment,
+:root[data-theme="light"] .comment-item{background:#e8e9e4;color:#171a17;border-color:var(--line)}
+
+:root[data-theme="dark"] .btn-secondary,
+:root[data-theme="dark"] .trending-school,
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-item{background:#222f45;color:#f7f8fa;border-color:var(--line)}
+
+:root[data-theme="light"] .trending-mobile-wrap{background:#e1eafa;color:#17243b;border-color:#c7d4eb}
+
+:root[data-theme="light"] .trending-school,
+:root[data-theme="light"] .comment,
+:root[data-theme="light"] .comment-item{background:#e2eaf9;color:#17243b;border-color:#c7d4eb}
+
+:root[data-theme="light"] .comment-content,
+:root[data-theme="light"] .trending-school b,
+:root[data-theme="light"] .post-content,
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3{color:#17243b}
+
+/* In dark mode, make the comment text bright without whitening the comment panel. */
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-content,
+:root[data-theme="dark"] .comment-item,
+:root[data-theme="dark"] .comment-item p,
+:root[data-theme="dark"] .comment-item span{color:#fff}
+
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-item{background:#222f45}
+
+
+
+/* Light mode polish: enforce dark headings and add subtle, minimal visual structure. */
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3,
+:root[data-theme="light"] h4,
+:root[data-theme="light"] h5,
+:root[data-theme="light"] h6,
+:root[data-theme="light"] .title,
+:root[data-theme="light"] .section-title,
+:root[data-theme="light"] .card-title,
+:root[data-theme="light"] .panel-title,
+:root[data-theme="light"] .auth-card-heading,
+:root[data-theme="light"] .auth-card-heading h2,
+:root[data-theme="light"] .auth-intro h1,
+:root[data-theme="light"] .profile-name,
+:root[data-theme="light"] .profile-name-link,
+:root[data-theme="light"] .trending-school b,
+:root[data-theme="light"] .leftside h3,
+:root[data-theme="light"] .rightside h3,
+:root[data-theme="light"] .main h2,
+:root[data-theme="light"] .main h3{color:#17243b!important}
+
+:root[data-theme="light"] .trending-mobile-wrap,
+:root[data-theme="light"] .trending-school{
+  border-radius:12px;
+}
+
+:root[data-theme="light"] .trending-school{
+  box-shadow:inset 3px 0 0 #8ba8e8;
+}
+
+:root[data-theme="light"] body,
+:root[data-theme="light"] body *,
+:root[data-theme="light"] .auth,
+:root[data-theme="light"] .auth *,
+:root[data-theme="light"] input,
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] select,
+:root[data-theme="light"] option,
+:root[data-theme="light"] button,
+:root[data-theme="light"] .navitem,
+:root[data-theme="light"] .tiny,
+:root[data-theme="light"] .muted,
+:root[data-theme="light"] .comment,
+:root[data-theme="light"] .comment *,
+:root[data-theme="light"] .trending-school,
+:root[data-theme="light"] .trending-school *,
+:root[data-theme="light"] .profile-name-link,
+:root[data-theme="light"] .post-content{color:#000000!important}
+
+
+
+/* Feed composer box */
+.post-composer{
+  padding:16px 18px;
+  border:1px solid #dbe4f3;
+  background:linear-gradient(125deg,#ffffff 0%,#f7f9ff 65%,#f1fbf8 100%);
+  box-shadow:0 5px 18px rgba(39,67,117,.07);
+}
+
+.post-composer-top{display:flex;align-items:center;gap:12px}
+
+.post-composer-avatar{
+  display:flex;align-items:center;justify-content:center;flex:0 0 42px;height:42px;
+  border-radius:50%;background:#e6edff;color:#315fce;font-size:21px;font-weight:800;
+}
+
+.post-composer-prompt{
+  flex:1;min-width:0;text-align:left;padding:12px 15px;border:1px solid #e0e6f0;
+  border-radius:999px;background:#f4f6fa;color:#515d70;font:inherit;cursor:pointer;
+  transition:border-color .16s ease,background .16s ease,box-shadow .16s ease;
+}
+
+.post-composer-prompt:hover{background:#fff;border-color:#8aa7ed;box-shadow:0 0 0 3px rgba(49,95,206,.08)}
+
+.post-composer-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 0;padding-top:12px;border-top:1px solid #e8edf5}
+
+.post-composer-actions .tiny{display:inline-flex;align-items:center;gap:5px}
+
+.post-composer-actions .btn{margin-left:auto}
+
+.feed-head{display:flex;align-items:center;justify-content:space-between;gap:14px}
+
+.feed-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.feed-controls label{margin:0}
+
+:root[data-theme="dark"] .post-composer{background:linear-gradient(125deg,#172746,#1b2e4a);border-color:#354a6d}
+
+:root[data-theme="dark"] .post-composer-prompt{background:#203454;border-color:#354a6d;color:#f5f7ff}
+
+:root[data-theme="dark"] .post-composer-actions{border-color:#354a6d}
+
+:root[data-theme="dark"] .post-composer-avatar{background:#2b4166;color:#cbdcff}
+
+
+
+/* Replace the browser's default file-picker text with a clear Add button. */
+.post-image-input{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+
+.field:has(.post-image-input:focus-visible) .post-image-add,
+.post-image-add:focus-visible{outline:3px solid #8aa7ed;outline-offset:3px}
+
+.post-image-add{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:9px 18px;border-radius:10px;cursor:pointer;font-weight:600}
+
+.trending-mobile-wrap.messages-view{display:none}
+
+.trending-mobile-wrap.messages-view{display:none!important}
+
+body:not(:has(.auth)) .post-top .avatar{flex-shrink:0}
+
+body:not(:has(.auth)) .rightside h3,body:not(:has(.auth)) .trending-mobile-wrap h3{
+  font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted);font-weight:850
+}
+
+body:not(:has(.auth)) .trending-school{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:13px;margin:8px 0;border:1px solid var(--line);border-radius:13px;background:var(--p);color:var(--txt);text-align:left;cursor:pointer}
+
+body:not(:has(.auth)) .trending-school:hover{border-color:var(--blue);transform:translateY(-1px)}
+
+body:not(:has(.auth)) .trending-mobile-wrap{display:none}
+
+.feed-heading{flex:1;min-width:0;text-align:center}
+
+.feed-heading .title{margin-left:auto;margin-right:auto}
+
+
+
+/* Accessible full-screen in-app image preview for posts, profiles, statuses and chat. */
+.post-image,.profile-public-post img,.status-panel img,.message-bubble img{cursor:zoom-in}
