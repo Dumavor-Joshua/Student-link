@@ -72,6 +72,7 @@ These require a dedicated test Supabase project and real browser/device testing.
 - Added regression assertions for duplicate class attributes, duplicate IDs in the HTML shell, missing local asset references, and the duplicate feed-controls rule.
 - Added a regression assertion against duplicate named function declarations across the application JavaScript modules.
 - Fixed a service-worker fallback bug: notification queue cleanup was scoped inside `try` but called from `catch`, which could throw a `ReferenceError` when IndexedDB was unavailable. The cleanup now lives in a shared helper, and a regression assertion covers the fallback path.
+- Fixed an offline app-shell gap: the service worker previously precached application modules and feature CSS but omitted `assets/bootstrap.js` and `assets/startup.css`, both required to boot and render the app shell offline. Added both exact versioned URLs, bumped the shell cache to `studentlink-shell-v80`, and added a regression assertion for these assets.
 - Kept the work on a separate branch so `main` remains untouched while broader changes are reviewed.
 
 ## Recommended implementation order
