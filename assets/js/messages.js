@@ -78,7 +78,7 @@ async function openConversation(conversationId){
  };
  $('#messenger-back').onclick=()=>{layout.classList.remove('chat-open');document.querySelector('.layout')?.classList.remove('messages-chat-open');S.chat=null};
  const fileInput=$('#message-file'),attachButton=$('#attach-file'),attachmentStatus=$('#attachment-status');
- const stickerPicker=$('#sticker-picker');$('#sticker-toggle').onclick=()=>{stickerPicker.hidden=!stickerPicker.hidden};stickerPicker.querySelectorAll('[data-sticker]').forEach(b=>b.onclick=async()=>{stickerPicker.hidden=true;await sendStickerMessage(conversationId,b.dataset.sticker)});
+ const stickerPicker=$('#sticker-picker'),stickerToggle=$('#sticker-toggle');stickerToggle.setAttribute('aria-expanded','false');stickerToggle.onclick=()=>{stickerPicker.hidden=!stickerPicker.hidden;stickerToggle.setAttribute('aria-expanded',String(!stickerPicker.hidden))};stickerPicker.querySelectorAll('[data-sticker]').forEach(b=>b.onclick=async()=>{stickerPicker.hidden=true;stickerToggle.setAttribute('aria-expanded','false');b.disabled=true;try{await sendStickerMessage(conversationId,b.dataset.sticker)}finally{b.disabled=false}});if(!document.documentElement.dataset.stickerDismissBound){document.documentElement.dataset.stickerDismissBound='1';document.addEventListener('click',event=>{const picker=$('#sticker-picker'),toggle=$('#sticker-toggle');if(picker&&!picker.hidden&&!event.target.closest('#sticker-picker')&&!event.target.closest('#sticker-toggle')){picker.hidden=true;toggle?.setAttribute('aria-expanded','false')}});document.addEventListener('keydown',event=>{if(event.key==='Escape'){const picker=$('#sticker-picker'),toggle=$('#sticker-toggle');if(picker&&!picker.hidden){picker.hidden=true;toggle?.setAttribute('aria-expanded','false')}}})}
  attachButton.onclick=()=>fileInput.click();
  fileInput.onchange=()=>{const file=fileInput.files?.[0];if(!file){attachmentStatus.hidden=true;attachmentStatus.textContent='';return;}if(file.size<=0||file.size>=5*1024*1024){toast('Choose a non-empty file smaller than 5 MB.');fileInput.value='';attachmentStatus.hidden=true;attachmentStatus.textContent='';return;}attachmentStatus.textContent='📎 '+file.name+' · '+formatAttachmentSize(file.size)+' · ready to send';attachmentStatus.hidden=false;};
  $('#msgtext').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#msgform').requestSubmit()}});
@@ -89,10 +89,26 @@ async function sendStickerMessage(conversationId,sticker){
  try{const {error}=await db.from('messages').insert({conversation_id:conversationId,sender_id:S.session.user.id,body:'[[sticker]]'+sticker});if(error)throw error;await loadConvos();await openConversation(conversationId)}
  catch(error){console.error('Sticker send failed:',error);toast('Sticker could not be sent. Try again.')}
 }
+function showViewOnceImagePreview(url){
+ const overlay=document.createElement('div');overlay.className='studentlink-image-viewer view-once-image-viewer';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','View-once image preview');
+ overlay.innerHTML='<button type="button" class="image-viewer-close" aria-label="Close view-once image">×</button><img class="image-viewer-full" alt="View-once image"><div class="image-viewer-caption">This image is view-once. Close the preview when finished.</div>';
+ const image=overlay.querySelector('img');image.src=url;
+ const close=()=>{image.removeAttribute('src');overlay.remove();document.body.classList.remove('image-viewer-open');document.removeEventListener('keydown',onKey);};
+ const onKey=event=>{if(event.key==='Escape'){event.preventDefault();close();}};
+ overlay.addEventListener('click',event=>{if(event.target===overlay||event.target.closest('.image-viewer-close'))close();});
+ document.body.appendChild(overlay);document.body.classList.add('image-viewer-open');document.addEventListener('keydown',onKey);overlay.querySelector('.image-viewer-close').focus();
+}
 async function openViewOnceMessage(messageId){
- const win=window.open('about:blank','_blank');if(win)win.opener=null;
- try{const {data:path,error}=await db.rpc('studentlink_consume_view_once',{p_message_id:messageId});if(error)throw error;if(!path){if(win)win.close();toast('This view-once photo has already been opened or is unavailable.');return;}const {data,error:signedError}=await db.storage.from('message-files').createSignedUrl(path,60);if(signedError)throw signedError;if(win)win.location.replace(data.signedUrl);else toast('Your browser blocked the photo. Allow pop-ups and try again.');await openConversation(S.chat)}
- catch(error){if(win)win.close();console.error('View-once open failed:',error);toast('This photo could not be opened. It may already have been viewed.')}
+ try{
+  const conversationId=S.chat;
+  const {data:path,error}=await db.rpc('studentlink_consume_view_once',{p_message_id:messageId});
+  if(error)throw error;
+  if(!path){toast('This view-once photo has already been opened or is unavailable.');return;}
+  const {data,error:signedError}=await db.storage.from('message-files').createSignedUrl(path,60);
+  if(signedError)throw signedError;
+  if(conversationId&&S.chat===conversationId)await openConversation(conversationId);
+  showViewOnceImagePreview(data.signedUrl);
+ }catch(error){console.error('View-once open failed:',error);toast('This photo could not be opened. It may already have been viewed.')}
 }
 async function renderMessageRows(rows){
  const messages=rows||[];
