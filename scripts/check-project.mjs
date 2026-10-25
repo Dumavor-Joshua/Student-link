@@ -146,7 +146,7 @@ assert.ok(js.includes('async function sendBrowserNotification') && js.includes('
 assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
 assert.ok(js.includes("pushParams.get('openProfile')") && js.includes("item.type==='message'") && js.includes('S.publicProfileId=item.actor_id'), 'Notification links must open message conversations or the relevant profile');
 assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
-assert.ok(html.includes('studentlink-messages-layout-69') && sw.includes('studentlink-messages-layout-69') && sw.includes('studentlink-shell-v69'), 'Performance fix must ship with matching fresh app-shell cache versions');
+assert.ok(html.includes('studentlink-status-scrolltop-70') && sw.includes('studentlink-status-scrolltop-70') && sw.includes('studentlink-shell-v70'), 'Performance fix must ship with matching fresh app-shell cache versions');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
 assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
@@ -176,7 +176,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-messages-layout-69') && sw.includes('studentlink-messages-layout-69') && sw.includes('studentlink-shell-v69'), 'Updated app and service-worker assets must use matching fresh cache versions');
+assert.ok(html.includes('studentlink-status-scrolltop-70') && sw.includes('studentlink-status-scrolltop-70') && sw.includes('studentlink-shell-v70'), 'Updated app and service-worker assets must use matching fresh cache versions');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -188,7 +188,7 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrl(m.attachment_path,3600)'), 'Message files must use expiring signed URLs suitable for inline previews');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-messages-layout-69') && sw.includes('studentlink-messages-layout-69') && sw.includes('studentlink-shell-v69'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-status-scrolltop-70') && sw.includes('studentlink-status-scrolltop-70') && sw.includes('studentlink-shell-v70'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
 
 assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('<details class="status-compose">'), 'Statuses must use a compact horizontal story tray with an expandable composer and viewer');
@@ -273,10 +273,13 @@ assert.ok(js.includes('setupStudentLinkImageViewer') && js.includes('studentlink
 assert.ok(js.includes('message-attachment-image') && js.includes("startsWith('image/')") && js.includes('createSignedUrl(m.attachment_path,3600)'), 'Chat image attachments must render inline using viewable signed URLs');
 assert.ok(css.includes('.message-attachment-image-wrap') && css.includes('.message-attachment-image'), 'Chat image previews must have responsive styles');
 assert.ok(css.includes('.studentlink-image-viewer') && css.includes('image-viewer-prev'), 'Image preview must have responsive overlay and image navigation styles');
-assert.ok(html.includes('studentlink-messages-layout-69') && sw.includes('studentlink-shell-v69'), 'Image preview release must refresh shell and service-worker cache versions');
+assert.ok(html.includes('studentlink-status-scrolltop-70') && sw.includes('studentlink-shell-v70'), 'Image preview release must refresh shell and service-worker cache versions');
 
 assert.ok(css.includes('messages-status-collapsed') && css.includes('.layout.messages-mode .messenger-layout{flex:1 1 auto!important'), 'Messages should collapse statuses on scroll and fill the available viewport');
 assert.ok(js.includes('setupMessagesStatusCollapse') && js.includes('main.scrollTop>35'), 'Messages page should collapse status section after scrolling');
 
 assert.ok(css.includes('position:fixed!important;top:68px!important') && css.includes('grid-template-columns:minmax(0,1fr)!important'), 'Messages workspace must occupy the viewport below the header');
 assert.ok(js.includes("layout.querySelector('#convos')?.addEventListener('scroll',collapse") && js.includes('messages-status-collapsed'), 'Status tray must collapse when chat areas are scrolled');
+
+assert.ok(js.includes('const syncList=()=>{if(list&&list.scrollTop<=2)expand();else collapse();}') && js.includes("list.addEventListener('wheel'"), 'Status tray must hide on downward chat-list scroll and return at list top');
+assert.ok(css.includes('visibility:hidden!important') && css.includes('flex-basis:0!important'), 'Collapsed status section must fully disappear');
