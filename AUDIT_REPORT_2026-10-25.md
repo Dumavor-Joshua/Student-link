@@ -89,3 +89,11 @@ These require a dedicated test Supabase project and real browser/device testing.
 ## Release status
 
 **Not release-ready on the strength of static inspection alone.** This branch is an incremental start, not a claim that every line, every database policy, and every real-device behavior has already been proven correct.
+
+
+## Follow-up: status composer control and safe cleanup — 25 October 2026
+
+- Made the Add status summary control explicitly toggle the composer, keep its expanded state accessible, and focus the status text field when opened. This removes reliance on the browser's default `details/summary` toggle behavior alone.
+- Added a regression check for the explicit status-button behavior.
+- Versioned the changed messaging script in the HTML preload, bootstrap loader, and service-worker shell, and bumped the shell cache to `studentlink-shell-v81` so installed PWAs fetch the updated control.
+- Reviewed repository files before deletion. Existing `pages/*.html` routes are compatibility redirects, icon variants are referenced by the web app manifest, and root SQL files may serve as setup/bootstrap scripts distinct from incremental migrations. These were retained because deleting them without deployment/reference history could break shared links or database setup. No file was deleted merely because its name looked old.
