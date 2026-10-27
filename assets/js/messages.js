@@ -37,6 +37,10 @@ async function viewMessages(){
   });
   statusComposer.addEventListener('toggle',()=>statusToggle.setAttribute('aria-expanded',String(statusComposer.open)));
  }
+ if(S.openStatusComposerOnMessages){
+  S.openStatusComposerOnMessages=false;
+  if(statusComposer&&statusToggle){statusComposer.open=true;statusToggle.setAttribute('aria-expanded','true');requestAnimationFrame(()=>$('#status-text')?.focus());}
+ }
  const renderList=(filter='')=>{const q=filter.trim().toLowerCase(),items=S.convos.filter(c=>c.otherNickname.toLowerCase().includes(q)||String(c.lastMessage||'').toLowerCase().includes(q));
  container.innerHTML=items.length?items.map(c=>'<button type="button" class="messenger-conversation '+(S.chat===c.id?'active':'')+'" data-convo="'+esc(c.id)+'">'+profileAvatarMarkup(c.otherNickname,c.otherAvatar||'','avatar',c.otherId)+'<span class="messenger-conversation-copy"><strong>'+esc(c.otherNickname)+'</strong><span class="tiny messenger-preview">'+esc(c.lastMessage||'No messages yet')+'</span></span><span class="messenger-unread-badge"'+(c.unreadCount?'':' hidden')+' aria-label="'+esc(c.unreadCount)+' unread messages">'+esc(c.unreadCount||0)+'</span></button>').join(''):'<div class="messenger-empty">'+(S.convos.length?'No matching conversations.':'No conversations yet. Add a friend to start chatting.')+'</div>';
  container.querySelectorAll('[data-convo]').forEach(el=>el.onclick=()=>openConversation(el.dataset.convo));};
