@@ -73,7 +73,7 @@ if(!window.__studentLinkGlobalControlsBound){
   if(brand){event.preventDefault();event.stopPropagation();if(typeof setView==='function')setView('feed');document.querySelector('.trending-mobile-wrap')?.classList.remove('scroll-collapsed');window.scrollTo({top:0,behavior:'auto'});document.querySelector('.main')?.scrollTo({top:0,behavior:'auto'});}
  },true);
 }
-/* Header brand is a reliable, direct shortcut back to the Feed. */
+/* Header brand is a reliable, direct shortcut back to Home. */
 if(!window.__studentLinkBrandShortcutBound){
  window.__studentLinkBrandShortcutBound=true;
  document.addEventListener('click',event=>{
