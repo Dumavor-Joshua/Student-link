@@ -1,0 +1,24 @@
+<!-- Home feed's static structure. Data-driven post cards are rendered by feed.js. -->
+<div class="head feed-head">
+  <div class="feed-heading"><h1 class="title">Home</h1></div>
+  <div class="feed-controls">
+    <label for="feed-filter" class="tiny">Show</label>
+    <select id="feed-filter" aria-label="Filter posts">
+      <option value="all" {{allSelected}}>All schools</option>
+      <option value="school" {{schoolSelected}} {{schoolDisabled}}>My school</option>
+    </select>
+    <button class="btn btn-secondary" id="add-status-feed" type="button">＋ Add status</button>
+    <button class="btn" id="new-post" type="button">New post</button>
+  </div>
+</div>
+<section class="card post-composer" aria-label="Create a post">
+  <div class="post-composer-top">
+    <span class="post-composer-avatar" aria-hidden="true">✎</span>
+    <button type="button" class="post-composer-prompt" id="post-composer-open">Share something with your school community…</button>
+  </div>
+  <div class="post-composer-actions">
+    <span class="tiny">💬 Start a discussion</span>
+    <span class="tiny">🖼️ Add a photo or poll</span>
+    <button type="button" class="btn btn-secondary" id="post-composer-create">Create post +</button>
+  </div>
+</section>
