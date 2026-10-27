@@ -12,6 +12,7 @@ assert.deepEqual([...new Set(duplicateFunctionNames)], [], 'Application JavaScri
 const css = ['assets/css/base.css','assets/css/feed.css','assets/css/messages.css','assets/css/profile.css','assets/css/notifications.css','assets/css/games.css'].map(read).join('\n');
 const startup = read('assets/startup.css');
 const sw = read('sw.js');
+const homeTemplate = read('pages/templates/home-feed.html');
 const schema = read('supabase_schema.sql');
 const migration = read('supabase/migrations/20261009_harden_poll_vote_policy.sql');
 const profileMigration = read('supabase/migrations/20261009_profile_photos_deactivation_and_feed.sql');
@@ -28,6 +29,8 @@ const manifest = JSON.parse(read('manifest.json'));
 assert.ok(html.includes('href="./manifest.json?v=studentlink-install-62"') && manifest.start_url.includes('source=pwa'), 'PWA entry point must use the refreshed manifest and a stable install start URL');
 assert.ok(manifest.icons.some(icon => icon.src.endsWith('.png?v=studentlink-install-62') && icon.sizes === '192x192' && icon.type === 'image/png' && icon.purpose === 'any') && manifest.icons.some(icon => icon.sizes === '512x512' && icon.purpose === 'maskable'), 'PWA manifest must declare a standard PNG icon and a maskable high-resolution icon');
 assert.ok(html.includes('assets/css/base.css?v=') && html.includes('assets/bootstrap.js?v=') && sw.includes('assets/js/core.js?v=studentlink-refactor-79'), 'StudentLink must keep its multi-file application assets separately versioned');
+assert.ok(js.includes("fetch('pages/templates/home-feed.html')") && homeTemplate.includes('id="feed-filter"') && homeTemplate.includes('id="post-composer-open"'), 'Home feed structure must live in an external HTML template loaded by feed.js');
+assert.ok(sw.includes("new URL('./pages/templates/home-feed.html',BASE).href") && sw.includes('studentlink-shell-v81'), 'External Home template must be cached for offline use under the refreshed shell cache');
 assert.ok(html.includes('<div class="sk-label sk-label-top">'), 'Startup skeleton label must use one valid class attribute');
 assert.ok(!/<[^>]+\bclass="[^"]*"\s+class="/.test(html), 'HTML must not contain duplicate class attributes on one element');
 const htmlIds = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
