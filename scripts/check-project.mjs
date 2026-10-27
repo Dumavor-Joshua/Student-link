@@ -36,10 +36,10 @@ for (const match of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)(?:[?#][^"]*)?
   assert.doesNotThrow(() => read(match[1]), `Referenced local asset must exist: ${match[1]}`);
 }
 
-assert.ok(html.includes('href="assets/css/base.css?v=studentlink-refactor-80"') && html.includes('href="assets/css/feed.css?v=studentlink-refactor-80"') && html.includes('href="assets/css/messages.css?v=studentlink-status-whatsapp-3"'), 'HTML must load the extracted stylesheet, including its cache version');
+assert.ok(html.includes('href="assets/css/base.css?v=studentlink-refactor-80"') && html.includes('href="assets/css/feed.css?v=studentlink-refactor-80"') && html.includes('href="assets/css/messages.css?v=studentlink-status-whatsapp-4"'), 'HTML must load the extracted stylesheet, including its cache version');
 assert.equal((read('assets/css/feed.css').match(/\.feed-controls\{display:flex;align-items:center;gap:8px;flex-wrap:wrap\}/g) || []).length, 1, 'Feed controls CSS rule must not be duplicated');
 assert.ok(sw.includes('assets/icon-192.png?v=studentlink-install-62'), 'Service worker must precache the PNG app icon');
-assert.ok(sw.includes("studentlink-shell-v87") && sw.includes('assets/startup.css?v=studentlink-split-65') && sw.includes('assets/bootstrap.js?v=studentlink-status-whatsapp-3'), 'Offline app shell must cache the startup styles and application loader needed by the HTML entry point');
+assert.ok(sw.includes("studentlink-shell-v88") && sw.includes('assets/startup.css?v=studentlink-split-65') && sw.includes('assets/bootstrap.js?v=studentlink-status-whatsapp-4'), 'Offline app shell must cache the startup styles and application loader needed by the HTML entry point');
 assert.ok(sw.includes('const refresh=fetch(request)') && sw.includes('await caches.match(rootURL)'), 'Service worker must serve cached shell assets immediately and refresh them in the background');
 assert.ok(sw.includes("payload.conversation_id") && sw.includes("payload.actor_id"), 'Push notification routing must accept database-style snake_case identifiers');
 assert.ok(sw.includes("NOTIFICATION_SUMMARY_TAG='studentlink-notification-summary-v1'") && sw.includes('showGroupedStudentLinkNotification') && sw.includes("NOTIFICATION_QUEUE_LIMIT=5"), 'Push notifications must be aggregated into one expandable, bounded summary');
@@ -193,7 +193,7 @@ assert.ok(js.includes('async function sendBrowserNotification') && js.includes('
 assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
 assert.ok(js.includes("pushParams.get('openProfile')") && js.includes("item.type==='message'") && js.includes('S.publicProfileId=item.actor_id'), 'Notification links must open message conversations or the relevant profile');
 assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
-assert.ok(html.includes('studentlink-status-whatsapp-3') && bootstrap.includes('studentlink-status-whatsapp-3') && sw.includes('studentlink-status-whatsapp-3') && sw.includes('studentlink-shell-v87'), 'Performance fix must ship with matching fresh app-shell cache versions');
+assert.ok(html.includes('studentlink-status-whatsapp-4') && bootstrap.includes('studentlink-status-whatsapp-4') && sw.includes('studentlink-status-whatsapp-4') && sw.includes('studentlink-shell-v87'), 'Performance fix must ship with matching fresh app-shell cache versions');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
 assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
@@ -238,7 +238,7 @@ assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachme
 assert.ok(html.includes('studentlink-refactor-80') && sw.includes('studentlink-refactor-80') && sw.includes('studentlink-shell-v87'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
 assert.ok(js.includes("statusToggle.addEventListener('click'") && js.includes("statusComposer.open=!statusComposer.open") && js.includes("requestAnimationFrame(()=>$('#status-text')?.focus())") && js.includes('id="status-add-button"'), 'Add status button must be visible, explicitly open, and focus the status composer');
-assert.ok(html.includes('studentlink-status-whatsapp-3') && bootstrap.includes('studentlink-status-whatsapp-3') && sw.includes('studentlink-status-whatsapp-3') && sw.includes('studentlink-shell-v87'), 'Status button release must update preload, loader, and service-worker cache versions');
+assert.ok(html.includes('studentlink-status-whatsapp-4') && bootstrap.includes('studentlink-status-whatsapp-4') && sw.includes('studentlink-status-whatsapp-4') && sw.includes('studentlink-shell-v87'), 'Status button release must update preload, loader, and service-worker cache versions');
 
 assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('<details class="status-compose'), 'Statuses must use a compact horizontal story tray with an expandable composer and viewer');
 assert.ok(js.includes('status-thumb-image') && js.includes('status-thumb-video') && js.includes('status-thumb-text'), 'Status tray icons must use media thumbnails or text artwork instead of profile photos');
