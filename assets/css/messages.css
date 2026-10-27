@@ -303,3 +303,19 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
 /* Keep the status composer visible when the status strip is collapsed. */
 .layout.messages-mode.messages-status-collapsed .messages-status-strip .status-compose-inline[open]{display:block!important;visibility:visible!important;opacity:1!important}
 .layout.messages-mode.messages-status-collapsed .messages-status-strip .status-compose-inline[open] .status-form{display:flex!important;visibility:visible!important}
+
+
+/* Status tray: keep the Add status action visible; reveal the composer only on demand. */
+.status-panel-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.status-panel-heading h2{margin-right:auto}
+.status-add-button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:8px 14px;border:0;border-radius:22px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap}
+.status-add-button:hover{filter:brightness(1.08)}
+.status-add-button:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+.status-add-compact{display:none}
+.status-compose:not([open]){display:none!important}
+.status-form{grid-template-columns:minmax(0,1fr) minmax(140px,220px) auto!important;align-items:start}
+.status-form textarea{grid-column:1/-1;width:100%;min-width:0;min-height:76px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--p);color:var(--txt);font:inherit;font-size:16px}
+.status-form input[type=file]{max-width:100%;font-size:13px!important}
+.layout.messages-mode.messages-status-collapsed .status-panel-heading .status-add-button{display:inline-flex!important;visibility:visible!important;opacity:1!important}
+.layout.messages-mode.messages-status-collapsed .status-panel .status-compose{display:none!important}
+@media(max-width:520px){.status-panel-heading{gap:8px}.status-add-button{min-height:36px;padding:7px 12px;font-size:13px}.status-add-wide{display:inline}.status-add-compact{display:none}.status-form{grid-template-columns:minmax(0,1fr)!important}.status-form textarea,.status-form input[type=file],.status-form button{grid-column:1/-1;width:100%}}
