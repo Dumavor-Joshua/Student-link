@@ -292,3 +292,10 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
  .layout.messages-mode .messages-status-strip .status-add-compact{display:inline}
  .layout.messages-mode .messages-status-strip .status-add-button{width:42px;height:42px;min-width:42px;padding:0;border-radius:50%;font-size:20px}
 }
+
+
+/* Make the status action unmistakable on both wide and narrow screens. */
+.layout.messages-mode .messages-status-strip .status-add-button{display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important;min-width:max-content!important;width:auto!important;height:auto!important;padding:8px 12px!important;border:1px solid var(--line)!important;border-radius:20px!important;background:var(--p2)!important;color:var(--txt)!important;font-size:13px!important;font-weight:700!important;white-space:nowrap!important;overflow:visible!important}
+.layout.messages-mode .messages-status-strip .status-add-wide{display:inline!important}
+.layout.messages-mode .messages-status-strip .status-add-compact{display:none!important}
+@media(max-width:760px){.layout.messages-mode .messages-status-strip{display:flex!important;visibility:visible!important;opacity:1!important;overflow:visible!important;flex-wrap:nowrap!important;min-height:46px!important}.layout.messages-mode .messages-status-strip .status-add-button{min-width:max-content!important;width:auto!important;height:42px!important;padding:0 12px!important;border-radius:22px!important;font-size:13px!important}.layout.messages-mode .messages-status-strip .status-add-wide{display:inline!important}.layout.messages-mode .messages-status-strip .status-add-compact{display:none!important}}
