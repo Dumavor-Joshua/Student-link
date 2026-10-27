@@ -243,3 +243,21 @@ body:not(:has(.auth)) .trending-mobile-wrap{display:none}
 
 /* Accessible full-screen in-app image preview for posts, profiles, statuses and chat. */
 .post-image,.profile-public-post img,.status-panel img,.message-bubble img{cursor:zoom-in}
+
+
+/* Home heading row: keep the school filter and New post action together, eliminating the orphaned second row. */
+.feed-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:12px;margin-bottom:12px!important}
+.feed-heading{flex:0 0 auto;min-width:0;text-align:left}
+.feed-heading .title{margin:0!important;text-align:left}
+.feed-controls{flex:0 1 auto;min-width:0;display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-end;gap:8px}
+.feed-controls select{width:196px;max-width:196px;min-width:0;flex:0 1 196px}
+#new-post{flex:0 0 auto;white-space:nowrap;min-height:40px}
+#add-status-feed{flex:0 0 auto;white-space:nowrap;min-height:40px}
+@media(max-width:760px){
+ .feed-head{align-items:center;flex-wrap:wrap;row-gap:8px}
+ .feed-heading{flex:1 1 100%;text-align:left}
+ .feed-controls{width:100%;justify-content:flex-start;flex-wrap:wrap}
+ .feed-controls select{flex:1 1 130px;width:auto;max-width:none}
+ #new-post{order:2}
+ #add-status-feed{order:3}
+}
