@@ -58,7 +58,7 @@ The migration `supabase/migrations/20261011_enforce_blocks_on_contact.sql` makes
 
 ## Status media and expiry
 
-Status media is stored in the private `status-media` bucket. The `20261118_harden_status_media_and_expiry.sql` migration enforces owner-matched storage paths, a 24-hour expiry window, and a 10 MB limit for the supported image and video MIME types (MP4, WebM, and QuickTime). Apply this migration to an existing Supabase project before relying on the updated status uploader. The migration does not itself schedule deletion of expired storage objects; periodic cleanup still needs to be configured.
+Status media is stored in the private `status-media` bucket. The `20261118_harden_status_media_and_expiry.sql` migration enforces owner-matched storage paths, a 24-hour expiry window, and a 10 MB limit for the supported image and video MIME types (MP4, WebM, and QuickTime). Apply this migration to an existing Supabase project before relying on the updated status uploader. The migration does not itself schedule deletion of expired storage objects. The `cleanup-expired-statuses` Edge Function removes expired rows and unshared media in batches of 500. To enable the hourly job: deploy the function with JWT verification disabled; set the `STATUS_CLEANUP_SECRET` function secret; create matching `project_url` and `status_cleanup_secret` entries in Supabase Vault; then apply `20261118_schedule_expired_status_cleanup.sql`. The function independently checks the bearer secret and uses the server-side service-role key; never put either secret in browser code or Git. The migration intentionally fails if the Vault entries are missing.
 
 ## Notification compatibility
 
