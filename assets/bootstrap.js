@@ -5,13 +5,13 @@
   window.addEventListener('appinstalled',function(){window.studentLinkInstallPrompt=null;var button=document.getElementById('install-app');if(button)button.hidden=true;});
   var appSources=[
     'assets/js/core.js?v=studentlink-perf-1',
-    'assets/js/notifications.js?v=studentlink-refactor-80',
-    'assets/js/feed.js?v=studentlink-refactor-80',
+    'assets/js/notifications.js?v=studentlink-perf-1',
+    'assets/js/feed.js?v=studentlink-perf-1',
     'assets/js/messages.js?v=studentlink-perf-1',
     'assets/js/status.js?v=studentlink-perf-1',
-    'assets/js/games.js?v=studentlink-refactor-80',
-    'assets/js/profile.js?v=studentlink-refactor-80',
-    'assets/js/main.js?v=studentlink-refactor-80'
+    'assets/js/games.js?v=studentlink-perf-1',
+    'assets/js/profile.js?v=studentlink-perf-1',
+    'assets/js/main.js?v=studentlink-perf-1'
   ];
   var sources=[
     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
