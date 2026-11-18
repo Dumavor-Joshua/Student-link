@@ -27,6 +27,7 @@ const notificationRlsMigration = read('supabase/migrations/20261011_optimize_not
 const statusMediaMigration = read('supabase/migrations/20261118_harden_status_media_and_expiry.sql');
 const statusCleanupFunction = read('supabase/functions/cleanup-expired-statuses/index.ts');
 const statusCleanupMigration = read('supabase/migrations/20261118_schedule_expired_status_cleanup.sql');
+const supabaseConfig = read('supabase/config.toml');
 const manifest = JSON.parse(read('manifest.json'));
 assert.ok(html.includes('href="./manifest.json?v=studentlink-install-62"') && manifest.start_url.includes('source=pwa'), 'PWA entry point must use the refreshed manifest and a stable install start URL');
 assert.ok(manifest.icons.some(icon => icon.src.endsWith('.png?v=studentlink-install-62') && icon.sizes === '192x192' && icon.type === 'image/png' && icon.purpose === 'any') && manifest.icons.some(icon => icon.sizes === '512x512' && icon.purpose === 'maskable'), 'PWA manifest must declare a standard PNG icon and a maskable high-resolution icon');
@@ -358,3 +359,4 @@ assert.ok(statusCleanupFunction.includes('STATUS_CLEANUP_SECRET') && statusClean
 assert.ok(statusCleanupFunction.includes('.limit(500)') && statusCleanupFunction.includes('.gt(\'expires_at\', cutoff)'), 'Status cleanup must process bounded batches and preserve media referenced by active statuses');
 assert.ok(statusCleanupFunction.includes(".from(\"status-media\").remove(removablePaths)") && statusCleanupFunction.includes(".from(\"studentlink_statuses\").delete({ count: \"exact\" })"), 'Status cleanup must remove private media through Storage API and then delete expired rows');
 assert.ok(statusCleanupMigration.includes("cron.schedule(") && statusCleanupMigration.includes("'15 * * * *'") && statusCleanupMigration.includes('vault.decrypted_secrets'), 'Expired status cleanup must be scheduled hourly using secrets from Vault');
+assert.ok(supabaseConfig.includes('[functions.cleanup-expired-statuses]') && supabaseConfig.includes('verify_jwt = false'), 'Scheduled cleanup function must use explicit function-level JWT configuration and its own bearer-secret check');
