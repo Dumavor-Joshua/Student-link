@@ -248,7 +248,7 @@ function installCanonicalSchoolDirectory(names){
 }
 async function loadCanonicalSchoolDirectory(){
   try{
-    const response=await fetch(new URL('data/ghana-shs-master.json',document.baseURI),{cache:'no-store'});
+    const response=await fetch(new URL('data/ghana-shs-master.json',document.baseURI),{cache:'default'});
     if(!response.ok)throw new Error('Directory request returned '+response.status);
     const payload=await response.json();
     if(!Array.isArray(payload.schools))throw new Error('Directory file has no school list');
