@@ -1,4 +1,4 @@
-const CACHE_NAME='studentlink-shell-v91';
+const CACHE_NAME='studentlink-shell-v92';
 const BASE=new URL('./',self.location.href);
 const APP_SHELL=[new URL('./',BASE).href,new URL('./status.html',BASE).href,new URL('./manifest.json?v=studentlink-install-62',BASE).href,new URL('./data/ghana-shs-master.json',BASE).href,new URL('./assets/css/base.css?v=studentlink-refactor-80',BASE).href,new URL('./assets/css/feed.css?v=studentlink-refactor-80',BASE).href,new URL('./assets/css/messages.css?v=studentlink-status-page-1',BASE).href,new URL('./assets/css/profile.css?v=studentlink-refactor-80',BASE).href,new URL('./assets/css/notifications.css?v=studentlink-refactor-80',BASE).href,new URL('./assets/css/games.css?v=studentlink-refactor-80',BASE).href,new URL('./assets/startup.css?v=studentlink-split-65',BASE).href,new URL('./assets/bootstrap.js?v=studentlink-status-whatsapp-5',BASE).href,new URL('./assets/js/core.js?v=studentlink-status-page-1',BASE).href,new URL('./assets/js/notifications.js?v=studentlink-refactor-80',BASE).href,new URL('./assets/js/feed.js?v=studentlink-refactor-80',BASE).href,new URL('./assets/js/messages.js?v=studentlink-status-page-1',BASE).href,new URL('./assets/js/status.js?v=studentlink-refactor-80',BASE).href,new URL('./assets/js/games.js?v=studentlink-refactor-80',BASE).href,new URL('./assets/js/profile.js?v=studentlink-refactor-80',BASE).href,new URL('./assets/js/main.js?v=studentlink-refactor-80',BASE).href,new URL('./assets/favicon.svg',BASE).href,new URL('./assets/icon-192.png?v=studentlink-install-62',BASE).href,new URL('./assets/icon-192.svg?v=studentlink-install-62',BASE).href,new URL('./assets/icon-512.svg?v=studentlink-install-62',BASE).href];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});
@@ -8,9 +8,10 @@ self.addEventListener('fetch',event=>{
  const url=new URL(request.url);if(url.origin!==self.location.origin)return;
  if(request.mode==='navigate'){
   const rootURL=new URL('./',BASE).href;
-  const refresh=fetch(request).then(response=>response.ok?caches.open(CACHE_NAME).then(cache=>cache.put(rootURL,response.clone()).then(()=>response)):response).catch(()=>null);
+  const cacheKey=new URL(request.url);cacheKey.search='';cacheKey.hash='';
+  const refresh=fetch(request).then(response=>response.ok?caches.open(CACHE_NAME).then(cache=>cache.put(cacheKey.href,response.clone()).then(()=>response)):response).catch(()=>null);
   event.waitUntil(refresh.then(()=>{}));
-  event.respondWith((async()=>await caches.match(request)||await caches.match(rootURL)||await refresh||Response.error())());
+  event.respondWith((async()=>await caches.match(request,{ignoreSearch:true})||await caches.match(rootURL)||await refresh||Response.error())());
   return;
  }
  if(APP_SHELL.includes(request.url)){
