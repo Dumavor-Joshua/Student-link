@@ -83,3 +83,8 @@ The repository has a Netlify site at `https://student-link1.netlify.app`, but th
 ## Verification notes
 
 The static test script is a regression guard, not an end-to-end browser test. Authentication, social actions, push notifications, multiplayer with two separate accounts, iPhone Safari, and low-bandwidth behaviour still require live-device checks before a release is considered fully verified.
+
+
+### Dedicated status composer page
+
+The Messages **Add status** action now opens the standalone `status.html` route. The route reuses the authenticated StudentLink app session and the existing status upload/list logic; it does not create a separate authentication or upload implementation. It supports text plus the existing image/video allow-list, 10 MB upload ceiling, 30-second video ceiling, and 24-hour expiry policy. The service worker precaches the page and caches navigation documents by their own path so opening the status page does not replace the cached home page.
