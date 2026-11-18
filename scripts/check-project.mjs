@@ -372,3 +372,8 @@ assert.ok(statusPage.includes('assets/bootstrap.js') && statusPage.includes('<ti
 assert.ok(statusMessages.includes("window.location.href='status.html?openStatus=1'") && statusMessages.includes('async function viewStatus()'), 'Add status must navigate to the dedicated status page');
 assert.ok(statusCore.includes("pushParams.get('openStatus')==='1'") && statusCore.includes("status:()=>viewStatus()"), 'The app router must open the status composer on its dedicated page');
 assert.ok(statusMessages.includes("window.location.href='index.html?openMessages=1'"), 'Status page must provide a route back to Messages');
+
+const statusWorker = read('sw.js');
+assert.ok(statusWorker.includes("new URL('./status.html',BASE).href") && statusWorker.includes('studentlink-shell-v91'), 'Service worker must precache the dedicated status page in the new shell cache');
+assert.ok(statusWorker.includes('await caches.match(request)||await caches.match(rootURL)'), 'Offline navigation must prefer a cached requested page before the app root');
+assert.ok(bootstrap.includes('assets/js/core.js?v=studentlink-status-page-1') && bootstrap.includes('assets/js/messages.js?v=studentlink-status-page-1'), 'Bootstrap must load the current dedicated status routing scripts');
