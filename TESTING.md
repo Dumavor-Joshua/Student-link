@@ -13,7 +13,10 @@ Run these tests against a dedicated test Supabase project using two test account
 - [ ] Test private message attachments, signed-link expiry, and upload type/size limits.
 - [ ] Test status images and MP4/WebM/QuickTime videos up to 10 MB; reject unsupported MIME types and oversized files.
 - [ ] Confirm status creation cannot reference another user's storage path or set a future creation timestamp/expiry beyond 24 hours.
-- [ ] Confirm expired statuses disappear from feeds and their media is eventually removed from private storage.
+- [ ] Confirm expired statuses disappear from feeds. Deploy `cleanup-expired-statuses` with JWT verification disabled, configure matching `STATUS_CLEANUP_SECRET` and Vault secrets, and apply `20261118_schedule_expired_status_cleanup.sql`.
+- [ ] Invoke the cleanup function with an invalid bearer secret and confirm HTTP 401; invoke it with the configured secret and confirm expired rows plus unshared media are removed.
+- [ ] Confirm active media is retained if an unexpired status still references the same storage path; confirm the job processes no more than 500 expired rows per invocation and retries safely after a Storage or database error.
+- [ ] Inspect Cron job history and function logs after the hourly run. Do not mark cleanup verified from static checks alone.
 - [ ] Review password protection, redirect allow-list, auth rate limits, and storage settings.
 
 ## Authentication and accounts
