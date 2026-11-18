@@ -8,6 +8,7 @@ const bootstrap = read('assets/bootstrap.js');
 const js = ['assets/js/core.js','assets/js/notifications.js','assets/js/feed.js','assets/js/messages.js','assets/js/status.js','assets/js/games.js','assets/js/profile.js','assets/js/main.js'].map(read).join('\n');
 const gameLoader = read('assets/js/game-loader.js');
 const feed = read('assets/js/feed.js');
+const status = read('assets/js/status.js');
 const declaredFunctions = [...js.matchAll(/(?:^|\n)\s*(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g)].map((match) => match[1]);
 const duplicateFunctionNames = declaredFunctions.filter((name, index) => declaredFunctions.indexOf(name) !== index);
 assert.deepEqual([...new Set(duplicateFunctionNames)], [], 'Application JavaScript must not redeclare named functions across modules');
@@ -216,6 +217,7 @@ assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), '
 assert.ok(bootstrap.includes('var appSources=[') && bootstrap.includes("'assets/js/main.js?v=studentlink-refactor-80'") && bootstrap.includes('assets/js/game-loader.js?v=studentlink-game-lazy-1') && !bootstrap.includes("'assets/js/games.js?v=") && bootstrap.includes('app.async=false'), 'Startup must load the lightweight game loader, not the full games module');
 assert.ok(!html.includes('assets/css/games.css') && !html.includes('assets/js/games.js') && gameLoader.includes('games.css?v=studentlink-refactor-80') && gameLoader.includes('games.js?v=studentlink-refactor-80'), 'Game-only CSS and JavaScript must load only when the Games view is opened');
 assert.ok(feed.includes("profiles').select('id,nickname').in('id',authorIds)") && feed.includes('new Map((peopleResult.data||[]).map(person=>[person.id,person.nickname]))'), 'Comment author profiles must be fetched in one batched query rather than one query per comment');
+assert.ok(js.includes('async function optimizeStudentLinkImage') && feed.includes('optimizeStudentLinkImage(file)') && status.includes('optimizeStudentLinkImage(file)'), 'Post and status images must be resized/compressed before upload when supported');
 assert.ok(sw.includes('studentlink-shell-v98') && sw.includes('assets/js/game-loader.js?v=studentlink-game-lazy-1') && !sw.includes('assets/js/games.js?v=') && !sw.includes('assets/css/games.css?v='), 'Offline shell must cache the lightweight game loader and cache full game assets on demand');
 assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
