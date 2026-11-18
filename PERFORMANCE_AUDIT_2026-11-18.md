@@ -9,8 +9,10 @@ This is a source and database-statistics audit, not a Lighthouse run or a real-d
 ## Implemented on this branch
 
 1. Increased the background unread-conversation fallback poll from 15 seconds to 60 seconds. Realtime remains the primary update mechanism; foreground/focus refreshes remain in place. This reduces redundant polling while retaining a periodic recovery path.
-2. Changed the static school-directory fetch from `cache: 'no-store'` to normal browser caching. The service worker already includes the directory in its app shell, so this avoids explicitly bypassing the browser HTTP cache.
-3. Updated the affected asset query versions and bumped the service-worker shell cache from `studentlink-shell-v95` to `studentlink-shell-v96` so installed clients can receive the changed assets.
+2. Scoped friendship realtime subscriptions to rows where the signed-in user is either participant, rather than receiving every friendship event in the project.
+3. Coalesced bursts of message realtime events into a short queued refresh so rapid incoming messages do not each trigger a separate conversation-summary/profile refresh.
+4. Changed the static school-directory fetch from `cache: 'no-store'` to normal browser caching. The service worker already includes the directory in its app shell, so this avoids explicitly bypassing the browser HTTP cache.
+5. Updated the affected asset query versions and bumped the service-worker shell cache from `studentlink-shell-v95` through `studentlink-shell-v97` so installed clients can receive the changed assets.
 
 ## Source findings
 
@@ -33,7 +35,7 @@ This is a source and database-statistics audit, not a Lighthouse run or a real-d
 ### Messaging and realtime
 
 - The unread fallback polling change is implemented as above.
-- The single global realtime channel listens for all posts, all post likes, all friendship changes and all message inserts, while only notifications are filtered by the current user. Several subscriptions therefore receive events that are irrelevant to the current user. Scope these events where possible, or route per-user refreshes through user-filtered notifications; do not remove a realtime listener until equivalent delivery is verified with two accounts.
+- The single global realtime channel still listens for all posts, all post likes and all message inserts. Friendship subscriptions are now filtered to the signed-in user's rows. The remaining global subscriptions can receive irrelevant events; scope them where possible or route per-user refreshes through user-filtered notifications. Do not remove a realtime listener until equivalent delivery is verified with two accounts.
 - A message event currently reloads the conversation summary list. This can cause repeated summary/profile queries during busy periods. Consider updating only the affected conversation or coalescing refreshes.
 - Conversation messages are paginated when older messages are requested, which is good. Signed URLs for attachments are batched.
 
@@ -53,7 +55,7 @@ This is a source and database-statistics audit, not a Lighthouse run or a real-d
 5. Compress and resize post/status images before upload; generate small thumbnails and serve appropriately sized media. Keep original media only where needed.
 6. Review status retrieval and signed URL generation so inactive/unrelated users' media is not fetched or signed.
 7. Split feature CSS after measuring the impact, and remove duplicate/overridden rules only after computed-style and screenshot regression checks.
-8. Reduce unnecessary DOM rebuilding and coalesce duplicate refreshes. Avoid polling the whole conversation list after every individual message event.
+8. Reduce unnecessary DOM rebuilding and further coalesce duplicate refreshes. Message-event refresh coalescing is now in place; avoid polling the whole conversation list after every individual message event.
 9. Verify service-worker install/update behavior on both GitHub Pages and Netlify, including existing installed clients and offline launch.
 10. Run browser-level tests for sign-in, feed, polls, statuses, messages/attachments, notifications and multiplayer games before merging.
 
