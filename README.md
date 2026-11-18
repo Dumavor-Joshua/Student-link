@@ -56,6 +56,10 @@ Do not re-run the base schema over an existing production database without revie
 
 The migration `supabase/migrations/20261011_enforce_blocks_on_contact.sql` makes blocking a server-enforced contact boundary by reusing the existing caller-scoped `is_blocked_between` helper: new friend requests, acceptance of pending requests, new conversations, and new messages are rejected when either participant has blocked the other. Existing conversation history is not automatically deleted. Apply the migration to an existing database after reviewing its diff, and verify it with two test accounts before release.
 
+## Status media and expiry
+
+Status media is stored in the private `status-media` bucket. The `20261118_harden_status_media_and_expiry.sql` migration enforces owner-matched storage paths, a 24-hour expiry window, and a 10 MB limit for the supported image and video MIME types (MP4, WebM, and QuickTime). Apply this migration to an existing Supabase project before relying on the updated status uploader. The migration does not itself schedule deletion of expired storage objects; periodic cleanup still needs to be configured.
+
 ## Notification compatibility
 
 Foreground notification delivery now prefers the service worker's persistent `showNotification()` API, which is the compatible path for mobile web apps. Notification clicks route friend-request alerts to Friends and message alerts to the relevant conversation. This frontend change does not replace the required server-side Web Push sender, VAPID configuration, browser permission, or real-device background tests.
