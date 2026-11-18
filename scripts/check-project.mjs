@@ -364,3 +364,11 @@ assert.ok(statusCleanupMigration.includes("cron.schedule(") && statusCleanupMigr
 assert.ok(supabaseConfig.includes('[functions.cleanup-expired-statuses]') && supabaseConfig.includes('verify_jwt = false'), 'Scheduled cleanup function must use explicit function-level JWT configuration and its own bearer-secret check');
 
 assert.ok(statusJs.includes('createSignedUrls(mediaPaths,300)') && !statusJs.includes('.createSignedUrl('), 'Status media URLs must be signed in one batch rather than one network request per status');
+
+const statusPage = read('status.html');
+const statusMessages = read('assets/js/messages.js');
+const statusCore = read('assets/js/core.js');
+assert.ok(statusPage.includes('assets/bootstrap.js') && statusPage.includes('<title>StudentLink — Add status</title>'), 'Dedicated status page must load the shared app runtime');
+assert.ok(statusMessages.includes("window.location.href='status.html?openStatus=1'") && statusMessages.includes('async function viewStatus()'), 'Add status must navigate to the dedicated status page');
+assert.ok(statusCore.includes("pushParams.get('openStatus')==='1'") && statusCore.includes("status:()=>viewStatus()"), 'The app router must open the status composer on its dedicated page');
+assert.ok(statusMessages.includes("window.location.href='index.html?openMessages=1'"), 'Status page must provide a route back to Messages');
