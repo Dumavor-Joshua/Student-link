@@ -9,7 +9,7 @@
     'assets/js/feed.js?v=studentlink-refactor-80',
     'assets/js/messages.js?v=studentlink-perf-1',
     'assets/js/status.js?v=studentlink-status-page-4',
-    'assets/js/games.js?v=studentlink-refactor-80',
+    'assets/js/game-loader.js?v=studentlink-game-lazy-1',
     'assets/js/profile.js?v=studentlink-refactor-80',
     'assets/js/main.js?v=studentlink-refactor-80'
   ];
