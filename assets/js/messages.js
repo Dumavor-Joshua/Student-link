@@ -173,7 +173,7 @@ async function refreshUnreadMessageBadges(){
 function startUnreadBadgeSync(){
   if(window.studentLinkUnreadBadgeSyncStarted)return;
   window.studentLinkUnreadBadgeSyncStarted=true;
-  window.setInterval(()=>{if(document.visibilityState==='visible')refreshUnreadMessageBadges()},15000);
+  window.setInterval(()=>{if(document.visibilityState==='visible')refreshUnreadMessageBadges()},60000);
   window.addEventListener('focus',refreshUnreadMessageBadges);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshUnreadMessageBadges()});
 }
