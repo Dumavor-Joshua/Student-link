@@ -21,7 +21,17 @@ Deno.serve(async (request) => {
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const secretKeysJson = Deno.env.get("SUPABASE_SECRET_KEYS");
+  let serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SECRET_KEY");
+  if (secretKeysJson) {
+    try {
+      const secretKeys = JSON.parse(secretKeysJson);
+      serviceRoleKey = secretKeys.default ?? Object.values(secretKeys)[0] ?? serviceRoleKey;
+    } catch {
+      console.error("Supabase secret-key configuration is not valid JSON.");
+      return Response.json({ error: "Cleanup is not configured" }, { status: 500, headers: corsHeaders });
+    }
+  }
   if (!supabaseUrl || !serviceRoleKey) {
     console.error("Missing Supabase server environment variables.");
     return Response.json({ error: "Cleanup is not configured" }, { status: 500, headers: corsHeaders });
