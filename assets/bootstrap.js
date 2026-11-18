@@ -7,7 +7,7 @@
     'assets/js/core.js?v=studentlink-refactor-80',
     'assets/js/notifications.js?v=studentlink-refactor-80',
     'assets/js/feed.js?v=studentlink-refactor-80',
-    'assets/js/messages.js?v=studentlink-status-whatsapp-4',
+    'assets/js/messages.js?v=studentlink-status-whatsapp-5',
     'assets/js/status.js?v=studentlink-refactor-80',
     'assets/js/games.js?v=studentlink-refactor-80',
     'assets/js/profile.js?v=studentlink-refactor-80',
@@ -36,7 +36,7 @@
   }
   function loadLibrary(index){
     if(window.supabase&&typeof window.supabase.createClient==='function'){loadApp();return;}
-    if(index>=sources.length){loadApp();return;}
+    if(index>=sources.length){var root=document.getElementById('app');if(root)root.innerHTML='<section class="studentlink-load-error"><h2>StudentLink could not connect</h2><p>The Supabase library could not be downloaded from either provider. Check your connection and reload the page.</p><button type="button" onclick="window.location.reload()">Reload StudentLink</button></section>';return;}
     var script=document.createElement('script');
     script.src=sources[index];
     script.onload=function(){
@@ -50,4 +50,4 @@
   document.addEventListener('click',function(event){if(event.target&&event.target.closest('#modalclose')){var modal=document.getElementById('modalbg');if(modal)modal.classList.remove('show');}});
 })();
 
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-status-whatsapp-4").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=studentlink-status-whatsapp-5").catch(function(error){console.warn("StudentLink offline support unavailable:",error)})})}
