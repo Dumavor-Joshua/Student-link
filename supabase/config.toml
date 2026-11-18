@@ -1,0 +1,2 @@
+[functions.cleanup-expired-statuses]
+verify_jwt = false
