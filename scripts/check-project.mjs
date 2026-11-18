@@ -24,6 +24,7 @@ const messageReadMigration = read('supabase/migrations/20261010_add_conversation
 const notificationHardeningMigration = read('supabase/migrations/20261010_harden_notification_rpc_and_indexes.sql');
 const blockContactMigration = read('supabase/migrations/20261011_enforce_blocks_on_contact.sql');
 const notificationRlsMigration = read('supabase/migrations/20261011_optimize_notification_rls.sql');
+const statusMediaMigration = read('supabase/migrations/20261118_harden_status_media_and_expiry.sql');
 const manifest = JSON.parse(read('manifest.json'));
 assert.ok(html.includes('href="./manifest.json?v=studentlink-install-62"') && manifest.start_url.includes('source=pwa'), 'PWA entry point must use the refreshed manifest and a stable install start URL');
 assert.ok(manifest.icons.some(icon => icon.src.endsWith('.png?v=studentlink-install-62') && icon.sizes === '192x192' && icon.type === 'image/png' && icon.purpose === 'any') && manifest.icons.some(icon => icon.sizes === '512x512' && icon.purpose === 'maskable'), 'PWA manifest must declare a standard PNG icon and a maskable high-resolution icon');
@@ -341,6 +342,11 @@ assert.ok(css.includes('.messages-status-strip{flex:1 1 auto') && css.includes('
 
 assert.ok(js.includes('activeStatusUserIds=new Set()') && js.includes('has-active-status') && js.includes('data-avatar-user'), 'Active status ring must apply to profile avatars across app sections');
 assert.ok(js.includes('file.size>10*1024*1024') && js.includes('duration>30'), 'Status uploads must enforce 10 MB and 30 second video limits');
+assert.ok(js.includes("'video/mp4','video/webm','video/quicktime'") && js.includes("'image/avif'"), 'Status uploads must use the explicit supported media MIME allow-list');
+assert.ok(statusMediaMigration.includes("storage.foldername(media_path)") && statusMediaMigration.includes("storage.foldername(objects.name))[1]=s.user_id::text"), 'Status media paths must belong to the status owner');
+assert.ok(statusMediaMigration.includes("created_at >= now()-interval '5 minutes'") && statusMediaMigration.includes("expires_at <= created_at+interval '24 hours'"), 'Status creation and expiry must be enforced by database policy');
+assert.ok(statusMediaMigration.includes('file_size_limit=excluded.file_size_limit') && statusMediaMigration.includes('10485760'), 'Status media storage must allow the intended 10 MB maximum');
+assert.ok(bootstrap.includes('Supabase library could not be downloaded') && !bootstrap.includes('if(index>=sources.length){loadApp();return;}'), 'Application modules must not start when both Supabase CDNs fail');
 assert.ok(css.includes('.profile-avatar.has-active-status') && css.includes('conic-gradient'), 'Active status avatars must show a circular story ring');
 
 assert.ok(js.includes('status-compose-inline') && js.includes('status-add-compact') && js.includes('id="status-list"'), 'Add status control must precede status badges in the header row');
