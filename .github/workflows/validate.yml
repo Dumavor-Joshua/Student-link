@@ -2,7 +2,7 @@ name: StudentLink validation
 
 on:
   push:
-    branches: [main, 'studentlink/**', 'refactor/**', 'audit-fixes-*']
+    branches: [main, 'studentlink/**', 'refactor/**', 'audit-fixes-*', 'status-page-focus-*']
   pull_request:
     branches: [main]
 
