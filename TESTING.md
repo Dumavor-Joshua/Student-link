@@ -98,3 +98,13 @@ A checkbox means the test was actually performed and passed. Static source check
 - [ ] Test responsive layout at viewport widths 320, 340, 360, 375, 390, 414, 430, 600, 767, 768, 980, 1024, and 1440 CSS pixels. Include portrait and landscape where practical.
 - [ ] On small screens, confirm chat fills the main area, back-to-chats works, bottom navigation is not layered over the composer, and safe-area padding leaves the Send button accessible.
 - [ ] Test Android Chrome installed-PWA and browser modes; test iOS Safari separately if supported. Automated syntax/static checks are not substitutes for these browser checks.
+
+
+### Dedicated status page
+
+- [ ] From Messages, select **Add status** and confirm that `status.html` opens rather than an inline dropdown.
+- [ ] Confirm the dedicated page retains the signed-in session, including after Google OAuth redirects back to `status.html`.
+- [ ] Confirm the back control returns to Messages.
+- [ ] Publish a text-only status, an allowed image, and an allowed video; confirm the existing 10 MB and 30-second limits still apply.
+- [ ] Confirm statuses load in the page and the story viewer still opens from each status item.
+- [ ] With the service worker installed, visit Messages and Status, then test offline navigation between both routes. Confirm the cached status page does not replace the cached home page.
