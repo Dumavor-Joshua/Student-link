@@ -245,9 +245,9 @@ assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses')
 assert.ok(js.includes("window.location.href='status.html?openStatus=1'") && js.includes('async function viewStatus()') && js.includes('id="status-add-button"'), 'Add status button must open the dedicated status page');
 assert.ok(html.includes('studentlink-status-whatsapp-5') && bootstrap.includes('studentlink-status-whatsapp-5') && sw.includes('studentlink-status-whatsapp-5') && sw.includes('studentlink-shell-v92'), 'Status button release must update preload, loader, and service-worker cache versions');
 
-assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('<details class="status-compose'), 'Statuses must use a compact horizontal story tray with an expandable composer and viewer');
+assert.ok(js.includes('data-status-item') && js.includes('openStatusViewer') && js.includes('async function viewStatus()') && js.includes('id="status-form"'), 'Statuses must use a compact horizontal story tray and a dedicated composer page');
 assert.ok(js.includes('status-thumb-image') && js.includes('status-thumb-video') && js.includes('status-thumb-text'), 'Status tray icons must use media thumbnails or text artwork instead of profile photos');
-assert.ok(js.includes('accept="image/*,video/*"') && js.includes('status-preview-video'), 'Statuses must support photo and video uploads and playback');
+assert.ok(js.includes('accept="image/jpeg,image/png,image/webp,image/gif,image/avif,video/mp4,video/webm,video/quicktime"') && js.includes('status-preview-video'), 'Statuses must support the explicitly allowed photo and video types and playback');
 assert.ok(css.includes('.status-viewer{') && css.includes('flex:0 0 68px'), 'Status stories must stay compact until opened in the full-screen viewer');
 assert.ok(js.includes('sendStickerMessage') && js.includes('[[sticker]]') && js.includes('sticker-picker'), 'Messages must support sticker sending and rendering');
 assert.ok(js.includes('createSignedUrls(regularPaths,3600)') && js.includes('data-message-image-preview') && js.includes('[[view-once]] '), 'Message images must use batched signed URLs and keep view-once media out of ordinary previews');
@@ -353,8 +353,8 @@ assert.ok(statusMediaMigration.includes('file_size_limit=excluded.file_size_limi
 assert.ok(bootstrap.includes('Supabase library could not be downloaded') && !bootstrap.includes('if(index>=sources.length){loadApp();return;}'), 'Application modules must not start when both Supabase CDNs fail');
 assert.ok(css.includes('.profile-avatar.has-active-status') && css.includes('conic-gradient'), 'Active status avatars must show a circular story ring');
 
-assert.ok(js.includes('status-compose-inline') && js.includes('status-add-compact') && js.includes('id="status-list"'), 'Add status control must precede status badges in the header row');
-assert.ok(css.includes('.status-add-wide{display:none}') && css.includes('.status-add-compact{display:inline}'), 'Add status must adapt from a desktop button to a mobile plus icon');
+assert.ok(js.includes('messages-status-strip') && js.includes('id="status-add-button"') && js.includes('id="status-list"') && js.includes("window.location.href='status.html?openStatus=1'"), 'Add status control must open the dedicated page beside the status tray');
+assert.ok(css.includes('.messages-status-strip .status-add-button') && css.includes('.status-page-form button'), 'Add status and status composer controls must have dedicated responsive styling');
 
 assert.ok(statusCleanupFunction.includes('npm:@supabase/supabase-js@2.119.1'), 'Cleanup Edge Function dependency must be pinned to a tested SDK release');
 assert.ok(statusCleanupFunction.includes('STATUS_CLEANUP_SECRET') && statusCleanupFunction.includes('SUPABASE_SECRET_KEYS') && statusCleanupFunction.includes('SUPABASE_SERVICE_ROLE_KEY'), 'Status cleanup must authenticate scheduled calls and use server-only storage credentials');
