@@ -6,6 +6,24 @@ let activeStatusUserIds=new Set();
 function safeSessionGet(key){try{return window.sessionStorage.getItem(key)}catch(_){return null}}function safeSessionSet(key,value){try{window.sessionStorage.setItem(key,value);return true}catch(_){return false}}function safeSessionRemove(key){try{window.sessionStorage.removeItem(key)}catch(_){}}const S={session:null,profile:null,schools:[],schoolVariants:[],view:'feed',publicProfileId:null,schoolFilter:'',feedMode:'all',feedOrderIds:[],feedOrderMode:'',friends:[],requests:[],convos:[],chat:null,replyOnOpen:false,channel:null,tttChannel:null,tttGameId:null,onlineGameChannel:null,cfGameId:null,rpsGameId:null,rpsMode:'computer',game:'',ttt:Array(9).fill(0),notifiedMessageIds:new Set(),notifiedFriendshipIds:new Set(),messageReadAt:{},schoolStatsCache:null,schoolStatsLoadedAt:0,schoolStatsPromise:null,};
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function initials(s='S'){return esc(s.trim().split(/\s+/).slice(0,2).map(x=>x[0].toUpperCase()).join(''))}
 function makeRandomId(){if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.crypto.randomUUID();const bytes=new Uint8Array(16);if(window.crypto&&typeof window.crypto.getRandomValues==='function')window.crypto.getRandomValues(bytes);else for(let i=0;i<bytes.length;i++)bytes[i]=Math.floor(Math.random()*256);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const h=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20)}
+async function optimizeStudentLinkImage(file,maxDimension=1600,quality=0.82){
+ if(!file||!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size<350*1024)return file;
+ const objectUrl=URL.createObjectURL(file);
+ try{
+  const image=await new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('Could not decode image'));img.src=objectUrl});
+  const width=image.naturalWidth||image.width,height=image.naturalHeight||image.height;
+  if(!width||!height)return file;
+  const scale=Math.min(1,maxDimension/Math.max(width,height));
+  if(scale===1&&file.size<700*1024)return file;
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
+  const context=canvas.getContext('2d');if(!context)return file;
+  context.drawImage(image,0,0,canvas.width,canvas.height);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',quality));
+  return blob&&blob.type==='image/webp'&&blob.size<file.size?blob:file;
+ }catch(error){console.warn('StudentLink image compression skipped:',error);return file}
+ finally{URL.revokeObjectURL(objectUrl)}
+}
 function schoolKey(s=''){
   return String(s??'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('en')
     .replace(/&/g,' and ')
@@ -248,7 +266,7 @@ function installCanonicalSchoolDirectory(names){
 }
 async function loadCanonicalSchoolDirectory(){
   try{
-    const response=await fetch(new URL('data/ghana-shs-master.json',document.baseURI),{cache:'no-store'});
+    const response=await fetch(new URL('data/ghana-shs-master.json',document.baseURI),{cache:'default'});
     if(!response.ok)throw new Error('Directory request returned '+response.status);
     const payload=await response.json();
     if(!Array.isArray(payload.schools))throw new Error('Directory file has no school list');
