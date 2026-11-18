@@ -11,6 +11,9 @@ Run these tests against a dedicated test Supabase project using two test account
 - [ ] Confirm the block-contact migration is applied. After A blocks B, verify B cannot send a new request, accept a pending request, create a conversation, or send a message.
 - [ ] Verify the block-check RPC only permits checking relationships involving the caller.
 - [ ] Test private message attachments, signed-link expiry, and upload type/size limits.
+- [ ] Test status images and MP4/WebM/QuickTime videos up to 10 MB; reject unsupported MIME types and oversized files.
+- [ ] Confirm status creation cannot reference another user's storage path or set a future creation timestamp/expiry beyond 24 hours.
+- [ ] Confirm expired statuses disappear from feeds and their media is eventually removed from private storage.
 - [ ] Review password protection, redirect allow-list, auth rate limits, and storage settings.
 
 ## Authentication and accounts
