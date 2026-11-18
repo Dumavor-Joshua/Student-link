@@ -7,6 +7,7 @@ const html = read('index.html');
 const bootstrap = read('assets/bootstrap.js');
 const js = ['assets/js/core.js','assets/js/notifications.js','assets/js/feed.js','assets/js/messages.js','assets/js/status.js','assets/js/games.js','assets/js/profile.js','assets/js/main.js'].map(read).join('\n');
 const gameLoader = read('assets/js/game-loader.js');
+const feed = read('assets/js/feed.js');
 const declaredFunctions = [...js.matchAll(/(?:^|\n)\s*(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g)].map((match) => match[1]);
 const duplicateFunctionNames = declaredFunctions.filter((name, index) => declaredFunctions.indexOf(name) !== index);
 assert.deepEqual([...new Set(duplicateFunctionNames)], [], 'Application JavaScript must not redeclare named functions across modules');
