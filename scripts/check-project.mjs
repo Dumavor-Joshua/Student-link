@@ -355,6 +355,7 @@ assert.ok(css.includes('.profile-avatar.has-active-status') && css.includes('con
 assert.ok(js.includes('status-compose-inline') && js.includes('status-add-compact') && js.includes('id="status-list"'), 'Add status control must precede status badges in the header row');
 assert.ok(css.includes('.status-add-wide{display:none}') && css.includes('.status-add-compact{display:inline}'), 'Add status must adapt from a desktop button to a mobile plus icon');
 
+assert.ok(statusCleanupFunction.includes('npm:@supabase/supabase-js@2.119.1'), 'Cleanup Edge Function dependency must be pinned to a tested SDK release');
 assert.ok(statusCleanupFunction.includes('STATUS_CLEANUP_SECRET') && statusCleanupFunction.includes('SUPABASE_SERVICE_ROLE_KEY'), 'Status cleanup must authenticate scheduled calls and use server-only storage credentials');
 assert.ok(statusCleanupFunction.includes('.limit(500)') && statusCleanupFunction.includes('.gt(\'expires_at\', cutoff)'), 'Status cleanup must process bounded batches and preserve media referenced by active statuses');
 assert.ok(statusCleanupFunction.includes(".from(\"status-media\").remove(removablePaths)") && statusCleanupFunction.includes(".from(\"studentlink_statuses\").delete({ count: \"exact\" })"), 'Status cleanup must remove private media through Storage API and then delete expired rows');
