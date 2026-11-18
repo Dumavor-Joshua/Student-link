@@ -6,6 +6,7 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf
 const html = read('index.html');
 const bootstrap = read('assets/bootstrap.js');
 const js = ['assets/js/core.js','assets/js/notifications.js','assets/js/feed.js','assets/js/messages.js','assets/js/status.js','assets/js/games.js','assets/js/profile.js','assets/js/main.js'].map(read).join('\n');
+const gameLoader = read('assets/js/game-loader.js');
 const declaredFunctions = [...js.matchAll(/(?:^|\n)\s*(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g)].map((match) => match[1]);
 const duplicateFunctionNames = declaredFunctions.filter((name, index) => declaredFunctions.indexOf(name) !== index);
 assert.deepEqual([...new Set(duplicateFunctionNames)], [], 'Application JavaScript must not redeclare named functions across modules');
@@ -211,7 +212,9 @@ assert.ok(html.includes('rel="icon" type="image/svg+xml" href="assets/favicon.sv
 assert.ok(js.includes("document.getElementById('google-signin')"), 'Google button must be located during auth rendering');
 assert.ok(js.includes("googleButton?.addEventListener('click'") , 'Continue with Google must have a click handler');
 assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), 'Continue with Google must use Supabase Google OAuth');
-assert.ok(bootstrap.includes('var appSources=[') && bootstrap.includes("'assets/js/main.js?v=studentlink-refactor-80'") && bootstrap.includes('assets/js/game-loader.js?v=studentlink-game-lazy-1') && !bootstrap.includes("'assets/js/games.js?v=") && bootstrap.includes('app.async=false'), 'Startup must load the lightweight game loader, not the full games module');\nassert.ok(!html.includes('assets/css/games.css') && !html.includes('assets/js/games.js') && gameLoader.includes('assets/css/games.css') && gameLoader.includes('assets/js/games.js'), 'Game-only CSS and JavaScript must load only when the Games view is opened');\nassert.ok(sw.includes('studentlink-shell-v98') && sw.includes('assets/js/game-loader.js?v=studentlink-game-lazy-1') && !sw.includes('assets/js/games.js?v=') && !sw.includes('assets/css/games.css?v='), 'Offline shell must cache the lightweight game loader and cache full game assets on demand');
+assert.ok(bootstrap.includes('var appSources=[') && bootstrap.includes("'assets/js/main.js?v=studentlink-refactor-80'") && bootstrap.includes('assets/js/game-loader.js?v=studentlink-game-lazy-1') && !bootstrap.includes("'assets/js/games.js?v=") && bootstrap.includes('app.async=false'), 'Startup must load the lightweight game loader, not the full games module');
+assert.ok(!html.includes('assets/css/games.css') && !html.includes('assets/js/games.js') && gameLoader.includes('assets/css/games.css') && gameLoader.includes('assets/js/games.js'), 'Game-only CSS and JavaScript must load only when the Games view is opened');
+assert.ok(sw.includes('studentlink-shell-v98') && sw.includes('assets/js/game-loader.js?v=studentlink-game-lazy-1') && !sw.includes('assets/js/games.js?v=') && !sw.includes('assets/css/games.css?v='), 'Offline shell must cache the lightweight game loader and cache full game assets on demand');
 assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
