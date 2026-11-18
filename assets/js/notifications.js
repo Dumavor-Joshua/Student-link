@@ -274,7 +274,24 @@ async function setUpRealtime(){
   if(S.channel){await db.removeChannel(S.channel);S.channel=null}
   const refreshPosts=()=>{S.feedOrderIds=[];S.feedOrderMode='';if(S.view==='feed')renderView()};
   const refreshFriends=()=>{if(S.view==='friends')renderView()};
-  const refreshMessages=()=>{(async()=>{await loadConvos();if(S.view==='messages'){if(S.chat)await openConversation(S.chat);else await viewMessages()}else updateMessageBadges()})().catch(e=>console.warn('Could not refresh message badges:',e))};
+  let messageRefreshTimer=null,messageRefreshPending=false,messageRefreshRunning=false;
+  const refreshMessages=()=>{
+    messageRefreshPending=true;
+    clearTimeout(messageRefreshTimer);
+    messageRefreshTimer=window.setTimeout(async()=>{
+      if(messageRefreshRunning)return;
+      messageRefreshRunning=true;
+      try{
+        while(messageRefreshPending){
+          messageRefreshPending=false;
+          await loadConvos();
+          if(S.view==='messages'){if(S.chat)await openConversation(S.chat);else await viewMessages()}
+          else updateMessageBadges();
+        }
+      }catch(error){console.warn('Could not refresh message badges:',error)}
+      finally{messageRefreshRunning=false}
+    },200);
+  };
   const refreshLikeCount=payload=>{
     const row=payload.eventType==='DELETE'?payload.old:payload.new;
     if(!row||!row.post_id)return;
@@ -298,7 +315,8 @@ async function setUpRealtime(){
     .on('postgres_changes',{event:'*',schema:'public',table:'posts'},refreshPosts)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'user_id=eq.'+S.session.user.id},onNotificationChange)
     .on('postgres_changes',{event:'*',schema:'public',table:'post_likes'},refreshLikeCount)
-    .on('postgres_changes',{event:'*',schema:'public',table:'friendships'},onFriendshipChange)
+    .on('postgres_changes',{event:'*',schema:'public',table:'friendships',filter:'user_id=eq.'+S.session.user.id},onFriendshipChange)
+    .on('postgres_changes',{event:'*',schema:'public',table:'friendships',filter:'friend_id=eq.'+S.session.user.id},onFriendshipChange)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},onMessageChange)
     .subscribe(status=>{if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')console.warn('StudentLink realtime status:',status)});
 }
