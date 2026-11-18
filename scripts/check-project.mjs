@@ -25,6 +25,7 @@ const notificationHardeningMigration = read('supabase/migrations/20261010_harden
 const blockContactMigration = read('supabase/migrations/20261011_enforce_blocks_on_contact.sql');
 const notificationRlsMigration = read('supabase/migrations/20261011_optimize_notification_rls.sql');
 const statusMediaMigration = read('supabase/migrations/20261118_harden_status_media_and_expiry.sql');
+const statusJs = read('assets/js/status.js');
 const statusCleanupFunction = read('supabase/functions/cleanup-expired-statuses/index.ts');
 const statusCleanupMigration = read('supabase/migrations/20261118_schedule_expired_status_cleanup.sql');
 const supabaseConfig = read('supabase/config.toml');
@@ -361,3 +362,5 @@ assert.ok(statusCleanupFunction.includes('.limit(500)') && statusCleanupFunction
 assert.ok(statusCleanupFunction.includes(".from(\"status-media\").remove(removablePaths)") && statusCleanupFunction.includes(".from(\"studentlink_statuses\").delete({ count: \"exact\" })"), 'Status cleanup must remove private media through Storage API and then delete expired rows');
 assert.ok(statusCleanupMigration.includes("cron.schedule(") && statusCleanupMigration.includes("'15 * * * *'") && statusCleanupMigration.includes('vault.decrypted_secrets'), 'Expired status cleanup must be scheduled hourly using secrets from Vault');
 assert.ok(supabaseConfig.includes('[functions.cleanup-expired-statuses]') && supabaseConfig.includes('verify_jwt = false'), 'Scheduled cleanup function must use explicit function-level JWT configuration and its own bearer-secret check');
+
+assert.ok(statusJs.includes('createSignedUrls(mediaPaths,300)') && !statusJs.includes('.createSignedUrl('), 'Status media URLs must be signed in one batch rather than one network request per status');
