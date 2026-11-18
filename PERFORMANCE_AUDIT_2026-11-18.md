@@ -11,12 +11,14 @@ This is a source and database-statistics audit, not a Lighthouse run or a real-d
 1. Removed the full games JavaScript (~59 KB) and games-only stylesheet from the initial app shell. A lightweight loader now fetches them only when the Games view or an invited game is opened. The service worker caches those assets on first use so previously opened games can still work offline.
 2. Replaced the comments modal's one-profile-query-per-comment pattern with one batched profile query for all unique comment authors.
 3. Kept game loading retry-safe by retaining successful asset-load promises and retrying only failed resources.
+4. Added shared client-side image optimisation for large JPEG/PNG/WebP post and status uploads: downscale to a maximum 1,600-pixel edge, encode as WebP at quality 0.82, and keep the original whenever conversion is unsupported or would increase file size. Video uploads are unchanged.
+5. Set a long browser cache lifetime for uniquely named post-image objects; status media retains its short cache lifetime because statuses expire.
 
-4. Increased the background unread-conversation fallback poll from 15 seconds to 60 seconds. Realtime remains the primary update mechanism; foreground/focus refreshes remain in place. This reduces redundant polling while retaining a periodic recovery path.
-5. Scoped friendship realtime subscriptions to rows where the signed-in user is either participant, rather than receiving every friendship event in the project.
-6. Coalesced bursts of message realtime events into a short queued refresh so rapid incoming messages do not each trigger a separate conversation-summary/profile refresh.
-7. Changed the static school-directory fetch from `cache: 'no-store'` to normal browser caching. The service worker already includes the directory in its app shell, so this avoids explicitly bypassing the browser HTTP cache.
-8. Updated the affected asset query versions and bumped the service-worker shell cache through `studentlink-shell-v98` so installed clients can receive the changed assets.
+6. Increased the background unread-conversation fallback poll from 15 seconds to 60 seconds. Realtime remains the primary update mechanism; foreground/focus refreshes remain in place. This reduces redundant polling while retaining a periodic recovery path.
+7. Scoped friendship realtime subscriptions to rows where the signed-in user is either participant, rather than receiving every friendship event in the project.
+8. Coalesced bursts of message realtime events into a short queued refresh so rapid incoming messages do not each trigger a separate conversation-summary/profile refresh.
+9. Changed the static school-directory fetch from `cache: 'no-store'` to normal browser caching. The service worker already includes the directory in its app shell, so this avoids explicitly bypassing the browser HTTP cache.
+10. Updated the affected asset query versions and bumped the service-worker shell cache through `studentlink-shell-v98` so installed clients can receive the changed assets.
 
 ## Source findings
 
@@ -33,7 +35,7 @@ This is a source and database-statistics audit, not a Lighthouse run or a real-d
 - The comments modal previously made one profiles query per comment; this has now been replaced with one batched query for unique authors.
 - The feed requests up to 40 posts, then separately fetches profiles, likes, the current user's likes, comments and poll votes. The likes/comments queries fetch row IDs for aggregation in the browser instead of returning grouped counts. This becomes increasingly expensive as engagement grows; replace with a carefully secured aggregate RPC or view after regression tests.
 - Comment rendering performs a separate profile lookup for each comment (N+1 query pattern). Batch profile IDs into one query.
-- Post images already use lazy loading. Post uploads do not appear to resize/compress images before upload, unlike the profile-photo flow, which uses a canvas resize path.
+- Post images already use lazy loading. Large post and status images are now resized and converted to WebP before upload where supported; the original is retained if compression fails or does not reduce size. Profile photos already use a separate 640-pixel canvas resize path.
 - Status refresh can fetch up to 1,000 active rows and signs media URLs in batches of 100. This can create a large response and multiple storage requests for users with many active statuses. A better long-term design is a bounded, friend-scoped status query plus on-demand signing/loading, while preserving all story items users are expected to see.
 - Status thumbnails already lazy-load photos; video thumbnails use metadata preload and should be checked for unnecessary network work on a real device.
 
