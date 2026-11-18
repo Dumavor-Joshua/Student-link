@@ -319,3 +319,19 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
 .layout.messages-mode.messages-status-collapsed .status-panel-heading .status-add-button{display:inline-flex!important;visibility:visible!important;opacity:1!important}
 .layout.messages-mode.messages-status-collapsed .status-panel .status-compose{display:none!important}
 @media(max-width:520px){.status-panel-heading{gap:8px}.status-add-button{min-height:36px;padding:7px 12px;font-size:13px}.status-add-wide{display:inline}.status-add-compact{display:none}.status-form{grid-template-columns:minmax(0,1fr)!important}.status-form textarea,.status-form input[type=file],.status-form button{grid-column:1/-1;width:100%}}
+
+/* Dedicated status composer page. */
+.status-page{display:grid;gap:16px;max-width:760px;margin:0 auto;padding:4px 0 28px}
+.status-page-head{display:flex;align-items:flex-start;gap:14px}
+.status-page-head>div{min-width:0}
+.status-page-head .title{margin:0 0 4px}
+.status-compose-card,.status-page-list{padding:16px;min-width:0}
+.status-page-form{display:grid;gap:10px}
+.status-page-form>label{font-weight:700;font-size:14px}
+.status-page-form textarea{width:100%;min-height:112px;resize:vertical;box-sizing:border-box;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--p2);color:var(--txt);font:inherit;font-size:16px}
+.status-page-form input[type=file]{width:100%;min-width:0;box-sizing:border-box;padding:10px;border:1px dashed var(--line);border-radius:10px;background:var(--p2);color:var(--txt)}
+.status-page-form .tiny{margin:0;line-height:1.5}
+.status-page-form button{justify-self:start;min-width:150px;min-height:44px}
+.status-page-list .status-list{flex-wrap:wrap;overflow:visible}
+.status-page-list .status-item{flex:1 1 240px;max-width:100%}
+@media(max-width:520px){.status-page{gap:12px}.status-page-head{flex-direction:column;gap:10px}.status-page-head .btn{min-height:40px}.status-compose-card,.status-page-list{padding:12px}.status-page-form button{width:100%}}
