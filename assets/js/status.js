@@ -11,7 +11,7 @@ function setupStatusPanel(){
    activeRows.forEach(row=>{if(!statusGroups.has(row.user_id))statusGroups.set(row.user_id,[]);statusGroups.get(row.user_id).push(row)});
    activeStatusUserIds=new Set(statusGroups.keys());
    document.querySelectorAll('[data-avatar-user]').forEach(el=>el.classList.toggle('has-active-status',activeStatusUserIds.has(el.dataset.avatarUser)));
-   const ids=[...statusGroups.keys()],mediaPaths=[...new Set(activeRows.map(r=>r.media_path).filter(Boolean))];
+   const ids=[...statusGroups.keys()],latestRows=[...statusGroups.values()].map(userRows=>userRows[0]),mediaPaths=[...new Set(latestRows.map(r=>r.media_path).filter(Boolean))];
    const signedBatches=Array.from({length:Math.ceil(mediaPaths.length/100)},(_,i)=>mediaPaths.slice(i*100,(i+1)*100));
    const [profileResult,mediaResults]=await Promise.all([
     ids.length?db.from('profiles').select('id,nickname,avatar_url').in('id',ids):Promise.resolve({data:[],error:null}),
@@ -28,7 +28,7 @@ function setupStatusPanel(){
    };
    const thumbFor=row=>{
     const url=signedByPath.get(row.media_path);
-    if(url){const safe=esc(url);return String(row.media_mime_type||'').startsWith('video/')?'<video class="status-thumb-video" src="'+safe+'" muted playsinline preload="metadata" aria-label="Video status thumbnail"></video>':'<img class="status-thumb-image" src="'+safe+'" alt="Status photo" loading="lazy">'}
+    if(url){const safe=esc(url);return String(row.media_mime_type||'').startsWith('video/')?'<video class="status-thumb-video" src="'+safe+'" muted playsinline preload="none" aria-label="Video status thumbnail"></video>':'<img class="status-thumb-image" src="'+safe+'" alt="Status photo" loading="lazy">'}
     return row.body?'<span class="status-thumb-text">Aa</span>':'';
    };
    list.innerHTML=statusGroups.size?[...statusGroups.entries()].map(([userId,userRows])=>{
@@ -52,10 +52,20 @@ function setupStatusPanel(){
   finally{button.disabled=false}
  };
  list.addEventListener('click',e=>{const item=e.target.closest('[data-status-user]');if(item)openStatusViewer(item.dataset.statusUser)});
+ async function ensureStatusMediaSigned(rows){
+  const paths=[...new Set(rows.map(row=>row.media_path).filter(path=>path&&!signedByPath.has(path)))];
+  const batches=Array.from({length:Math.ceil(paths.length/100)},(_,i)=>paths.slice(i*100,(i+1)*100));
+  const results=await Promise.all(batches.map(batch=>db.storage.from('status-media').createSignedUrls(batch,300)));
+  results.forEach(result=>{
+   if(result.error){console.warn('Could not sign opened status media:',result.error.message);return}
+   (result.data||[]).filter(item=>item.signedUrl).forEach(item=>signedByPath.set(item.path,item.signedUrl));
+  });
+ }
  function openStatusViewer(userId){
   const userRows=statusGroups.get(userId);if(!userRows?.length)return;
+  const mediaReady=ensureStatusMediaSigned(userRows).catch(error=>console.warn('Could not load opened status media:',error));
   const ordered=[...userRows].reverse(),personName=list.querySelector('[data-status-user="'+userId+'"] .status-copy strong')?.textContent||'Student';
-  let index=0;
+  let index=0,mediaSigningFinished=false;
   const viewer=document.createElement('div');viewer.className='status-viewer';viewer.setAttribute('role','dialog');viewer.setAttribute('aria-modal','true');viewer.setAttribute('aria-label','Status updates from '+personName);
   const progress=document.createElement('div');progress.className='status-viewer-progress';progress.setAttribute('aria-hidden','true');
   const heading=document.createElement('div');heading.className='status-viewer-heading';heading.setAttribute('aria-live','polite');
@@ -72,7 +82,7 @@ function setupStatusPanel(){
    if(url&&String(row.media_mime_type||'').startsWith('video/')){const video=document.createElement('video');video.className='status-viewer-video';video.src=url;video.controls=true;video.autoplay=true;video.playsInline=true;video.preload='metadata';content.append(video)}
    else if(url){const image=document.createElement('img');image.className='status-viewer-image';image.src=url;image.alt='Status photo from '+personName;content.append(image)}
    if(row.body){const text=document.createElement('p');text.className='status-viewer-text';text.textContent=row.body;content.append(text)}
-   if(!url&&!row.body){const unavailable=document.createElement('p');unavailable.className='status-viewer-text';unavailable.textContent='This status media is unavailable.';content.append(unavailable)}
+   if(!url&&row.media_path){const pending=document.createElement('p');pending.className='status-viewer-text';pending.textContent=mediaSigningFinished?'This status media is unavailable.':'Loading media…';content.append(pending)}else if(!url&&!row.body){const unavailable=document.createElement('p');unavailable.className='status-viewer-text';unavailable.textContent='This status media is unavailable.';content.append(unavailable)}
    previous.disabled=index===0;next.disabled=index===ordered.length-1;
   };
   const goPrevious=()=>{if(index>0){index--;render()}};
@@ -80,7 +90,7 @@ function setupStatusPanel(){
   const onKey=event=>{if(event.key==='Escape')dismiss();else if(event.key==='ArrowLeft')goPrevious();else if(event.key==='ArrowRight')goNext()};
   previous.addEventListener('click',goPrevious);next.addEventListener('click',goNext);close.addEventListener('click',dismiss);
   viewer.addEventListener('click',event=>{if(event.target===viewer)dismiss()});
-  viewer.append(progress,heading,close,previous,content,next);document.body.append(viewer);document.body.classList.add('status-viewer-open');document.addEventListener('keydown',onKey);render();close.focus();
+  viewer.append(progress,heading,close,previous,content,next);document.body.append(viewer);document.body.classList.add('status-viewer-open');document.addEventListener('keydown',onKey);render();mediaReady.then(()=>{mediaSigningFinished=true;if(viewer.isConnected)render()});close.focus();
  }
  refresh();
 }
