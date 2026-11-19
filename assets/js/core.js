@@ -247,7 +247,7 @@ function installCanonicalSchoolDirectory(names){
   return true;
 }
 let schoolDirectoryPromise=null;
-function loadCanonicalSchoolDirectory(){
+async function loadCanonicalSchoolDirectory(){
   if(schoolDirectoryPromise)return schoolDirectoryPromise;
   schoolDirectoryPromise=(async()=>{
     try{
