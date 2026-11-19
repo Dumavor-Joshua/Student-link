@@ -45,7 +45,7 @@ assert.ok(html.includes('href="assets/css/base.css?v=studentlink-refactor-80"') 
 assert.equal((read('assets/css/feed.css').match(/\.feed-controls\{display:flex;align-items:center;gap:8px;flex-wrap:wrap\}/g) || []).length, 1, 'Feed controls CSS rule must not be duplicated');
 assert.ok(sw.includes('assets/icon-192.png?v=studentlink-install-62'), 'Service worker must precache the PNG app icon');
 assert.ok(!sw.includes('data/ghana-shs-master.json'), 'The large school directory must not delay service-worker installation; the built-in directory remains the offline fallback');
-assert.ok(sw.includes("studentlink-shell-v97") && sw.includes('assets/startup.css?v=studentlink-split-65') && sw.includes('assets/bootstrap.js?v=studentlink-status-whatsapp-7'), 'Offline app shell must cache the startup styles and application loader needed by the HTML entry point');
+assert.ok(sw.includes("studentlink-shell-v98") && sw.includes('assets/startup.css?v=studentlink-split-65') && sw.includes('assets/bootstrap.js?v=studentlink-status-whatsapp-8'), 'Offline app shell must cache the startup styles and application loader needed by the HTML entry point');
 assert.ok(sw.includes('const refresh=fetch(request)') && sw.includes('await caches.match(rootURL)'), 'Service worker must serve cached shell assets immediately and refresh them in the background');
 assert.ok(sw.includes("payload.conversation_id") && sw.includes("payload.actor_id"), 'Push notification routing must accept database-style snake_case identifiers');
 assert.ok(sw.includes("NOTIFICATION_SUMMARY_TAG='studentlink-notification-summary-v1'") && sw.includes('showGroupedStudentLinkNotification') && sw.includes("NOTIFICATION_QUEUE_LIMIT=5"), 'Push notifications must be aggregated into one expandable, bounded summary');
@@ -86,7 +86,7 @@ assert.match(swRuntime.openedUrl, /^https:\/\/studentlink\.test\//, 'Malformed n
 assert.match(swRuntime.openedUrl, /openMessages=1/, 'Malformed message notification URLs must fall back to the messages view');
 assert.ok(js.includes("type:'STUDENTLINK_SHOW_NOTIFICATION'") && sw.includes("message.type!=='STUDENTLINK_SHOW_NOTIFICATION'"), 'Foreground notifications must use the same grouping path as background push');
 assert.ok(bootstrap.includes("'assets/js/core.js?v=studentlink-status-page-3'"), 'HTML must load the extracted application script through the resilient loader with its cache version');
-assert.ok(bootstrap.includes('loadLibrary(0)') && bootstrap.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'), 'Supabase loading must have a fallback CDN before app startup');
+assert.ok(bootstrap.includes('loadLibrary(0)') && bootstrap.includes('unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js') && bootstrap.includes('index===0?4500:6000'), 'Supabase loading must have a timed fallback CDN before app startup');
 assert.ok(html.includes('rel="preconnect" href="https://cdn.jsdelivr.net"') && html.includes('rel="preconnect" href="https://unpkg.com"'), 'Supabase CDNs must be preconnected to reduce startup latency');
 assert.ok(!html.includes('fonts.googleapis.com') && !html.includes('fonts.gstatic.com'), 'A remote emoji font must not block initial rendering');
 assert.ok(startup.includes('min-height:calc(100dvh - 96px)') && startup.includes('.startup-skeleton .sk-outline{flex:1;min-height:120px'), 'The mobile sketch skeleton must fill the available viewport height');
@@ -110,6 +110,7 @@ assert.ok(js.includes('Trending schools are temporarily unavailable.'), 'Trendin
 assert.ok(!js.includes('My school isn’t listed'), 'School selector must not show the unlisted-school checkbox');
 assert.ok(js.includes('function canonicalVerifiedSchoolName') && js.includes("String(name??'').trim().replace"), 'School selector must still accept manually typed school names');
 assert.ok(js.includes('let schoolDirectoryPromise=null;') && js.includes("input.addEventListener('focus'") && js.includes('await boot();'), 'The full school directory must load only when a school field is focused, not during startup');
+assert.ok(js.includes('Reveal the app shell as soon as authentication is known') && js.includes("S.profile={id:session.user.id,nickname:'Student',school:''};") && js.includes('await loadProfile();'), 'The app shell must replace the full-page skeleton before profile retrieval completes');
 
 
 assert.ok(js.includes("from('student_feedback').select"), 'Feedback history must load from Supabase');
@@ -200,7 +201,7 @@ assert.ok(js.includes('async function sendBrowserNotification') && js.includes('
 assert.ok(js.includes('if(mobile)return;') && js.includes('StudentLink persistent browser notification failed'), 'Mobile browsers must not fall back to the unsupported Notification constructor');
 assert.ok(js.includes("pushParams.get('openProfile')") && js.includes("item.type==='message'") && js.includes('S.publicProfileId=item.actor_id'), 'Notification links must open message conversations or the relevant profile');
 assert.ok(js.includes("'?openFriends=1'") && js.includes("encodeURIComponent(row.conversation_id)"), 'Notification clicks must route to the relevant friends view or conversation');
-assert.ok(html.includes('studentlink-status-whatsapp-7') && bootstrap.includes('studentlink-status-whatsapp-7') && sw.includes('studentlink-status-whatsapp-7') && sw.includes('studentlink-shell-v97'), 'Performance fix must ship with matching fresh app-shell cache versions');
+assert.ok(html.includes('studentlink-status-whatsapp-8') && bootstrap.includes('studentlink-status-whatsapp-8') && sw.includes('studentlink-status-whatsapp-8') && sw.includes('studentlink-shell-v98'), 'Performance fix must ship with matching fresh app-shell cache versions');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('not public.is_blocked_between(user_id, friend_id)'), 'Blocked accounts must not initiate or accept friend requests');
 assert.ok(blockContactMigration.includes('not public.is_blocked_between(c.user_a, c.user_b)'), 'Blocked accounts must not create conversations or send new messages');
 assert.ok(blockContactMigration.includes('is_blocked_between') && blockContactMigration.includes('only allows'), 'Block enforcement must reuse the caller-scoped block-check helper');
@@ -235,7 +236,7 @@ assert.ok(js.includes("layout.classList.toggle('messages-mode',S.view==='message
 assert.ok(js.includes("classList.add('messages-chat-open')") && js.includes("classList.remove('messages-chat-open')"), 'Mobile chat navigation must hide and restore the bottom navigation correctly');
 assert.ok(css.includes('.layout.messages-mode>.leftside,.layout.messages-mode>.rightside{display:none}'), 'Messages view must hide the global desktop side panels');
 assert.ok(css.includes('@media(max-width:520px)') && css.includes('.layout.messages-mode.messages-chat-open .messenger-chat'), 'Messages view must have small-screen chat sizing');
-assert.ok(html.includes('studentlink-refactor-80') && sw.includes('studentlink-refactor-80') && sw.includes('studentlink-shell-v97'), 'Updated app and service-worker assets must use matching fresh cache versions');
+assert.ok(html.includes('studentlink-refactor-80') && sw.includes('studentlink-refactor-80') && sw.includes('studentlink-shell-v98'), 'Updated app and service-worker assets must use matching fresh cache versions');
 
 
 assert.ok(js.includes('id="messages-back-feed"') && js.includes("setView('feed')"), 'Messages page must have a working back-to-feed button');
@@ -247,10 +248,10 @@ assert.ok(js.includes('attachment_path,attachment_name,attachment_mime_type,atta
 assert.ok(js.includes('createSignedUrls(regularPaths,3600)') && js.includes("createSignedUrl(path,60)"), 'Regular message files must use batched expiring URLs while view-once files use short-lived URLs only after consumption');
 assert.ok(schema.includes('attachment_size bigint') && schema.includes("VALUES('message-files','message-files',false"), 'Fresh schema must include private message attachment storage');
 assert.ok(css.includes('.messages-back-feed') && css.includes('.message-attachment'), 'Back and attachment controls must have responsive styles');
-assert.ok(html.includes('studentlink-refactor-80') && sw.includes('studentlink-refactor-80') && sw.includes('studentlink-shell-v97'), 'Updated messaging assets must bypass stale caches');
+assert.ok(html.includes('studentlink-refactor-80') && sw.includes('studentlink-refactor-80') && sw.includes('studentlink-shell-v98'), 'Updated messaging assets must bypass stale caches');
 assert.ok(js.includes('setupStatusPanel') && js.includes('studentlink_statuses') && js.includes('24 hours'), 'Messages must include expiring status updates');
 assert.ok(js.includes("window.location.href='status.html?openStatus=1'") && js.includes('async function viewStatus()') && js.includes('id="status-add-button"'), 'Add status button must open the dedicated status page');
-assert.ok(html.includes('studentlink-status-whatsapp-7') && bootstrap.includes('studentlink-status-whatsapp-7') && sw.includes('studentlink-status-whatsapp-7') && sw.includes('studentlink-shell-v97'), 'Status button release must update preload, loader, and service-worker cache versions');
+assert.ok(html.includes('studentlink-status-whatsapp-8') && bootstrap.includes('studentlink-status-whatsapp-8') && sw.includes('studentlink-status-whatsapp-8') && sw.includes('studentlink-shell-v98'), 'Status button release must update preload, loader, and service-worker cache versions');
 
 assert.ok(js.includes('data-status-user') && js.includes('openStatusViewer') && js.includes('async function viewStatus()') && js.includes('id="status-form"'), 'Statuses must use a compact horizontal story tray and a dedicated composer page');
 assert.ok(js.includes('status-thumb-image') && js.includes('status-thumb-video') && js.includes('status-thumb-text'), 'Status tray icons must use media thumbnails or text artwork instead of profile photos');
@@ -277,7 +278,7 @@ assert.equal((js.match(/function scrambleWord\(/g)||[]).length, 1, 'Word scrambl
 assert.ok(css.includes('.navitem span.nav-unread-badge{display:inline-flex}'), 'Unread conversation count must remain visible in mobile navigation');
 
 assert.ok(js.includes("studentlink_conversation_summaries") && js.includes('last_read_at'), 'Unread counts must use shared Supabase read receipts through the batched summary RPC');
-assert.ok(js.includes('S.session=session;await loadProfile();') && !js.includes('await directoryReady;S.session=session;'), 'Authentication restoration must not wait for school-directory loading');
+assert.ok(js.includes('S.session=session;') && js.includes("S.profile={id:session.user.id,nickname:'Student',school:''};") && js.includes('await loadProfile();') && !js.includes('await directoryReady;'), 'Authentication restoration must reveal the app shell before profile loading and must not wait for school-directory loading');
 assert.ok(js.includes("from('conversation_reads').upsert({conversation_id:conversationId,user_id:S.session.user.id,last_read_at:timestamp}"), 'Opening a conversation must persist its read cursor to Supabase');
 assert.ok(!js.includes('id="messages-shortcut"') && !js.includes('data-message-header-badge'), 'The header must not show a separate Messages button');
 assert.ok(js.includes("nav('messages','💬','Messages')"), 'Messages must remain accessible from the sidebar navigation');
@@ -338,7 +339,7 @@ assert.ok(js.includes('setupStudentLinkImageViewer') && js.includes('studentlink
 assert.ok(js.includes('message-attachment-image') && js.includes("startsWith('image/')") && js.includes('createSignedUrls(regularPaths,3600)') && js.includes('data-message-image-preview'), 'Chat image attachments must render inline using batched signed URLs');
 assert.ok(css.includes('.message-attachment-image-wrap') && css.includes('.message-attachment-image'), 'Chat image previews must have responsive styles');
 assert.ok(css.includes('.studentlink-image-viewer') && css.includes('image-viewer-prev'), 'Image preview must have responsive overlay and image navigation styles');
-assert.ok(html.includes('studentlink-refactor-80') && sw.includes('studentlink-shell-v97'), 'Image preview release must refresh shell and service-worker cache versions');
+assert.ok(html.includes('studentlink-refactor-80') && sw.includes('studentlink-shell-v98'), 'Image preview release must refresh shell and service-worker cache versions');
 
 assert.ok(css.includes('.layout.messages-mode .messenger-layout{flex:1 1 auto!important'), 'Messages workspace must fill the available viewport');
 assert.ok(js.includes('function setupMessagesStatusCollapse(){}'), 'Messages status row must remain stable instead of collapsing into a separate panel');
@@ -380,6 +381,6 @@ assert.ok(statusCore.includes("location.pathname.endsWith('/status.html')") && s
 assert.ok(statusMessages.includes("window.location.href='index.html?openMessages=1'"), 'Status page must provide a route back to Messages');
 
 const statusWorker = read('sw.js');
-assert.ok(statusWorker.includes("new URL('./status.html',BASE).href") && statusWorker.includes('studentlink-shell-v97'), 'Service worker must precache the dedicated status page in the new shell cache');
+assert.ok(statusWorker.includes("new URL('./status.html',BASE).href") && statusWorker.includes('studentlink-shell-v98'), 'Service worker must precache the dedicated status page in the new shell cache');
 assert.ok(statusWorker.includes('await caches.match(request,{ignoreSearch:true})||await caches.match(rootURL)') && statusWorker.includes("cache.put(cacheKey.href,response.clone())"), 'Offline navigation must prefer a cached requested page before the app root');
 assert.ok(bootstrap.includes('assets/js/core.js?v=studentlink-status-page-3') && bootstrap.includes('assets/js/messages.js?v=studentlink-status-row-1'), 'Bootstrap must load the current dedicated status routing scripts');

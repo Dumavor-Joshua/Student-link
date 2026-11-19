@@ -95,12 +95,23 @@
       return;
     }
     var script=document.createElement('script');
-    script.src=sources[index];
-    script.onload=function(){
+    var settled=false;
+    var timeout=setTimeout(function(){
+      if(settled)return;
+      settled=true;
+      script.remove();
+      loadLibrary(index+1);
+    },index===0?4500:6000);
+    function finish(){
+      if(settled)return;
+      settled=true;
+      clearTimeout(timeout);
       if(window.supabase&&typeof window.supabase.createClient==='function')loadApp();
       else loadLibrary(index+1);
-    };
-    script.onerror=function(){loadLibrary(index+1);};
+    }
+    script.src=sources[index];
+    script.onload=finish;
+    script.onerror=finish;
     document.head.appendChild(script);
   }
 
@@ -115,7 +126,7 @@
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('./sw.js?v=studentlink-status-whatsapp-7').catch(function(error){
+    navigator.serviceWorker.register('./sw.js?v=studentlink-status-whatsapp-8').catch(function(error){
       console.warn('StudentLink offline support unavailable:',error);
     });
   });
