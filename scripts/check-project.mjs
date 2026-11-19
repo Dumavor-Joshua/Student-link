@@ -278,7 +278,7 @@ assert.equal((js.match(/function scrambleWord\(/g)||[]).length, 1, 'Word scrambl
 assert.ok(css.includes('.navitem span.nav-unread-badge{display:inline-flex}'), 'Unread conversation count must remain visible in mobile navigation');
 
 assert.ok(js.includes("studentlink_conversation_summaries") && js.includes('last_read_at'), 'Unread counts must use shared Supabase read receipts through the batched summary RPC');
-assert.ok(js.includes('S.session=session;await loadProfile();') && !js.includes('await directoryReady;S.session=session;'), 'Authentication restoration must not wait for school-directory loading');
+assert.ok(js.includes('S.session=session;') && js.includes("S.profile={id:session.user.id,nickname:'Student',school:''};") && js.includes('await loadProfile();') && !js.includes('await directoryReady;'), 'Authentication restoration must reveal the app shell before profile loading and must not wait for school-directory loading');
 assert.ok(js.includes("from('conversation_reads').upsert({conversation_id:conversationId,user_id:S.session.user.id,last_read_at:timestamp}"), 'Opening a conversation must persist its read cursor to Supabase');
 assert.ok(!js.includes('id="messages-shortcut"') && !js.includes('data-message-header-badge'), 'The header must not show a separate Messages button');
 assert.ok(js.includes("nav('messages','💬','Messages')"), 'Messages must remain accessible from the sidebar navigation');
