@@ -213,9 +213,9 @@ assert.ok(js.includes("googleButton?.addEventListener('click'") , 'Continue with
 assert.ok(js.includes("provider: 'google'") && js.includes('signInWithOAuth'), 'Continue with Google must use Supabase Google OAuth');
 assert.ok(bootstrap.includes('var appSources=[') && bootstrap.includes("'assets/js/main.js?v=studentlink-refactor-80'") && bootstrap.includes('app.async=false'), 'Essential modules must download in parallel and execute in dependency order');
 const initialModuleBatch = bootstrap.slice(bootstrap.indexOf('var appSources=['), bootstrap.indexOf('];', bootstrap.indexOf('var appSources=[')));
-assert.doesNotMatch(initialModuleBatch, /games\\.js/, 'The games engine must not compete with essential startup modules');
+assert.doesNotMatch(initialModuleBatch, /games\.js/, 'The games engine must not compete with essential startup modules');
 assert.ok(bootstrap.includes('function loadGames()') && bootstrap.includes("assets/js/games.js?v=studentlink-refactor-80") && bootstrap.includes('window.viewGames=function()') && bootstrap.includes('window.viewGame=function()'), 'Games routes must load their JavaScript on demand, including direct game invitations');
-assert.ok(html.includes('media="print" onload="this.onload=null;this.media=\'all\'"') && html.includes('assets/css/messages.css') && html.includes('assets/css/games.css'), 'Noncritical feature stylesheets must not block the initial render');
+assert.ok(html.includes('media="print" onload="this.onload=null;this.media=\'all\'"') && html.includes('assets/css/messages.css') && !html.includes('assets/css/games.css') && bootstrap.includes('assets/css/games.css?v=studentlink-refactor-80'), 'Noncritical feature stylesheets must not block the initial render');
 assert.ok(js.includes("redirectTo: window.location.origin + window.location.pathname"), 'Google OAuth must return to the current StudentLink page path');
 assert.ok(js.includes("studentlink-google-signup-profile") && js.includes("profile details could not be saved"), 'Google signup must carry nickname and school into a new profile when possible');
 assert.ok(!js.includes('Search the alphabetical Ghana SHS/SHTS directory'), 'Signup must not show the extra school helper prompt below the school field');
