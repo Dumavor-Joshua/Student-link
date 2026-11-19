@@ -362,3 +362,19 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
 .status-viewer-nav:focus-visible,.status-viewer-close:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .status-viewer-content{padding:0 48px}
 @media(max-width:600px){.status-ring{width:56px;height:56px}.status-viewer-nav{width:34px;height:54px;font-size:34px}.status-viewer-prev{left:5px}.status-viewer-next{right:5px}.status-viewer-content{padding:0 28px}}
+
+
+/* Keep the story tray in the Messages header instead of a separate spacer row. */
+.layout.messages-mode .messages-page-head{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;margin:0 0 10px!important;padding:0!important;min-width:0}
+.layout.messages-mode .messages-heading-row{display:flex;align-items:center;gap:12px;width:100%;min-width:0}
+.layout.messages-mode .messages-page-head>.status-panel{display:block!important;width:100%;min-width:0;margin:0!important;padding:9px 12px!important;max-height:116px;overflow:hidden}
+.layout.messages-mode .messages-page-head>.status-panel .status-panel-heading{margin:0 0 5px!important}
+.layout.messages-mode .messages-page-head>.status-panel .status-list{padding:2px 0 4px!important;min-height:58px}
+.layout.messages-mode .messages-page-head>.status-panel .status-item{flex:0 0 58px!important;width:58px!important;min-width:58px!important;padding:0!important;align-items:center!important;flex-direction:column!important;gap:3px!important}
+.layout.messages-mode .messages-page-head>.status-panel .status-copy{max-width:58px;text-align:center;font-size:10px;line-height:1.2}
+.layout.messages-mode .messages-page-head>.status-panel .status-count{display:none}
+@media(max-width:760px){.layout.messages-mode .messages-heading-row{gap:7px}.layout.messages-mode .messages-page-head{gap:6px!important;margin-bottom:8px!important}.layout.messages-mode .messages-page-head>.status-panel{max-height:108px;padding:7px 9px!important}.layout.messages-mode .messages-page-head>.status-panel .status-panel-heading h2{font-size:13px!important}.layout.messages-mode .messages-page-head>.status-panel .status-panel-heading>span{font-size:10px}.layout.messages-mode .messages-page-head>.status-panel .status-list{gap:10px!important}}
+
+/* Hide both school-discovery surfaces while composing a status. */
+body.status-page-active .trending-mobile-wrap,
+body.status-page-active .layout>.rightside{display:none!important}
