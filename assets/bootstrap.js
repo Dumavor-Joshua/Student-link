@@ -7,7 +7,7 @@
     'assets/js/core.js?v=studentlink-status-page-3',
     'assets/js/notifications.js?v=studentlink-refactor-80',
     'assets/js/feed.js?v=studentlink-refactor-80',
-    'assets/js/messages.js?v=studentlink-status-page-3',
+    'assets/js/messages.js?v=studentlink-status-row-1',
     'assets/js/status.js?v=studentlink-status-page-3',
     'assets/js/games.js?v=studentlink-refactor-80',
     'assets/js/profile.js?v=studentlink-refactor-80',
