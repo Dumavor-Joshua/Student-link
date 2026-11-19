@@ -107,9 +107,8 @@ async function startStudentLink(){
       renderAuth('signup','Setup needed: create Supabase project, run supabase_schema.sql, and replace the two configuration values in assets/js/core.js.');
       return;
     }
-    // Fetch the school directory while Supabase restores the session instead of blocking it first.
-    const directoryReady=loadCanonicalSchoolDirectory();
-    await boot(directoryReady);
+    // The full school directory is loaded only when a student focuses a school field.
+    await boot();
   }catch(error){
     console.error('StudentLink startup failed:',error);
     if(!app)return;
