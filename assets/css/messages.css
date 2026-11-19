@@ -378,31 +378,3 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
 /* Hide both school-discovery surfaces while composing a status. */
 body.status-page-active .trending-mobile-wrap,
 body.status-page-active .layout>.rightside{display:none!important}
-
-
-/* Compact, single-row story tray: Add status stays at the right edge; stories extend left. */
-.layout.messages-mode .messages-heading-row{display:flex;align-items:center;gap:10px;min-width:0;width:100%}
-.layout.messages-mode .messages-page-head{display:flex!important;flex-direction:row!important;align-items:center!important;gap:12px!important;min-width:0;margin:0 0 10px!important;padding:0!important}
-.layout.messages-mode .messages-page-title{flex:0 0 auto;min-width:0}
-.layout.messages-mode .messages-status-strip{display:flex!important;flex:1 1 auto!important;flex-direction:row-reverse!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;min-width:0!important;width:auto!important;overflow:hidden!important}
-.layout.messages-mode .messages-status-strip>.status-add-button{order:0;flex:0 0 auto;white-space:nowrap}
-.layout.messages-mode .messages-status-strip>.status-panel{display:block!important;flex:1 1 auto!important;min-width:0!important;width:auto!important;max-width:100%!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden!important}
-.layout.messages-mode .messages-status-strip>.status-panel .status-list{display:flex!important;flex-direction:row-reverse!important;justify-content:flex-start!important;align-items:center!important;gap:8px!important;width:100%!important;max-width:100%!important;min-width:0!important;padding:3px 0!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important}
-.layout.messages-mode .messages-status-strip>.status-panel .status-item{flex:0 0 52px!important;width:52px!important;min-width:52px!important;gap:2px!important}
-.layout.messages-mode .messages-status-strip>.status-panel .status-avatar{width:44px!important;height:44px!important;flex-basis:44px!important}
-.layout.messages-mode .messages-status-strip>.status-panel .status-copy{max-width:52px!important}
-.layout.messages-mode .messages-status-strip>.status-panel .status-copy strong{font-size:10px!important}
-.layout.messages-mode .messages-status-strip>.status-panel .status-panel-heading{display:none!important}
-@media(max-width:760px){.layout.messages-mode .messages-page-head{gap:8px!important}.layout.messages-mode .messages-heading-row{gap:7px!important}.layout.messages-mode .messages-page-title{flex:0 0 auto}.layout.messages-mode .messages-page-title .tiny{display:none}.layout.messages-mode .messages-status-strip{gap:5px!important}.layout.messages-mode .messages-status-strip>.status-add-button{min-height:34px!important;padding:6px 8px!important;font-size:11px!important}.layout.messages-mode .messages-status-strip>.status-panel .status-item{flex-basis:44px!important;width:44px!important;min-width:44px!important}.layout.messages-mode .messages-status-strip>.status-panel .status-avatar{width:38px!important;height:38px!important;flex-basis:38px!important}.layout.messages-mode .messages-status-strip>.status-panel .status-copy{max-width:44px!important}.layout.messages-mode .messages-status-strip>.status-panel .status-copy strong{font-size:9px!important}}
-
-/* Resize the chat workspace to the visible viewport when Android/iOS opens its keyboard. */
-@media(max-width:760px){
- .layout.messages-mode .messenger-layout{height:calc(var(--studentlink-visual-height,100dvh) - 150px)!important;min-height:0!important;max-height:none!important}
- .layout.messages-mode .messenger-chat{min-height:0!important;overflow:hidden!important}
- .layout.messages-mode .messenger-scroll{min-height:0!important;flex:1 1 auto!important}
- .layout.messages-mode .messenger-composer{position:relative!important;flex:0 0 auto!important;bottom:auto!important;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))!important}
- body.message-keyboard-open .layout.messages-mode{height:var(--studentlink-visual-height,100dvh)!important;max-height:var(--studentlink-visual-height,100dvh)!important;overflow:hidden!important}
- body.message-keyboard-open .layout.messages-mode .messenger-layout{height:calc(var(--studentlink-visual-height,100dvh) - 150px)!important}
- body.message-keyboard-open .layout.messages-mode .messenger-chat{height:100%!important}
- body.message-keyboard-open .layout.messages-mode .messenger-composer{padding-bottom:8px!important}
-}
