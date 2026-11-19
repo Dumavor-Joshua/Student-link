@@ -1,26 +1,26 @@
 /* StudentLink status composer, grouped story tray, and navigable story viewer. */
 function setupStatusPanel(){
- const form=$('#status-form'),list=$('#status-list');if(!list)return;
+ const form=$('#status-form'),list=$('#status-list');if(!form||!list)return;
  let statusGroups=new Map(),signedByPath=new Map();
  const refresh=async()=>{
   try{
    const {data:rows,error}=await db.from('studentlink_statuses').select('id,user_id,body,media_path,media_mime_type,created_at,expires_at').gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false}).limit(1000);
    if(error)throw error;
-   const activeRows=rows||[];
-   statusGroups=new Map();
-   activeRows.forEach(row=>{if(!statusGroups.has(row.user_id))statusGroups.set(row.user_id,[]);statusGroups.get(row.user_id).push(row)});
-   activeStatusUserIds=new Set(statusGroups.keys());
+   activeStatusUserIds=new Set((rows||[]).map(r=>r.user_id));
    document.querySelectorAll('[data-avatar-user]').forEach(el=>el.classList.toggle('has-active-status',activeStatusUserIds.has(el.dataset.avatarUser)));
-   const ids=[...statusGroups.keys()],mediaPaths=[...new Set(activeRows.map(r=>r.media_path).filter(Boolean))];
-   const signedBatches=Array.from({length:Math.ceil(mediaPaths.length/100)},(_,i)=>mediaPaths.slice(i*100,(i+1)*100));
-   const [profileResult,mediaResults]=await Promise.all([
-    ids.length?db.from('profiles').select('id,nickname,avatar_url').in('id',ids):Promise.resolve({data:[],error:null}),
-    Promise.all(signedBatches.map(paths=>db.storage.from('status-media').createSignedUrls(paths,300)))
-   ]);
-   if(profileResult.error)throw profileResult.error;
-   const byId=new Map((profileResult.data||[]).map(p=>[p.id,p]));
+   const ids=[...new Set((rows||[]).map(r=>r.user_id))];
+   const {data:profiles,error:pe}=ids.length?await db.from('profiles').select('id,nickname,avatar_url').in('id',ids):{data:[],error:null};
+   if(pe)throw pe;
+   const byId=new Map((profiles||[]).map(p=>[p.id,p]));
+   const mediaPaths=[...new Set((rows||[]).map(r=>r.media_path).filter(Boolean))];
    signedByPath=new Map();
-   mediaResults.forEach(result=>{if(result.error){console.warn('Could not sign a batch of status media:',result.error.message);return}(result.data||[]).filter(item=>item.signedUrl).forEach(item=>signedByPath.set(item.path,item.signedUrl))});
+   if(mediaPaths.length){
+    const {data:signedRows,error:se}=await db.storage.from('status-media').createSignedUrls(mediaPaths,300);
+    if(se)console.warn('Could not sign some status media:',se.message);
+    else signedByPath=new Map((signedRows||[]).filter(item=>item.signedUrl).map(item=>[item.path,item.signedUrl]));
+   }
+   statusGroups=new Map();
+   (rows||[]).forEach(row=>{if(!statusGroups.has(row.user_id))statusGroups.set(row.user_id,[]);statusGroups.get(row.user_id).push(row)});
    const ringFor=count=>{
     const slice=360/count,gap=Math.min(3,slice*.18),parts=[];
     for(let i=0;i<count;i++){const start=i*slice,end=(i+1)*slice-gap;parts.push('#28c58b '+start+'deg '+end+'deg','transparent '+end+'deg '+(i+1)*slice+'deg')}
@@ -38,7 +38,7 @@ function setupStatusPanel(){
    }).join(''):'<p class="tiny status-empty">No active statuses from your friends yet.</p>';
   }catch(error){console.warn('Could not load statuses:',error);list.innerHTML='<p class="tiny">Statuses are temporarily unavailable. Please try again later.</p>'}
  };
- if(form)form.onsubmit=async e=>{
+ form.onsubmit=async e=>{
   e.preventDefault();const body=$('#status-text').value.trim(),file=$('#status-file').files?.[0],button=$('#status-publish');
   if(!body&&!file){toast('Add text or a photo/video to your status.');return}
   if(file&&(!['image/jpeg','image/png','image/webp','image/gif','image/avif','video/mp4','video/webm','video/quicktime'].includes(file.type)||file.size<=0||file.size>10*1024*1024)){toast('Choose an image or video no larger than 10 MB.');return}

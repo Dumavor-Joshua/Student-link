@@ -4,11 +4,11 @@
   window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();window.studentLinkInstallPrompt=event;var button=document.getElementById('install-app');if(button)button.hidden=false;});
   window.addEventListener('appinstalled',function(){window.studentLinkInstallPrompt=null;var button=document.getElementById('install-app');if(button)button.hidden=true;});
   var appSources=[
-    'assets/js/core.js?v=studentlink-status-page-3',
+    'assets/js/core.js?v=studentlink-status-page-2',
     'assets/js/notifications.js?v=studentlink-refactor-80',
     'assets/js/feed.js?v=studentlink-refactor-80',
-    'assets/js/messages.js?v=studentlink-status-page-3',
-    'assets/js/status.js?v=studentlink-status-page-3',
+    'assets/js/messages.js?v=studentlink-status-page-2',
+    'assets/js/status.js?v=studentlink-refactor-80',
     'assets/js/games.js?v=studentlink-refactor-80',
     'assets/js/profile.js?v=studentlink-refactor-80',
     'assets/js/main.js?v=studentlink-refactor-80'

@@ -363,10 +363,10 @@ assert.ok(statusCleanupFunction.includes(".from(\"status-media\").remove(removab
 assert.ok(statusCleanupMigration.includes("cron.schedule(") && statusCleanupMigration.includes("'15 * * * *'") && statusCleanupMigration.includes('vault.decrypted_secrets'), 'Expired status cleanup must be scheduled hourly using secrets from Vault');
 assert.ok(supabaseConfig.includes('[functions.cleanup-expired-statuses]') && supabaseConfig.includes('verify_jwt = false'), 'Scheduled cleanup function must use explicit function-level JWT configuration and its own bearer-secret check');
 
-assert.ok(statusJs.includes('createSignedUrls(paths,300)') && statusJs.includes('slice(i*100,(i+1)*100)') && !statusJs.includes('.createSignedUrl('), 'Status media URLs must be signed in one batch rather than one network request per status');
+assert.ok(statusJs.includes('createSignedUrls(mediaPaths,300)') && !statusJs.includes('.createSignedUrl('), 'Status media URLs must be signed in one batch rather than one network request per status');
 assert.ok(statusJs.includes('statusGroups=new Map()') && statusJs.includes('data-status-user') && statusJs.includes('ringFor(count)'), 'Multiple active statuses from one student must share a single segmented story ring');
 assert.ok(statusJs.includes('status-viewer-prev') && statusJs.includes('status-viewer-next') && statusJs.includes('goPrevious') && statusJs.includes('goNext'), 'Story viewer must provide working previous and next navigation');
-assert.ok(css.includes('::file-selector-button') && css.includes('body.status-page-active .trending-mobile-wrap'), 'Status composer must style the file picker and hide trending schools while posting');
+assert.ok(css.includes('::file-selector-button') && css.includes('status-page-active .trending-mobile-wrap'), 'Status composer must style the file picker and hide trending schools while posting');
 
 const statusPage = read('status.html');
 const statusMessages = read('assets/js/messages.js');

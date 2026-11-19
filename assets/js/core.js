@@ -547,7 +547,6 @@ async function renderView(){
   const main=$('#main');
   if(!main)return;
   document.body.classList.toggle('status-page-active',S.view==='status');
-  document.querySelector('.trending-mobile-wrap')?.classList.toggle('status-page-hidden',S.view==='status');
   main.setAttribute('aria-live','polite');
   main.setAttribute('aria-busy','true');
   main.innerHTML='<div class="card state-message" role="status"><span class="state-icon" aria-hidden="true">⏳</span><div><b>Loading this page…</b><p class="tiny">Please wait a moment.</p></div></div>';
