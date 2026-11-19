@@ -41,7 +41,7 @@ for (const match of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)(?:[?#][^"]*)?
   assert.doesNotThrow(() => read(match[1]), `Referenced local asset must exist: ${match[1]}`);
 }
 
-assert.ok(html.includes('href="assets/css/base.css?v=studentlink-refactor-80"') && html.includes('href="assets/css/feed.css?v=studentlink-refactor-80"') && html.includes('href="assets/css/messages.css?v=studentlink-status-page-3"'), 'HTML must load the extracted stylesheet, including its cache version');
+assert.ok(html.includes('href="assets/css/base.css?v=studentlink-refactor-80"') && html.includes('href="assets/css/feed.css?v=studentlink-refactor-80"') && html.includes('href="assets/css/messages.css?v=studentlink-status-row-1"'), 'HTML must load the extracted stylesheet, including its cache version');
 assert.equal((read('assets/css/feed.css').match(/\.feed-controls\{display:flex;align-items:center;gap:8px;flex-wrap:wrap\}/g) || []).length, 1, 'Feed controls CSS rule must not be duplicated');
 assert.ok(sw.includes('assets/icon-192.png?v=studentlink-install-62'), 'Service worker must precache the PNG app icon');
 assert.ok(sw.includes("studentlink-shell-v94") && sw.includes('assets/startup.css?v=studentlink-split-65') && sw.includes('assets/bootstrap.js?v=studentlink-status-whatsapp-5'), 'Offline app shell must cache the startup styles and application loader needed by the HTML entry point');
@@ -374,4 +374,4 @@ assert.ok(statusMessages.includes("window.location.href='index.html?openMessages
 const statusWorker = read('sw.js');
 assert.ok(statusWorker.includes("new URL('./status.html',BASE).href") && statusWorker.includes('studentlink-shell-v94'), 'Service worker must precache the dedicated status page in the new shell cache');
 assert.ok(statusWorker.includes('await caches.match(request,{ignoreSearch:true})||await caches.match(rootURL)') && statusWorker.includes("cache.put(cacheKey.href,response.clone())"), 'Offline navigation must prefer a cached requested page before the app root');
-assert.ok(bootstrap.includes('assets/js/core.js?v=studentlink-status-page-3') && bootstrap.includes('assets/js/messages.js?v=studentlink-status-page-3'), 'Bootstrap must load the current dedicated status routing scripts');
+assert.ok(bootstrap.includes('assets/js/core.js?v=studentlink-status-page-3') && bootstrap.includes('assets/js/messages.js?v=studentlink-status-row-1'), 'Bootstrap must load the current dedicated status routing scripts');
