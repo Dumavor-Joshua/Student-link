@@ -126,7 +126,7 @@
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('./sw.js?v=studentlink-status-whatsapp-7').catch(function(error){
+    navigator.serviceWorker.register('./sw.js?v=studentlink-status-whatsapp-8').catch(function(error){
       console.warn('StudentLink offline support unavailable:',error);
     });
   });
