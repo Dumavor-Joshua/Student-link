@@ -378,3 +378,41 @@ body.image-viewer-open{overflow:hidden!important;touch-action:none}
 /* Hide both school-discovery surfaces while composing a status. */
 body.status-page-active .trending-mobile-wrap,
 body.status-page-active .layout>.rightside{display:none!important}
+
+
+/* Messages status row: one line, with new stories growing left from Add status. */
+.layout.messages-mode .messages-page-head{display:block!important;min-width:0!important;margin:0 0 10px!important;padding:0!important}
+.layout.messages-mode .messages-heading-row{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px!important;width:100%!important;min-width:0!important}
+.layout.messages-mode .messages-page-title{flex:0 1 auto!important;min-width:0!important}
+.layout.messages-mode .messages-page-title h1{margin:0!important;white-space:nowrap;font-size:clamp(15px,2vw,22px)}
+.layout.messages-mode .messages-page-title p{display:none!important}
+.layout.messages-mode .messages-status-strip{display:flex!important;flex:1 1 0!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;direction:ltr!important}
+.layout.messages-mode .messages-status-strip>.status-list{display:flex!important;flex:1 1 0!important;flex-direction:row-reverse!important;align-items:center!important;justify-content:flex-start!important;gap:7px!important;width:0!important;min-width:0!important;max-width:none!important;margin:0!important;padding:2px 0!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important;scrollbar-width:none!important;direction:ltr!important;mask-image:linear-gradient(to left,#000 0%,#000 94%,transparent 100%)}
+.layout.messages-mode .messages-status-strip>.status-list::-webkit-scrollbar{display:none!important}
+.layout.messages-mode .messages-status-strip .status-item{display:flex!important;flex:0 0 48px!important;width:48px!important;min-width:48px!important;max-width:48px!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;padding:0!important;text-align:center!important}
+.layout.messages-mode .messages-status-strip .status-avatar{display:block!important;width:42px!important;height:42px!important;flex:0 0 42px!important}
+.layout.messages-mode .messages-status-strip .status-ring{width:42px!important;height:42px!important;padding:2px!important}
+.layout.messages-mode .messages-status-strip .status-copy{display:block!important;max-width:48px!important;min-width:0!important;text-align:center!important;overflow:hidden!important}
+.layout.messages-mode .messages-status-strip .status-copy strong{display:block!important;max-width:48px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:9px!important;line-height:1.15!important}
+.layout.messages-mode .messages-status-strip .status-count{display:none!important}
+.layout.messages-mode .messages-status-strip .status-empty{flex:0 0 auto!important;max-width:110px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:10px!important}
+.layout.messages-mode .messages-status-strip>.status-add-button{display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;min-width:max-content!important;min-height:36px!important;width:auto!important;height:36px!important;padding:0 10px!important;border:1px solid var(--line)!important;border-radius:19px!important;background:var(--p2)!important;color:var(--txt)!important;font-size:12px!important;font-weight:700!important;white-space:nowrap!important}
+.layout.messages-mode.messages-status-collapsed .messages-status-strip>.status-list{display:flex!important;visibility:visible!important;opacity:1!important}
+@media(max-width:600px){
+ .layout.messages-mode .messages-heading-row{gap:6px!important}
+ .layout.messages-mode .messages-back-feed{flex:0 0 auto!important;padding:6px 8px!important;font-size:12px!important;white-space:nowrap!important}
+ .layout.messages-mode .messages-page-title{flex:0 0 auto!important}
+ .layout.messages-mode .messages-page-title h1{font-size:15px!important}
+ .layout.messages-mode .messages-status-strip{gap:5px!important}
+ .layout.messages-mode .messages-status-strip>.status-list{gap:5px!important}
+ .layout.messages-mode .messages-status-strip .status-item{flex-basis:44px!important;width:44px!important;min-width:44px!important;max-width:44px!important}
+ .layout.messages-mode .messages-status-strip .status-avatar{width:38px!important;height:38px!important;flex-basis:38px!important}
+ .layout.messages-mode .messages-status-strip .status-ring{width:38px!important;height:38px!important}
+ .layout.messages-mode .messages-status-strip .status-copy strong{max-width:44px!important;font-size:8px!important}
+ .layout.messages-mode .messages-status-strip>.status-add-button{min-height:34px!important;height:34px!important;padding:0 7px!important;font-size:11px!important}
+}
+@media(max-width:370px){
+ .layout.messages-mode .messages-page-title h1{font-size:14px!important}
+ .layout.messages-mode .messages-back-feed{padding:5px 6px!important;font-size:11px!important}
+ .layout.messages-mode .messages-status-strip>.status-add-button{padding:0 6px!important;font-size:10px!important}
+}
