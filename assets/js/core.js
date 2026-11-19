@@ -277,7 +277,6 @@ function wireSchoolPicker(id){
     loadCanonicalSchoolDirectory().then(()=>{
       const datalist=document.getElementById('verified-gh-school-options');
       if(datalist)datalist.innerHTML=VERIFIED_GHANA_SHS_TVET.map(name=>'<option value="'+esc(name)+'"></option>').join('');
-      canonicalize();
     });
   },{once:true});
   input.addEventListener('change',canonicalize);
