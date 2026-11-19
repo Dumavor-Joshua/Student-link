@@ -332,17 +332,12 @@ assert.ok(css.includes('.message-attachment-image-wrap') && css.includes('.messa
 assert.ok(css.includes('.studentlink-image-viewer') && css.includes('image-viewer-prev'), 'Image preview must have responsive overlay and image navigation styles');
 assert.ok(html.includes('studentlink-refactor-80') && sw.includes('studentlink-shell-v94'), 'Image preview release must refresh shell and service-worker cache versions');
 
-assert.ok(css.includes('messages-status-collapsed') && css.includes('.layout.messages-mode .messenger-layout{flex:1 1 auto!important'), 'Messages should collapse statuses on scroll and fill the available viewport');
-assert.ok(js.includes('setupMessagesStatusCollapse') && js.includes('main.scrollTop>2'), 'Messages page should collapse status section after scrolling');
+assert.ok(css.includes('.layout.messages-mode .messenger-layout{flex:1 1 auto!important'), 'Messages workspace must fill the available viewport');
+assert.ok(js.includes('function setupMessagesStatusCollapse(){}'), 'Messages status row must remain stable instead of collapsing into a separate panel');
 
 assert.ok(css.includes('position:fixed!important;top:68px!important') && css.includes('grid-template-columns:minmax(0,1fr)!important'), 'Messages workspace must occupy the viewport below the header');
-assert.ok(js.includes("list.addEventListener('scroll',syncList") && js.includes('messages-status-collapsed'), 'Status tray must collapse when chat areas are scrolled');
-
-assert.ok(js.includes('const syncList=()=>{if(list&&list.scrollTop<=2)expand();else collapse();}') && js.includes("list.addEventListener('wheel'"), 'Status tray must hide on downward chat-list scroll and return at list top');
-assert.ok(css.includes('visibility:hidden!important') && css.includes('flex-basis:0!important'), 'Collapsed status section must fully disappear');
-
-assert.ok(js.includes('messages-status-strip') && js.includes('id="status-list"'), 'Status icons must render in the Messages heading row');
-assert.ok(css.includes('.messages-status-strip{flex:1 1 auto') && css.includes('justify-content:flex-end'), 'Status icons must align to the far right and scroll horizontally when space is limited');
+assert.ok(js.includes('messages-status-strip') && js.includes('id="status-list"') && js.includes('id="status-add-button"'), 'Statuses and Add status must share the Messages heading row');
+assert.ok(css.includes('.messages-status-strip>.status-list{display:flex!important') && css.includes('flex-direction:row-reverse!important'), 'New status stories must appear immediately left of Add status and extend leftwards in one horizontal row');
 
 assert.ok(js.includes('activeStatusUserIds=new Set()') && js.includes('has-active-status') && js.includes('data-avatar-user'), 'Active status ring must apply to profile avatars across app sections');
 assert.ok(js.includes('file.size>10*1024*1024') && js.includes('duration>30'), 'Status uploads must enforce 10 MB and 30 second video limits');
